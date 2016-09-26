@@ -1,4 +1,3 @@
-# ML-in-R
 ### Linear Regression
 
 	# check r-squared value. It has to be maximized for it be a good model. also check significance of variables. Remove
@@ -87,22 +86,36 @@
 	data.frame -> as.matrix -> as.vector -> clustering -> dim(vector) -> image.output
 	data.frame -> as.matrix -> as.vector -> test
 
+	# after clustering we can subset the data according to the clusters(for hierarchical especially) to study number of rows in each cluster.
+	# cluster1 <- subset(train , cluster == nth.cluster.number)
+
 	# Hierarchical
 
 		distances <- dist(movie[2:20] OR vector, method = "euclidean")
-		cluster <- hclust(distances, method = "ward.D")
-		plot(cluster)
-		clusterGroups <- cutree(cluster, k = no.of.clusters)
-		clusterGroups[index.of.var.to.see.which.cluster.it.belongs.to]
+		hcluster <- hclust(distances, method = "ward.D")
+		plot(hcluster)
+		hclusterGroups <- cutree(cluster, k = no.of.clusters)
+		hclusterGroups[index.of.var.to.see.which.cluster.it.belongs.to]
 
 	# K-Means
 
 		library("flesclust")
 		set.seed(1)
-		cluster <- kmeans(vector OR data.frame, centers = no.of.centroids, iter.max = no.of.max.iterations)
-		str(cluster)
-		clusterKcca <- as.kcca(cluster, originalDataFrame OR originalVector)
-		clusterPredict <- predict(clusterKcca, newdata = test.data.as.vector)
+		kcluster <- kmeans(vector OR data.frame, centers = no.of.centroids, iter.max = no.of.max.iterations)
+		str(kcluster)
+		
+		# rest of this for cluster-then-predict
+		# in cluster-then-predict problems, (remove target var->normalize(optional)->cluster->kcca)=>build "k" train and test sets using subset from original train according to clusters.
+		# example -> newTrain1 = subset(originalTrain, kclusterPredictTrain == 1), newTrain2 = subset(originalTrain, kclusterPredictTest == 2)
+		
+		kclusterKcca <- as.kcca(kcluster, originalDataFrame OR originalVector)
+		kclusterPredictTrain <- predict(kclusterKcca)
+		kclusterPredictTest <- predict(kclusterKcca, newdata = test.data.as.vector)
+
+		#easy way to split according to clusters in k-means
+		
+		KmeansCluster = split(data.frame, kcluster$cluster) # KmeansCluster[[1]] and so on to access 1st and other successive clusters
+
 
 ### K-fold cross validation
 		
@@ -116,7 +129,9 @@
 
 
 ### Splitting data set randomly
+
 		# sample.split balacnes partitions keeping in mind the outcome variable
+
 		library("caTools")
 		set.seed(10)
 		split <- sample.split(data.frame$target, splitRatio = 0.75)
@@ -124,7 +139,9 @@
 		test <- subset(data.frame, split == FALSE)
 
 ### Multiple imputation- Filling NA's randomly
+
 		# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
+		
 		library("mice")
 		set.seed(10)
 		imputed <- complete(mice(data.frame))
@@ -157,8 +174,19 @@
 	# choosing x random rows from a data set. given that nrow(train > x)
 	trainSmall = train[sample(nrow(train), x), ]
 
+### Normalization 
+	
+	# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
+
+	library(caret)
+
+	preproc = preProcess(Train)
+
+	normTrain = predict(preproc, Train)
+
+	normTest = predict(preproc, Test)
 
 ## If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
 ## split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
 ## different values, you will get different splits.
-	
+
