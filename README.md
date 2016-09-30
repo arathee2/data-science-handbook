@@ -56,7 +56,7 @@
 		
 	# model
 		
-		model <- rpart(y ~ x, data = train, method = "class", minbucket/cp = ) # large min bucket=> overfitting, smaller minbucket => biasing
+		model <- rpart(y ~ x, data = train, method = "class", minbucket/cp = ) # large min bucket=> overfitting, smaller minbucket => biasing.
 		prp(model) 
 		pred <- predict(model, test, type = "class")
 		table(test$target, pred)
@@ -76,7 +76,7 @@
 	
 	# model
 
-		model <- randomForest(as.factor(y) ~ x, data = train, ntree = 200, nodesize = 5/25/15/20) #nodesize similar to minbucket here
+		model <- randomForest(as.factor(y) ~ x, data = train, ntree = 200, nodesize = 5/25/15/20) #nodesize similar to minbucket here.
 		pred <- predict(model, test)
 		table(test$target, pred)
 
@@ -185,6 +185,14 @@
 	normTrain = predict(preproc, Train)
 
 	normTest = predict(preproc, Test)
+
+### One-Hot Encoding
+	library(dummies)
+
+	#create a dummy data frame
+		new_my_data <- dummy.data.frame(my_data, names = c("Item_Fat_Content","Item_Type",
+                        "Outlet_Establishment_Year","Outlet_Size",
+                        "Outlet_Location_Type","Outlet_Type"))
 
 ## If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
 ## split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
