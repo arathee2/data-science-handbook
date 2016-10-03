@@ -211,7 +211,9 @@
 
 ### Boruta Analysis to find importance of variable in a data set
 	
-	set.seed(13)
+	library(Boruta)
+		
+		set.seed(13)
 		bor_results <- Boruta(sample.df,response, maxRuns=101, doTrace=0)
 		summary(bor_results)
 
