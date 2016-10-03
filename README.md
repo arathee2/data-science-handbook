@@ -15,7 +15,7 @@
 		sse <- sum((pred - test$target)^2)
 		sst <- sum((mean(train$target) - test$target) ^ 2)
 		r-squared <- 1-(sse/sst)
-		rmse <- sqrt(sse/nrow(data.frame))
+		rmse <- sqrt(sse/nrow(data_frame))
 
 	# ROCR and AUC(area under curve)
 		
@@ -83,8 +83,8 @@
 
 ### Clustering
 
-	data.frame -> as.matrix -> as.vector -> clustering -> dim(vector) -> image.output
-	data.frame -> as.matrix -> as.vector -> test
+	data_frame -> as.matrix -> as.vector -> clustering -> dim(vector) -> image.output
+	data_frame -> as.matrix -> as.vector -> test
 
 	# after clustering we can subset the data according to the clusters(for hierarchical especially) to study number of rows in each cluster.
 	# cluster1 <- subset(train , cluster == nth.cluster.number)
@@ -101,7 +101,7 @@
 
 		library("flesclust")
 		set.seed(1)
-		kcluster <- kmeans(vector OR data.frame, centers = no.of.centroids, iter.max = no.of.max.iterations)
+		kcluster <- kmeans(vector OR data_frame, centers = no.of.centroids, iter.max = no.of.max.iterations)
 		str(kcluster)
 		
 		# rest of this for cluster-then-predict
@@ -114,7 +114,7 @@
 
 		#easy way to split according to clusters in k-means
 		
-		KmeansCluster = split(data.frame, kcluster$cluster) # KmeansCluster[[1]] and so on to access 1st and other successive clusters
+		KmeansCluster = split(data_frame, kcluster$cluster) # KmeansCluster[[1]] and so on to access 1st and other successive clusters
 
 
 ### K-fold cross validation
@@ -134,9 +134,9 @@
 
 		library("caTools")
 		set.seed(10)
-		split <- sample.split(data.frame$target, splitRatio = 0.75)
-		train <- subset(data.frame,split == TRUE)
-		test <- subset(data.frame, split == FALSE)
+		split <- sample.split(data_frame$target, splitRatio = 0.75)
+		train <- subset(data_frame,split == TRUE)
+		test <- subset(data_frame, split == FALSE)
 
 ### Multiple imputation- Filling NA's randomly
 
@@ -144,17 +144,20 @@
 		
 		library("mice")
 		set.seed(10)
-		imputed <- complete(mice(data.frame))
+		imputed <- complete(mice(data_frame))
 
 ### Removing Variables from data frame
 		
 		nonvars <- c("x1","x2","x3")
-		train <- train[, !(names(data.frame) %in% nonvars)]
-		test <- test[, !(names(data.frame) %in% nonvars)]
+		train <- train[, !(names(data_frame) %in% nonvars)]
+		test <- test[, !(names(data_frame) %in% nonvars)]
 					
 					OR
 
-		data.fram$var <- NULL
+		data_frame$var <- NULL
+
+					OR
+		new_data_frame <- setdiff(names(data_frame),c("x1","x2","x3"))
 
 ### Plotting
 	
@@ -166,13 +169,13 @@
 	
 	which.max(var)
 	which.min(var)
-	outliers <- subset(data.frame, data.frame$var >=< condition)
+	outliers <- subset(data_frame, data_frame$var >=< condition)
 	tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
 	match("value",var)
 	which(var == "value")
 
 	# choosing x random rows from a data set. given that nrow(train > x)
-	trainSmall = train[sample(nrow(train), x), ]
+	trainSmall <- train[sample(nrow(train), x), ]
 
 ### Normalization 
 	
@@ -180,13 +183,14 @@
 
 	library(caret)
 
-	preproc = preProcess(Train)
+	preproc <- preProcess(Train)
 
-	normTrain = predict(preproc, Train)
+	normTrain <- predict(preproc, Train)
 
-	normTest = predict(preproc, Test)
+	normTest <- predict(preproc, Test)
 
 ### One-Hot Encoding
+
 	library(dummies)
 
 	#create a dummy data frame
@@ -194,7 +198,45 @@
                         "Outlet_Establishment_Year","Outlet_Size",
                         "Outlet_Location_Type","Outlet_Type"))
 
+### Correlation matrix
+	
+	library(corrplot)
+
+		nums <- sapply(data_frame, is.numeric)
+		cordata<-data_frame[,nums]
+		cordata <-na.omit(cordata)
+		cor_matrix <- cor(cordata) # to see correlation table
+		corrplot(cor_matrix, method = "circle", type = "lower") # to visualize correlation matrix
+
+
+### Boruta Analysis to find importance of variable in a data set
+	
+	set.seed(13)
+		bor_results <- Boruta(sample.df,response, maxRuns=101, doTrace=0)
+		summary(bor_results)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Notes :
+
 ## If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
 ## split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
 ## different values, you will get different splits.
-
