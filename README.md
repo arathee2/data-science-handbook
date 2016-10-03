@@ -216,6 +216,7 @@
 		set.seed(13)
 		bor_results <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
 		summary(bor_results)
+		boruta_cor_matrix <- attStats(bor)
 
 
 
