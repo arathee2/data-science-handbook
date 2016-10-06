@@ -48,6 +48,34 @@
 		ROCR.predict <- prediction(pred, test$target)
 		auc <- as.numeric(performance(ROCR.predict,"auc")@y.values)
 
+### Neural Networks
+	
+	# min-max normalization
+
+		maxs <- apply(data, 2, max) 
+		mins <- apply(data, 2, min)
+		scaled <- as.data.frame(scale(data_frame, center = mins, scale = maxs - mins))
+		train_normalized
+		test_normalized
+
+	# model
+
+		library(neuralnet)
+
+		nn <- neuralnet(y ~ x, data = train_normalized, hidden=c(5,3), linear.output=T)
+		# hidden specifies the neurons in hidden layers.
+		# linear.output = T is for linear regression. It is set to F for classification.
+		
+		plot(nn)
+		nn_predict <- compute(nn, test_normalized[,1:13])
+
+		# de-normalizing the predictions and test set to calculate the accuracy.
+		
+		nn_predict_denormalized <- nn_predict$net.result*(max(data$target)-min(data$target))+min(data$target)
+		test_denormalized <- (test_normalized$target)*(max(data$target)-min(data$target))+min(data$target)
+		rmse
+
+
 ### Trees
 	
 	# for classification use method = "class" in rpart and type = "class" in predict
@@ -211,11 +239,11 @@
 
 ### Boruta Analysis to find importance of variable in a data set
 	
-	library(Boruta)
-		
+	library(Boruta)	
+
 		set.seed(13)
-		bor_results <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
-		summary(bor_results)
+		bor <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
+		summary(bor)
 		boruta_cor_matrix <- attStats(bor)
 
 
