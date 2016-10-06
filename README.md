@@ -69,7 +69,7 @@
 		plot(nn)
 		nn_predict <- compute(nn, test_normalized[,1:13])
 
-		# de-normalizing the predictions and test set to calculate the accuracy.
+	# de-normalizing the predictions and test set to calculate the accuracy.
 		
 		nn_predict_denormalized <- nn_predict$net.result*(max(data$target)-min(data$target))+min(data$target)
 		test_denormalized <- (test_normalized$target)*(max(data$target)-min(data$target))+min(data$target)
