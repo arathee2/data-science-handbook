@@ -28,6 +28,8 @@
 
 		step.model <- step(model)
 
+===========================================================================================================================
+
 ### Logistic Regression
 	
 	# check for VIC. VIC to be minimized.
@@ -47,6 +49,8 @@
 		pred <- predict(model, test)
 		ROCR.predict <- prediction(pred, test$target)
 		auc <- as.numeric(performance(ROCR.predict,"auc")@y.values)
+
+===========================================================================================================================
 
 ### Neural Networks
 	
@@ -69,14 +73,15 @@
 		plot(nn)
 		nn_predict <- compute(nn, test_normalized[,1:13])
 
-	# de-normalizing the predictions and test set to calculate the accuracy.
+		# de-normalizing the predictions and test set to calculate the accuracy.
 		
 		nn_predict_denormalized <- nn_predict$net.result*(max(data$target)-min(data$target))+min(data$target)
 		test_denormalized <- (test_normalized$target)*(max(data$target)-min(data$target))+min(data$target)
 		rmse
 
+===========================================================================================================================
 
-### Trees
+### Decision Trees
 	
 	# for classification use method = "class" in rpart and type = "class" in predict
 		library("rpart")
@@ -95,6 +100,8 @@
 		ROCR.predict <- prediction(pred[,2], test$target)
 		auc <- as.numeric(performance(ROCR.predict,"auc")@y.values)
 
+===========================================================================================================================
+
 ### Random Forest
 		
 		library("randomForest")
@@ -108,6 +115,7 @@
 		pred <- predict(model, test)
 		table(test$target, pred)
 
+===========================================================================================================================
 
 ### Clustering
 
@@ -144,6 +152,7 @@
 		
 		KmeansCluster = split(data_frame, kcluster$cluster) # KmeansCluster[[1]] and so on to access 1st and other successive clusters
 
+===========================================================================================================================
 
 ### K-fold cross validation
 		
@@ -155,6 +164,7 @@
 		cartGrid = expand.grid( .cp = seq(0.002,0.1,0.002))
 		train( targetVariable ~ . , data = train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
 
+===========================================================================================================================
 
 ### Splitting data set randomly
 
@@ -166,6 +176,8 @@
 		train <- subset(data_frame,split == TRUE)
 		test <- subset(data_frame, split == FALSE)
 
+===========================================================================================================================
+
 ### Multiple imputation- Filling NA's randomly
 
 		# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
@@ -173,6 +185,8 @@
 		library("mice")
 		set.seed(10)
 		imputed <- complete(mice(data_frame))
+
+===========================================================================================================================
 
 ### Removing Variables from data frame
 		
@@ -187,11 +201,15 @@
 					OR
 		new_data_frame <- setdiff(names(data_frame),c("x1","x2","x3"))
 
+===========================================================================================================================
+
 ### Plotting
 	
 	plot(x, y, xlab = , ylab = , main = , col = )
 	hist(x, xlab = , xlim = c(low.limit, up.limit), breaks = 100)
 	boxplot(y ~ x, xlab = , ylab = , main = )
+
+===========================================================================================================================
 
 ### Misc
 	
@@ -205,6 +223,8 @@
 	# choosing x random rows from a data set. given that nrow(train > x)
 	trainSmall <- train[sample(nrow(train), x), ]
 
+===========================================================================================================================
+
 ### Normalization 
 	
 	# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
@@ -217,6 +237,8 @@
 
 	normTest <- predict(preproc, Test)
 
+===========================================================================================================================
+
 ### One-Hot Encoding
 
 	library(dummies)
@@ -225,6 +247,8 @@
 		new_my_data <- dummy.data.frame(my_data, names = c("Item_Fat_Content","Item_Type",
                         "Outlet_Establishment_Year","Outlet_Size",
                         "Outlet_Location_Type","Outlet_Type"))
+
+===========================================================================================================================
 
 ### Correlation matrix
 	
@@ -236,6 +260,7 @@
 		cor_matrix <- cor(cordata) # to see correlation table
 		corrplot(cor_matrix, method = "circle", type = "lower") # to visualize correlation matrix
 
+===========================================================================================================================
 
 ### Boruta Analysis to find importance of variable in a data set
 	
@@ -246,6 +271,15 @@
 		summary(bor)
 		boruta_cor_matrix <- attStats(bor)
 
+===========================================================================================================================
+
+### Binning
+	
+		library("Hmisc")
+
+		bins <- cut2(data_frame$variable, g = number_of_bins) # cuts the variable on basis of quantile.
+
+===========================================================================================================================
 
 
 
@@ -263,11 +297,17 @@
 
 
 
-
-
+===========================================================================================================================
 
 Notes :
 
 ## If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
 ## split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
 ## different values, you will get different splits.
+
+===========================================================================================================================
+
+
+
+
+

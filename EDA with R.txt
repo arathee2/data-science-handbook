@@ -4,12 +4,16 @@
 		breaks = seq(from, to, jumps) OR c(0,20,40,60,80,100)
 		limits = c(lower_limit, upper_limit) # setting limit removes the data, effects graph
 
+===========================================================================================================================
+
 ## coord_cartesian()
 	# doesn't remove data, only zooms-in or zooms=out the graph.
 	
 		ylim = c(lower_limit,upper_limit)
 		xlim = c(lower_limit, upper_limit)
 	
+===========================================================================================================================
+
 ## coord_trans()
 	# Used to transform the coordinate axis. The changes in coor_trans occur after statistics whereas in other functions like scale they occus before statistics.
 	# It also changes the shape of geom_smooth.
@@ -19,27 +23,39 @@
 		limx = c(lower_limit, upper_limit)
 		limy = c(lower_limit, upper_limit)
 
+===========================================================================================================================
+
 ## facet_wrap()
 	# used to display the same grapgh across different categories of the variable provided. 
 		facet_wrap(~categorical_variable)
 
+===========================================================================================================================
+
 ## facet_grid()
 	# same as facet_wrap but used when we want to plot graph across 2 different categorical variables.
 		facet_grid(vertical_categorical_variable~horizontal_categorical_variable)
+
+===========================================================================================================================
 
 ## x and y labels
 	
 		xlab("x axis label name")
 		ylab("y axis label name")
 
+===========================================================================================================================
+
 ## alpha parameter
 	# used inside geom_xyz() to consider n points as one if set to 1/n and vice versa.
+
+===========================================================================================================================
 
 ## geom_histogram()
 	
 		binwidth
 		color = outline_color
 		fill = fill_color
+
+===========================================================================================================================
 
 ## geom_line()
 	
@@ -48,4 +64,16 @@
 		fun.args = list(probs = .9)
 		linetype = index of line type
 		aes(color = variable) # used as a 3rd variable in a 2D graph.
-## cut
+
+===========================================================================================================================
+
+
+
+
+
+
+
+
+
+
+
