@@ -292,7 +292,21 @@
 
 ==============================================================================================================================
 
+### dplyr
+		
+		library("dplyr")
 
+		select(data_frame, column_names)
+		filter(data_frame, condition)
+		arrange(data_frame, desc(factor_variable)) # ascending by default
+		mutate(data_frame, new_variable_name = equaltion)
+		group_by(data_frame, factor_variable)
+		summarize(data_frame, function())
+		count(data_frame, variable) # works similar table
+
+		piping : data_frame %>% operation1 %>% operation2 and so on...
+
+==============================================================================================================================
 
 
 

@@ -6,7 +6,7 @@
 
 ==============================================================================================================================
 
-## coord_cartesian()
+## coord_cartesian()	
 	# doesn't remove data, only zooms-in or zooms=out the graph.
 	
 		ylim = c(lower_limit,upper_limit)
@@ -37,10 +37,14 @@
 
 ==============================================================================================================================
 
-## x and y labels
-	
+## labels
+		
+		geom_text_repel(aes(label = variable), size = 2)	
 		xlab("x axis label name")
 		ylab("y axis label name")
+		ggtitle("grapgh title")
+		labs(title = "title", x = "x label", y = "y label")
+
 
 ==============================================================================================================================
 
