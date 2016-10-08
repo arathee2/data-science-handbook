@@ -303,6 +303,7 @@
 		group_by(data_frame, factor_variable)
 		summarize(data_frame, function())
 		count(data_frame, variable) # works similar table
+		top_n(20, data_frme) # for top 20 rows
 
 		piping : data_frame %>% operation1 %>% operation2 and so on...
 
