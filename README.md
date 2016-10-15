@@ -73,11 +73,21 @@
 		plot(nn)
 		nn_predict <- compute(nn, test_normalized[,1:13])
 
-		# de-normalizing the predictions and test set to calculate the accuracy.
+		# de-normalizing the predictions and test set to calculate the accuracy and not to forget to submit denormalized predictions.
 		
 		nn_predict_denormalized <- nn_predict$net.result*(max(data$target)-min(data$target))+min(data$target)
 		test_denormalized <- (test_normalized$target)*(max(data$target)-min(data$target))+min(data$target)
 		rmse
+
+==============================================================================================================================
+
+### SVM
+
+		library(e1071)
+
+		svm_model <- svm(target ~ ., data = train, cost = 1, gamma = 0.1)
+		svm_predictions <- predict(svm_model, test)
+		table(test$target, svm_predictions)
 
 ==============================================================================================================================
 
@@ -299,11 +309,11 @@
 		select(data_frame, column_names)
 		filter(data_frame, condition)
 		arrange(data_frame, desc(factor_variable)) # ascending by default
-		mutate(data_frame, new_variable_name = equaltion)
+		mutate(data_frame, new_variable_name = equation)
 		group_by(data_frame, factor_variable)
 		summarize(data_frame, function())
 		count(data_frame, variable) # works similar table
-		top_n(20, data_frme) # for top 20 rows
+		top_n(20, data_frame) # for top 20 rows
 
 		piping : data_frame %>% operation1 %>% operation2 and so on...
 
@@ -311,15 +321,51 @@
 
 ### Date and Time
 	
-	birthday <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%H:%S"
-	birth_year <- format(birthday, "%Y")
-	
+	data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
+	data_frame$day <- format(data_frame$date, "%d") # day
+	data_frame$month <- format(data_frame$date, "%m") # month
+	data_frame$year <- format(data_frame$date, "%Y") # year
+	data_frame$hour <- format(data_frame$date, "%H") # hour
 
 ==============================================================================================================================
 
+# To check for constant factors
 
+		d <- sapply(data_frame, function(x) is.factor(x))
 
+		m <- data_frame[,names(which(d=="TRUE"))]
 
+		ifelse(n<-sapply(m,function(x)length(levels(x)))==1,"999999999","0")
+		table(n)
+
+==============================================================================================================================
+
+# Caret
+
+		library("caret")
+		
+		fitControl = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
+		cartGrid = expand.grid( model specific parameters)
+		model <-train(y ~ x , data = , method = lm, glm, rpart, rf, nnet, svm, gbm, trControl, tuneGrid)
+		predictions <- train.predict(model, test)
+		confusionMatrix(predictions, test$target)
+
+==============================================================================================================================
+
+# GBM
+
+		fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
+
+		gbmGrid <-  expand.grid(interaction.depth = c(1, 5, 9), n.trees = (1:30)*50, shrinkage = 0.1, n.minobsinnode = 10)
+
+		gbmFit <- train(target ~ ., data = train,
+                method = "gbm",
+                trControl = fitControl,
+                verbose = FALSE,
+                tuneGrid = gbmGrid,
+                metric = "ROC")
+
+==============================================================================================================================
 
 
 
