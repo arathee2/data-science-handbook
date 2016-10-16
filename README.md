@@ -329,7 +329,7 @@
 
 ==============================================================================================================================
 
-# To check for constant factors
+### To check for constant factors
 
 		d <- sapply(data_frame, function(x) is.factor(x))
 
@@ -340,7 +340,7 @@
 
 ==============================================================================================================================
 
-# Caret
+### caret
 
 		library("caret")
 		
@@ -352,7 +352,7 @@
 
 ==============================================================================================================================
 
-# GBM
+### GBM
 
 		fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
 
@@ -367,6 +367,39 @@
 
 ==============================================================================================================================
 
+### xgboost
+		
+		xgb_grid <- expand.grid(
+	    nrounds = 2, 
+	    max_depth = c(5, 10, 15), 
+	    eta = c(0.01, 0.001, 0.0001), 
+	    gamma = c(1, 2, 3), 
+	    colsample_bytree = c(0.4, 0.7, 1.0), 
+	    min_child_weight = c(0.5, 1, 1.5)
+
+		)
+
+		xgb_trcontrol <- trainControl(
+	    method="repeatedcv",
+	    repeats = 5,
+	    number = 10,
+	    verboseIter = TRUE,
+	    returnData=FALSE,
+	    returnResamp = "all",
+	    allowParallel = TRUE
+
+		)
+
+		xgb_model <- train(x = as.matrix(train %>% select(-c(Id,targetVariable))),
+	    y = train$targetVariable,
+	    trControl = xgb_trcontrol,
+	    tuneGrid = xgb_grid,
+	    method="xgbTree" or "xgbLinear"
+		)
+
+		xgb_predictions_test <- predict(xgm_model, data.matrix(test))
+
+==============================================================================================================================
 
 
 
