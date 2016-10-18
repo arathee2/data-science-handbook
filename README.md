@@ -8,6 +8,10 @@
 	# model
 
 		model <- lm(y ~ x, data = train)
+		
+		library(Mglmnet)
+		model = glmnet(y ~ x,alpha = , lambda = seq(0, 100, 0.1)) # alpha = 0 for ridge, 1 for lasso
+		
 		pred <- predict(model, test)
 
 	# calc RMSE and R-squared
@@ -85,7 +89,7 @@
 
 		library(e1071)
 
-		svm_model <- svm(target ~ ., data = train, cost = 1, gamma = 0.1)
+		svm_model <- svm(target ~ ., data = train, kernel = "radial", cost = 1, gamma = 0.1)
 		svm_predictions <- predict(svm_model, test)
 		table(test$target, svm_predictions)
 
@@ -279,7 +283,7 @@
 		cordata<-data_frame[,nums]
 		cordata <-na.omit(cordata)
 		cor_matrix <- cor(cordata) # to see correlation table
-		corrplot(cor_matrix, method = "circle", type = "lower") # to visualize correlation matrix
+		corrplot(cor_matrix, method = "square", type = "lower") # to visualize correlation matrix
 
 ==============================================================================================================================
 
@@ -346,7 +350,7 @@
 		
 		fitControl = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
 		cartGrid = expand.grid( model specific parameters)
-		model <-train(y ~ x , data = , method = lm, glm, rpart, rf, nnet, svm, gbm, trControl, tuneGrid)
+		model <-train(y ~ x , data = , method = "lm, glm, rpart, rf, nnet, svm, gbm", trControl = , tuneGrid = )
 		predictions <- train.predict(model, test)
 		confusionMatrix(predictions, test$target)
 
@@ -370,19 +374,19 @@
 ### xgboost
 		
 		xgb_grid <- expand.grid(
-	    nrounds = 2, 
-	    max_depth = c(5, 10, 15), 
 	    eta = c(0.01, 0.001, 0.0001), 
+		max_depth = c(5, 10, 15), 
 	    gamma = c(1, 2, 3), 
 	    colsample_bytree = c(0.4, 0.7, 1.0), 
 	    min_child_weight = c(0.5, 1, 1.5)
+	    nrounds = 2, 
 
 		)
 
 		xgb_trcontrol <- trainControl(
 	    method="repeatedcv",
-	    repeats = 5,
 	    number = 10,
+	    repeats = 3,
 	    verboseIter = TRUE,
 	    returnData=FALSE,
 	    returnResamp = "all",
@@ -390,14 +394,14 @@
 
 		)
 
-		xgb_model <- train(x = as.matrix(train %>% select(-c(Id,targetVariable))),
-	    y = train$targetVariable,
+		xgb_model <- train(x = as.matrix(data_frame %>% select(-c(Id,targetVariable))),
+	    y = data_frame$targetVariable,
 	    trControl = xgb_trcontrol,
 	    tuneGrid = xgb_grid,
 	    method="xgbTree" or "xgbLinear"
 		)
 
-		xgb_predictions_test <- predict(xgm_model, data.matrix(test))
+		xgb_predictions_test <- predict(xgb_model, data.matrix(test))
 
 ==============================================================================================================================
 
