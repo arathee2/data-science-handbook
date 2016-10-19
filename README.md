@@ -129,6 +129,14 @@
 		pred <- predict(model, test)
 		table(test$target, pred)
 
+	# party-cforest
+		library(party)
+
+		cforest_model = cforest(targetVariable ~ . , data = train, controls=cforest_unbiased(ntree=1000))
+
+		cforest_prediction = predict(cforest_model, test, OOB=TRUE, type = "response")
+
+
 ==============================================================================================================================
 
 ### Clustering
@@ -252,26 +260,24 @@
 
 ### Normalization 
 	
-	# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
+		# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
 
-	library(caret)
+		library(caret)
 
-	preproc <- preProcess(Train)
+		preproc <- preProcess(Train)
 
-	normTrain <- predict(preproc, Train)
+		normTrain <- predict(preproc, Train)
 
-	normTest <- predict(preproc, Test)
+		normTest <- predict(preproc, Test)
 
 ==============================================================================================================================
 
 ### One-Hot Encoding
 
-	library(dummies)
+		library(caret)
 
-	#create a dummy data frame
-		new_my_data <- dummy.data.frame(my_data, names = c("Item_Fat_Content","Item_Type",
-                        "Outlet_Establishment_Year","Outlet_Size",
-                        "Outlet_Location_Type","Outlet_Type"))
+		dummies <- dummyVars(targetVariable ~ ., data = data_frame)
+		temp <- as.data.frame(predict(dummies, data_frame))
 
 ==============================================================================================================================
 
@@ -373,13 +379,15 @@
 
 ### xgboost
 		
+		library(xgboost)
+
 		xgb_grid <- expand.grid(
 	    eta = c(0.01, 0.001, 0.0001), 
 		max_depth = c(5, 10, 15), 
 	    gamma = c(1, 2, 3), 
 	    colsample_bytree = c(0.4, 0.7, 1.0), 
-	    min_child_weight = c(0.5, 1, 1.5)
-	    nrounds = 2, 
+	    min_child_weight = c(0.5, 1, 1.5),
+	    nrounds = 2 
 
 		)
 
@@ -402,6 +410,8 @@
 		)
 
 		xgb_predictions_test <- predict(xgb_model, data.matrix(test))
+
+		imp <- varImp(xgb_model)
 
 ==============================================================================================================================
 
