@@ -7,30 +7,26 @@
 
 	# model
 
-		model <- lm(y ~ x, data = train)
-		
-		library(Mglmnet)
-		model = glmnet(y ~ x,alpha = , lambda = seq(0, 100, 0.1)) # alpha = 0 for ridge, 1 for lasso
-		
-		pred <- predict(model, test)
+		linear.model <- lm(target ~ ., data = train)
+		linear.predict <- predict(linear.model, cv)
 
 	# calc RMSE and R-squared
 
-		sse <- sum((pred - test$target)^2)
-		sst <- sum((mean(train$target) - test$target) ^ 2)
-		r-squared <- 1-(sse/sst)
-		rmse <- sqrt(sse/nrow(data_frame))
+		linear.sse <- sum((linear.predict - cv$target)^2)
+		linear.sst <- sum((mean(train$target) - cv$target)^2)
+		linear.r.squared <- 1-(linear.sse/linear.sst)
+		linear.rmse <- sqrt(sse/nrow(cv))
 
 	# ROCR and AUC(area under curve)
 		
 		library("ROCR")
-		pred <- predict(model, test)
-		ROCR.predict <- prediction(pred, test$target)
-		auc <- as.numeric(performance(ROCR.predict,"auc")@y.values)
+		linear.predict <- predict(linear.model, cv)
+		linear.ROCR <- prediction(linear.predict, cv$target)
+		linear.auc <- as.numeric(performance(linear.ROCR,"auc")@y.values)
 
 	# step model
 
-		step.model <- step(model)
+		step.model <- step(linear.model)
 
 ==============================================================================================================================
 
@@ -40,19 +36,19 @@
 
 	# model
 
-		model <- glm(y ~ x, data = train, family = "binomial")
-		pred <- predict(model, test, type = "response")
+		glm.model <- glm(target ~ ., data = train, family = "binomial")
+		glm.predict <- predict(glm.model, cv, type = "response")
 	
 	# confusion matrix for accuracy check
 	
-		table(test$target, pred>threshold)
+		table(cv$target, glm.predict>0.5)
 	
 	# ROCR and AUC(area under curve)
 	
 		library("ROCR")
-		pred <- predict(model, test)
-		ROCR.predict <- prediction(pred, test$target)
-		auc <- as.numeric(performance(ROCR.predict,"auc")@y.values)
+		glm.predict <- predict(model, cv)
+		glm.ROCR <- prediction(glm.predict, cv$target)
+		glm.auc <- as.numeric(performance(glm.ROCR,"auc")@y.values)
 
 ==============================================================================================================================
 
@@ -63,25 +59,25 @@
 		maxs <- apply(data, 2, max) 
 		mins <- apply(data, 2, min)
 		scaled <- as.data.frame(scale(data_frame, center = mins, scale = maxs - mins))
-		train_normalized
-		test_normalized
+		train.normalized
+		test.normalized
 
 	# model
 
 		library(neuralnet)
 
-		nn <- neuralnet(y ~ x, data = train_normalized, hidden=c(5,3), linear.output=T)
+		nn.model <- neuralnet(target ~ ., data = train.normalized, hidden=c(5,3), linear.output=T)
 		# hidden specifies the neurons in hidden layers.
 		# linear.output = T is for linear regression. It is set to F for classification.
 		
-		plot(nn)
-		nn_predict <- compute(nn, test_normalized[,1:13])
+		plot(nn.model)
+		nn.predict <- compute(nn.model, cv.normalized[,1:13])
 
 		# de-normalizing the predictions and test set to calculate the accuracy and not to forget to submit denormalized predictions.
 		
-		nn_predict_denormalized <- nn_predict$net.result*(max(data$target)-min(data$target))+min(data$target)
-		test_denormalized <- (test_normalized$target)*(max(data$target)-min(data$target))+min(data$target)
-		rmse
+		nn.predict.denormalized <- nn.predict$net.result*(max(data$target)-min(data$target))+min(data$target)
+		test.denormalized <- (test.normalized$target)*(max(data$target)-min(data$target))+min(data$target)
+		nn.rmse
 
 ==============================================================================================================================
 
@@ -89,9 +85,9 @@
 
 		library(e1071)
 
-		svm_model <- svm(target ~ ., data = train, kernel = "radial", cost = 1, gamma = 0.1)
-		svm_predictions <- predict(svm_model, test)
-		table(test$target, svm_predictions)
+		svm.model <- svm(target ~ ., data = train, kernel = "radial", cost = 1, gamma = 0.1)
+		svm.predict <- predict(svm.model, cv)
+		table(cv$target, svm.predict)
 
 ==============================================================================================================================
 
@@ -103,16 +99,16 @@
 		
 	# model
 		
-		model <- rpart(y ~ x, data = train, method = "class", minbucket/cp = ) # large min bucket=> overfitting, smaller minbucket => biasing.
-		prp(model) 
-		pred <- predict(model, test, type = "class")
-		table(test$target, pred)
+		tree.model <- rpart(target ~ ., data = train, method = "class", minbucket/cp = ) # large min bucket=> overfitting, smaller minbucket => biasing.
+		prp(tree.model) 
+		tree.predict <- predict(tree.model, cv, type = "class")
+		table(cv$target, tree.predict)
 
 	# ROCR and AUC(area under curve)
 		
-		pred <- predict(model, test) # type = "class" not to be included here
-		ROCR.predict <- prediction(pred[,2], test$target)
-		auc <- as.numeric(performance(ROCR.predict,"auc")@y.values)
+		tree.predict <- predict(tree.model, cv) # type = "class" not to be included here
+		tree.ROCR <- prediction(tree.predict[,2], cv$target)
+		tree.auc <- as.numeric(performance(tree.ROCR,"auc")@y.values)
 
 ==============================================================================================================================
 
@@ -120,21 +116,20 @@
 		
 		library("randomForest")
 		set.seed(10)
-		train$target <- as.factor(train$target)
-		test$target <- as.factor(test$target)
-	
+		
 	# model
 
-		model <- randomForest(as.factor(y) ~ x, data = train, ntree = 200, nodesize = 5/25/15/20) #nodesize similar to minbucket here.
-		pred <- predict(model, test)
-		table(test$target, pred)
+		rf.model <- randomForest(target ~ ., data = train, ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
+		rf.predict <- predict(rf.model, cv)
+		table(cv$target, rf.predict)
 
 	# party-cforest
+
 		library(party)
 
-		cforest_model = cforest(targetVariable ~ . , data = train, controls=cforest_unbiased(ntree=1000))
+		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000))
 
-		cforest_prediction = predict(cforest_model, test, OOB=TRUE, type = "response")
+		cforest.prediction = predict(cforest.model, cv, OOB = TRUE, type = "response")
 
 
 ==============================================================================================================================
@@ -167,8 +162,8 @@
 		# example -> newTrain1 = subset(originalTrain, kclusterPredictTrain == 1), newTrain2 = subset(originalTrain, kclusterPredictTest == 2)
 		
 		kclusterKcca <- as.kcca(kcluster, originalDataFrame OR originalVector)
-		kclusterPredictTrain <- predict(kclusterKcca)
-		kclusterPredictTest <- predict(kclusterKcca, newdata = test.data.as.vector)
+		kcluster.predict.train <- predict(kclusterKcca)
+		kcluster.predict.test <- predict(kclusterKcca, newdata = test.data.as.vector)
 
 		#easy way to split according to clusters in k-means
 		
@@ -201,23 +196,24 @@
 
 ### Splitting data set randomly
 
-		# sample.split balacnes partitions keeping in mind the outcome variable
+	# sample.split balacnes partitions keeping in mind the outcome variable
 
 		library("caTools")
 		set.seed(10)
-		split <- sample.split(data_frame$target, splitRatio = 0.75)
+		split <- sample.split(data_frame$target, SplitRatio = 0.8)
 		train <- subset(data_frame,split == TRUE)
-		test <- subset(data_frame, split == FALSE)
+		cv <- subset(data_frame, split == FALSE)
 
 ==============================================================================================================================
 
 ### Multiple imputation- Filling NA's randomly
 
-		# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
+	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
 		
 		library("mice")
 		set.seed(10)
 		imputed <- complete(mice(data_frame))
+		data_frame$var <- imputed$var
 
 ==============================================================================================================================
 
@@ -238,37 +234,36 @@
 
 ### Plotting
 	
-	plot(x, y, xlab = , ylab = , main = , col = )
-	hist(x, xlab = , xlim = c(low.limit, up.limit), breaks = 100)
-	boxplot(y ~ x, xlab = , ylab = , main = )
+		plot(x, y, xlab = , ylab = , main = , col = )
+		hist(x, xlab = , xlim = c(low.limit, up.limit), breaks = 100)
+		boxplot(y ~ x, xlab = , ylab = , main = )
 
 ==============================================================================================================================
 
 ### Misc
 	
-	which.max(var)
-	which.min(var)
-	outliers <- subset(data_frame, data_frame$var >=< condition)
-	tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
-	match("value",var)
-	which(var == "value")
+		which.max(var)
+		which.min(var)
+		outliers <- subset(data_frame, data_frame$var >=< condition)
+		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
+		match("value",var)
+		which(var == "value")
 
-	# choosing x random rows from a data set. given that nrow(train > x)
-	trainSmall <- train[sample(nrow(train), x), ]
+	# choosing x random rows from a data set. given that x < nrow(train).
+
+		trainSmall <- train[sample(nrow(train), x), ]
 
 ==============================================================================================================================
 
 ### Normalization 
 	
-		# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
+	# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
 
 		library(caret)
 
-		preproc <- preProcess(Train)
-
-		normTrain <- predict(preproc, Train)
-
-		normTest <- predict(preproc, Test)
+		preproc <- preProcess(train)
+		normTrain <- predict(preproc, train)
+		normTest <- predict(preproc, test)
 
 ==============================================================================================================================
 
@@ -276,7 +271,7 @@
 
 		library(caret)
 
-		dummies <- dummyVars(targetVariable ~ ., data = data_frame)
+		dummies <- dummyVars(target ~ ., data = data_frame)
 		temp <- as.data.frame(predict(dummies, data_frame))
 
 ==============================================================================================================================
@@ -289,6 +284,7 @@
 		cordata<-data_frame[,nums]
 		cordata <-na.omit(cordata)
 		cor_matrix <- cor(cordata) # to see correlation table
+		cor_matrix
 		corrplot(cor_matrix, method = "square", type = "lower") # to visualize correlation matrix
 
 ==============================================================================================================================
@@ -298,9 +294,11 @@
 	library(Boruta)	
 
 		set.seed(13)
-		bor <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
-		summary(bor)
-		boruta_cor_matrix <- attStats(bor)
+		bor.model <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
+		summary(bor.model)
+		boruta.cor.matrix <- attStats(bor.model)
+		important.features <- features[boruta.model$finalDecision!="Rejected"]
+		important.features
 
 ==============================================================================================================================
 
@@ -321,7 +319,7 @@
 		arrange(data_frame, desc(factor_variable)) # ascending by default
 		mutate(data_frame, new_variable_name = equation)
 		group_by(data_frame, factor_variable)
-		summarize(data_frame, function())
+		summarize(data_frame, newVarName =  function()) # group_by(factorVariable) %>% summarize(count = n()) used commonly.
 		count(data_frame, variable) # works similar table
 		top_n(20, data_frame) # for top 20 rows
 
@@ -331,21 +329,21 @@
 
 ### Date and Time
 	
-	data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
-	data_frame$day <- format(data_frame$date, "%d") # day
-	data_frame$month <- format(data_frame$date, "%m") # month
-	data_frame$year <- format(data_frame$date, "%Y") # year
-	data_frame$hour <- format(data_frame$date, "%H") # hour
+		data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
+		data_frame$date <- as.POSIXct(data_frame$date) # dplyr does not handles date in POSIXlt format.
+		data_frame$day <- format(data_frame$date, "%d") # day
+		data_frame$month <- format(data_frame$date, "%m") # month
+		data_frame$year <- format(data_frame$date, "%Y") # year
+		data_frame$hour <- format(data_frame$date, "%H") # hour
+		data_frame$weekday <- format(data_frame$date, "%w") # weekday 0(sunday) - 6(saturday)
 
 ==============================================================================================================================
 
 ### To check for constant factors
 
-		d <- sapply(data_frame, function(x) is.factor(x))
-
-		m <- data_frame[,names(which(d=="TRUE"))]
-
-		ifelse(n<-sapply(m,function(x)length(levels(x)))==1,"999999999","0")
+		f <- sapply(data_frame, function(x) is.factor(x))
+		m <- data_frame[,names(which(f == "TRUE"))]
+		ifelse(n <- sapply(m, function(x) length(levels(x))) == 1,"constant factor","0")
 		table(n)
 
 ==============================================================================================================================
@@ -354,26 +352,27 @@
 
 		library("caret")
 		
-		fitControl = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
-		cartGrid = expand.grid( model specific parameters)
-		model <-train(y ~ x , data = , method = "lm, glm, rpart, rf, nnet, svm, gbm", trControl = , tuneGrid = )
-		predictions <- train.predict(model, test)
-		confusionMatrix(predictions, test$target)
+		algo.control = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
+		algo.grid = expand.grid( model specific parameters )
+		algo.model <-train(target ~ ., data = train, method = " ", trControl = algo.control, tuneGrid = algo.grid)
+		algo.predict <- predict.train(algo.model, cv)
+		confusionMatrix(algo.predict, cv$target)
+		imp <- varImp(algo.model)
+		plot(imp, top = 20))
 
 ==============================================================================================================================
 
 ### GBM
 
-		fitControl <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
+		gbm.control <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
 
-		gbmGrid <-  expand.grid(interaction.depth = c(1, 5, 9), n.trees = (1:30)*50, shrinkage = 0.1, n.minobsinnode = 10)
+		gbm.grid <-  expand.grid(interaction.depth = c(1, 5, 9), n.trees = (1:30)*50, shrinkage = 0.1, n.minobsinnode = 10)
 
 		gbmFit <- train(target ~ ., data = train,
                 method = "gbm",
-                trControl = fitControl,
+                trControl = gbm.ontrol,
                 verbose = FALSE,
-                tuneGrid = gbmGrid,
-                metric = "ROC")
+                tuneGrid = gbm.grid)
 
 ==============================================================================================================================
 
@@ -381,37 +380,33 @@
 		
 		library(xgboost)
 
-		xgb_grid <- expand.grid(
+		xgb.grid <- expand.grid(
 	    eta = c(0.01, 0.001, 0.0001), 
 		max_depth = c(5, 10, 15), 
 	    gamma = c(1, 2, 3), 
 	    colsample_bytree = c(0.4, 0.7, 1.0), 
 	    min_child_weight = c(0.5, 1, 1.5),
-	    nrounds = 2 
+	    nrounds = 2)
 
-		)
-
-		xgb_trcontrol <- trainControl(
+		xgb.control <- trainControl(
 	    method="repeatedcv",
 	    number = 10,
 	    repeats = 3,
 	    verboseIter = TRUE,
 	    returnData=FALSE,
 	    returnResamp = "all",
-	    allowParallel = TRUE
+	    allowParallel = TRUE)
 
+		xgb.model <- train(x = as.matrix(data_frame %>% select(-c(id,target))),
+	    y = data_frame$target,
+	    trControl = xgb.control,
+	    tuneGrid = xgb.grid,
+	    method="xgbTree" # "xgbLinear"
 		)
 
-		xgb_model <- train(x = as.matrix(data_frame %>% select(-c(Id,targetVariable))),
-	    y = data_frame$targetVariable,
-	    trControl = xgb_trcontrol,
-	    tuneGrid = xgb_grid,
-	    method="xgbTree" or "xgbLinear"
-		)
+		xgb.predict <- predict(xgb.model, data.matrix(cv))
 
-		xgb_predictions_test <- predict(xgb_model, data.matrix(test))
-
-		imp <- varImp(xgb_model)
+		imp <- varImp(xgb.model)
 
 ==============================================================================================================================
 

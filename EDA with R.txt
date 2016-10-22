@@ -88,16 +88,44 @@
 geom-point, line, bar, histogram, boxplot, density
 facet-wrap, grid
 
+==============================================================================================================================
+
+## Text-Analysis
+
+	library(tm)
+	library(SnowballC)
+
+	# cleaning data
+
+	bag <- Corpus(VectorSource(data_frame$textVariable))
+
+	bag <- tm_map(bag, tolower)
+	bag <- tm_map(bag, PlainTextDocument)
+
+	bag <- tm_map(bag, removePunctuation)
+
+	bag <- tm_map(bag, removeWords, c("your custom words", stopwords("english")))
+
+	bag <- tm_map(bag, stemDocument)
+
+	# converting to data frame
+
+	frequencies <- DocumentTermMatrix(bag)
+
+	findFreqTerms(frequencies, lowfreq = 20) # to words that appear atleast 20 times
+
+	sparseWords <- removeSparseTerms(frequencies, 0.995) # words that appear in 99.5 percent tweets
+	
+	sparseWords <- as.data.frame(as.matrix(sparseWords)) # converting the matrix of sparse words to data frame
+
+	colnames(sparseWords) <- make.names(colnames(sparseWords))
+
+
+==============================================================================================================================
 
 
 
-
-
-
-
-
-
-
+==============================================================================================================================
 
 
 
