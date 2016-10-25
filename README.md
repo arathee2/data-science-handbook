@@ -331,11 +331,11 @@
 	
 		data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
 		data_frame$date <- as.POSIXct(data_frame$date) # dplyr does not handles date in POSIXlt format.
-		data_frame$day <- format(data_frame$date, "%d") # day
-		data_frame$month <- format(data_frame$date, "%m") # month
-		data_frame$year <- format(data_frame$date, "%Y") # year
-		data_frame$hour <- format(data_frame$date, "%H") # hour
-		data_frame$weekday <- format(data_frame$date, "%w") # weekday 0(sunday) - 6(saturday)
+		data_frame$day <- as.integer(format(data_frame$date, "%d")) # day
+		data_frame$month <- as.integer(format(data_frame$date, "%m")) # month
+		data_frame$year <- as.integer(format(data_frame$date, "%Y")) # year
+		data_frame$hour <- as.integer(format(data_frame$date, "%H")) # hour
+		data_frame$weekday <- as.integer(format(data_frame$date, "%w")) # weekday 0(sunday) - 6(saturday)
 
 ==============================================================================================================================
 
