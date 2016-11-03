@@ -370,9 +370,11 @@
 
 		gbmFit <- train(target ~ ., data = train,
                 method = "gbm",
-                trControl = gbm.ontrol,
+                trControl = gbm.control,
                 verbose = FALSE,
                 tuneGrid = gbm.grid)
+
+		gbm.predict <- predict(gbmFit, cv)
 
 ==============================================================================================================================
 
