@@ -354,7 +354,7 @@
 		
 		algo.control = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
 		algo.grid = expand.grid( model specific parameters )
-		algo.model <-train(target ~ ., data = train, method = " ", trControl = algo.control, tuneGrid = algo.grid)
+		algo.model <-train(target ~ ., data = train, method = " ", preProcess = "scale", trControl = algo.control, tuneGrid = algo.grid)
 		algo.predict <- predict.train(algo.model, cv)
 		confusionMatrix(algo.predict, cv$target)
 		imp <- varImp(algo.model)
