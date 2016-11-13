@@ -425,9 +425,9 @@
 
 Notes :
 
-## If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
-## split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
-## different values, you will get different splits.
+If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
+split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
+different values, you will get different splits.
 
 ==============================================================================================================================
 

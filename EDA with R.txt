@@ -125,12 +125,21 @@
 ## Maps
 	
 		library(ggmap)
-		rohtak <- ggmap(get_googlemap(center=as.numeric(geocode("rohtak")), scale=2, zoom=13), extent="normal")
 
+		usa <- ggmap(get_googlemap(center=as.numeric(geocode("usa")), scale=2, zoom=13), extent="normal")
+		usa <- get_map(location="united states", zoom = 4, maptype = "terrain",source="google",color="color")
+		usa <- get_map(location = c(left, bottom, right, top), source = "osm")
+		
+		ggmap(usa) + geom_point(data = data_frame, aes(x = Longitude, y = Latitude))
+		
 ==============================================================================================================================
 
+## String
 
+		library(stringr)
+		str_extract(variable, pattern) # pattern <- "[a-zA-Z]*"
 
+==============================================================================================================================
 
 
 
