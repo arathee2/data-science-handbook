@@ -24,7 +24,7 @@
 
 ==============================================================================================================================
 
-## ggplot(data = ,aes(x = , fill = factor)) + geom_bar() # 1D category
+## ggplot(data = ,aes(x = , y = ..count..,fill = factor)) + geom_bar(position = , color = , fill = ) # 1D category
 ## ggplot(data = , aes(x = , y = )) + geom(stat = "identity") # 2D category vs num
 ## stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")    	
 
