@@ -394,8 +394,13 @@
 		library(tidyr)
 
 		separate(data_frame, variable, c("new","names"), sep = ", ") # separate rohtak, haryana
+		
 		unite(data_frame, new.variable, c(var1, var2), sep = " ") # combine first name and last name into name
-		gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) # oppsoite of one-hot encoding
+
+		gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) %>%
+				filter(new.numerical.var == 1) %>% 
+				select(-new.numerical.var) # oppsoite of one-hot encoding
+
 		spread(data_frame, categorical.var, corresponding.numerical.var) # oppsoite of gather
 
 ==============================================================================================================================
