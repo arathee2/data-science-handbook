@@ -34,7 +34,7 @@
 
 ==============================================================================================================================
 
-## coord_cartesian(xlim = (), ylim = c()) # doesn't remove data, only zooms-in or zooms=out the graph.
+## coord_cartesian(xlim = c(), ylim = c()) # doesn't remove data, only zooms-in or zooms=out the graph.
 	
 ==============================================================================================================================
 

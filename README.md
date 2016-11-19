@@ -66,8 +66,12 @@
 
 		library(neuralnet)
 
-		nn.model <- neuralnet(target ~ ., data = train.normalized, hidden=c(5,3), linear.output=T)
-		# hidden specifies the neurons in hidden layers.
+		n <- names(train)
+		f <- as.formula(paste("targetVariable ~", paste(n[!n %in% c("targetVariable")], collapse = " + ")))
+
+		nn.model <- neuralnet(f, data = train.normalized, hidden=c(5,3), linear.output=T)
+		# hidden specifies the neurons in hidden layers. Here are 2 hidden layers with 5 and 3 neurons respecively.
+		# a good thumb rule is to have 2/3 hidden layers with 2/3rd of neurons present in previous layer.
 		# linear.output = T is for linear regression. It is set to F for classification.
 		
 		plot(nn.model)
@@ -232,14 +236,6 @@
 
 ==============================================================================================================================
 
-### Plotting
-	
-		plot(x, y, xlab = , ylab = , main = , col = )
-		hist(x, xlab = , xlim = c(low.limit, up.limit), breaks = 100)
-		boxplot(y ~ x, xlab = , ylab = , main = )
-
-==============================================================================================================================
-
 ### Misc
 	
 		which.max(var)
@@ -252,18 +248,6 @@
 	# choosing x random rows from a data set. given that x < nrow(train).
 
 		trainSmall <- train[sample(nrow(train), x), ]
-
-==============================================================================================================================
-
-### Normalization 
-	
-	# this prevents to dominate vars with low values by the vars with high values. It sets the mean to 0 and SD to 1.
-
-		library(caret)
-
-		preproc <- preProcess(train)
-		normTrain <- predict(preproc, train)
-		normTest <- predict(preproc, test)
 
 ==============================================================================================================================
 
@@ -281,8 +265,8 @@
 	library(corrplot)
 
 		nums <- sapply(data_frame, is.numeric)
-		cordata<-data_frame[,nums]
-		cordata <-na.omit(cordata)
+		cordata <- data_frame[,nums]
+		cordata <- na.omit(cordata)
 		cor_matrix <- cor(cordata) # to see correlation table
 		cor_matrix
 		corrplot(cor_matrix, method = "square", type = "lower") # to visualize correlation matrix
@@ -310,35 +294,6 @@
 
 ==============================================================================================================================
 
-### dplyr
-		
-		library("dplyr")
-
-		select(data_frame, column_names)
-		filter(data_frame, condition)
-		arrange(data_frame, desc(factor_variable)) # ascending by default
-		mutate(data_frame, new_variable_name = equation)
-		group_by(data_frame, factor_variable)
-		summarize(data_frame, newVarName =  function()) # group_by(factorVariable) %>% summarize(count = n()) used commonly.
-		count(data_frame, variable) # works similar table
-		top_n(20, data_frame) # for top 20 rows
-
-		piping : data_frame %>% operation1 %>% operation2 and so on...
-
-==============================================================================================================================
-
-### Date and Time
-	
-		data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
-		data_frame$date <- as.POSIXct(data_frame$date) # dplyr does not handles date in POSIXlt format.
-		data_frame$day <- as.integer(format(data_frame$date, "%d")) # day
-		data_frame$month <- as.integer(format(data_frame$date, "%m")) # month
-		data_frame$year <- as.integer(format(data_frame$date, "%Y")) # year
-		data_frame$hour <- as.integer(format(data_frame$date, "%H")) # hour
-		data_frame$weekday <- as.integer(format(data_frame$date, "%w")) # weekday 0(sunday) - 6(saturday)
-
-==============================================================================================================================
-
 ### To check for constant factors
 
 		f <- sapply(data_frame, function(x) is.factor(x))
@@ -352,6 +307,9 @@
 
 		library("caret")
 		
+		n <- names(train)
+		f <- as.formula(paste("targetVariable ~", paste(n[!n %in% c("targetVariable")], collapse = " + ")))
+
 		algo.control = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
 		algo.grid = expand.grid( model specific parameters )
 		algo.model <-train(target ~ ., data = train, method = " ", preProcess = "scale", trControl = algo.control, tuneGrid = algo.grid)
@@ -375,6 +333,7 @@
                 tuneGrid = gbm.grid)
 
 		gbm.predict <- predict(gbmFit, cv)
+		confusionMatrix(gbm.predict, cv$target)
 
 ==============================================================================================================================
 
@@ -399,8 +358,8 @@
 	    returnResamp = "all",
 	    allowParallel = TRUE)
 
-		xgb.model <- train(x = as.matrix(data_frame %>% select(-c(id,target))),
-	    y = data_frame$target,
+		xgb.model <- train(x = as.matrix(train %>% select(-c(id,target))),
+	    y = train$target,
 	    trControl = xgb.control,
 	    tuneGrid = xgb.grid,
 	    method="xgbTree" # "xgbLinear"
@@ -409,29 +368,49 @@
 		xgb.predict <- predict(xgb.model, data.matrix(cv))
 
 		imp <- varImp(xgb.model)
+		confusionMatrix(xgb.predict, cv$target)
 
 ==============================================================================================================================
 
+### dplyr
+		
+		library("dplyr")
 
+		select(data_frame, column_names)
+		filter(data_frame, condition)
+		arrange(data_frame, desc(factor_variable)) # ascending by default
+		mutate(data_frame, new_variable_name = equation)
+		group_by(data_frame, factor_variable)
+		summarize(data_frame, newVarName =  function()) # group_by(factorVariable) %>% summarize(count = n()) used commonly.
+		count(data_frame, variable) # works similar table
+		top_n(20, data_frame) # for top 20 rows
 
-
-
-
-
-
-
-
-==============================================================================================================================
-
-Notes :
-
-If you set a random seed, split, set the seed again to the same value, and then split again, you will get the same
-split. However, if you set the seed and then split twice, you will get different splits. If you set the seed to
-different values, you will get different splits.
+		piping : data_frame %>% operation1 %>% operation2 and so on...
 
 ==============================================================================================================================
 
+### tidyr
 
+		library(tidyr)
+
+		separate(data_frame, variable, c("new","names"), sep = ", ") # separate rohtak, haryana
+		unite(data_frame, new.variable, c(var1, var2), sep = " ") # combine first name and last name into name
+		gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) # oppsoite of one-hot encoding
+		spread(data_frame, categorical.var, corresponding.numerical.var) # oppsoite of gather
+
+==============================================================================================================================
+
+### Date and Time
+	
+		data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
+		data_frame$date <- as.POSIXct(data_frame$date) # dplyr does not handles date in POSIXlt format.
+		data_frame$day <- as.integer(format(data_frame$date, "%d")) # day
+		data_frame$month <- as.integer(format(data_frame$date, "%m")) # month
+		data_frame$year <- as.integer(format(data_frame$date, "%Y")) # year
+		data_frame$hour <- as.integer(format(data_frame$date, "%H")) # hour
+		data_frame$weekday <- as.integer(format(data_frame$date, "%w")) # weekday 0(sunday) - 6(saturday)
+
+==============================================================================================================================
 
 
 
