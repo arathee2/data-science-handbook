@@ -1,6 +1,14 @@
 ==============================================================================================================================
 
-## geom_histogram(binwidth = , color = , fill = ) + ggplot(aes(fill = factor_variable)) # 1D
+## geom_histogram(binwidth = , color = , fill = ) + ggplot(aes(fill = factor_variable)) # 1D continous
+
+## geom_freqpoly()
+
+==============================================================================================================================
+
+## geom_bar(position = , color = ) + ggplot(aes(x = , fill = factor)) # 1D category
+## geom_bar(stat = "identity") + ggplot(aes(x = , y = )) # 2D category vs num
+## stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")  	
 
 ==============================================================================================================================
 
@@ -24,29 +32,59 @@
 
 ==============================================================================================================================
 
-## ggplot(data = ,aes(x = , y = ..count..,fill = factor)) + geom_bar(position = , color = , fill = ) # 1D category
-## ggplot(data = , aes(x = , y = )) + geom(stat = "identity") # 2D category vs num
-## stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")    	
+## facet_wrap(~categorical_variable)
 
-==============================================================================================================================
-
-## scale_x_continuous( breaks = seq(), limits = c() )
+## facet_grid(vertical_categorical_variable~horizontal_categorical_variable)
 
 ==============================================================================================================================
 
 ## coord_cartesian(xlim = c(), ylim = c()) # doesn't remove data, only zooms-in or zooms=out the graph.
-	
-==============================================================================================================================
 
 ## coord_trans(x = log, y = sqrt, limx = c(), limy = c()) # Used to transform the coordinate axis.
 
+## coord_flip()
+
+## coord_polar() # can be used with bar plot to create pie charts.
+
+## coord_map()
+
 ==============================================================================================================================
 
-## facet_wrap(~categorical_variable)
+## scale_x_continuous(breaks = seq(), limits = c())
+
+## scale_color_gradient(low = "red", high = "yellow", name = "legend.name", labels = c("label1","label2"))
+
+## scale_size_area()
+
+## scale_color_brewer()
+
+## scale_fill_brewer()
 
 ==============================================================================================================================
 
-## facet_grid(vertical_categorical_variable~horizontal_categorical_variable)
+## themes
+
+		library(ggthemes)
+
+		theme_grey()
+		theme_bw()
+		theme_excel() + scale_fill_economist()
+		theme_few() + scale_fill_few()
+		theme_solarized() + scale_fill_solarized()
+		theme_stata() + scale_fill_stata()
+		theme_tufte() + scale_fill_tableau()
+		theme_gdocs() + scale_fill_gdocs()
+		theme_wsj() + scale_fill_wsj(palette = "black_green")
+
+## theme(
+		axis.line, axis.text.x = element_text(angle = 45, hjust = 1), axis.text.y, axis.ticks, axis.title.x, axis.title.y,
+		legend.background, legend.key, legend.text, legend.title = "legend.name",
+		panel.background, panel.border, panel.grid.major, panel.grid.minor
+		strip.background, strip.text.x, strip.text.y
+		)
+
+## geom_text(aes(label = var), vjust = +/- 1) # text on top of graphs.
+
 
 ==============================================================================================================================
 
@@ -58,10 +96,7 @@
 		ylab("y axis label name")
 		ggtitle("graph title")
 		labs(title = "title", x = "x label", y = "y label")
-		ggplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) # to tilt x axis label
-		ggplot() + geom_text(aes(label = var), vjust = +/- 1) # + pushes downward
 		
-
 ==============================================================================================================================
 
 ## gridExtra
@@ -136,7 +171,8 @@
 
 		map <- leaflet() %>%
 				addTiles() %>%  # Add default OpenStreetMap map tiles
-				addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
+				addMarkers(lng = , lat = , popup = "popup.text")
+		
 		print(map)
 		
 ==============================================================================================================================
