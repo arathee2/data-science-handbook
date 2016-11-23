@@ -153,8 +153,8 @@
 		
 		set.seed(154)
 				
-		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 10,
-	    			max.words=1500, random.order=FALSE, rot.per=0.65, 
+		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
+	    			max.words=1500, random.order=FALSE, rot.per=0.35, 
         			colors=brewer.pal(8, "Dark2"), scale(5,0.5))
 
 ==============================================================================================================================
@@ -193,8 +193,13 @@
 		substr("Amandeep",1,4) # return Aman
 		str_trim()
 
-
 ==============================================================================================================================
+
+
+
+
+
+
 
 
 
