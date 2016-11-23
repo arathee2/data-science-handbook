@@ -4,6 +4,8 @@
 
 ## geom_freqpoly()
 
+## geom_density(stat = "identity") + ggplot(aes(color = factor_variable)) # 1D
+
 ==============================================================================================================================
 
 ## geom_bar(position = , color = ) + ggplot(aes(x = , fill = factor)) # 1D category
@@ -12,15 +14,15 @@
 
 ==============================================================================================================================
 
-## geom_density(stat = "identity") + ggplot(aes(color = factor_variable)) # 1D
-
-==============================================================================================================================
-
 ## geom_point(alpha = 0.5) + ggplot(aes(fill = factor_variable)) # 2D num vs num
 
 ==============================================================================================================================
 
 ## geom_boxplot(aes(color = factor_variable), alpha = 0.1) # factor vs num
+
+==============================================================================================================================
+
+## geom_tile() + ggplot(aes(x = , y = , fill = numeric.variable))
 
 ==============================================================================================================================
 
@@ -50,9 +52,9 @@
 
 ==============================================================================================================================
 
-## scale_x_continuous(breaks = seq(), limits = c())
+## scale_x_continuous(breaks = seq(), limits = c(), labels = c())
 
-## scale_color_gradient(low = "red", high = "yellow", name = "legend.name", labels = c("label1","label2"))
+## scale_color_gradient(low = "green", high = "red")
 
 ## scale_size_area()
 
@@ -76,15 +78,15 @@
 		theme_gdocs() + scale_fill_gdocs()
 		theme_wsj() + scale_fill_wsj(palette = "black_green")
 
-## theme(
-		axis.line, axis.text.x = element_text(angle = 45, hjust = 1), axis.text.y, axis.ticks, axis.title.x, axis.title.y,
-		legend.background, legend.key, legend.text, legend.title = "legend.name",
-		panel.background, panel.border, panel.grid.major, panel.grid.minor
-		strip.background, strip.text.x, strip.text.y
-		)
+## scale_fill/color_manual/continuous/discrete(guide = guide_legend("legend.title"),
+		labels = c("legend.names"), values = c("legend.colors"))
+
+## theme(axis.line, axis.text.x = element_text(face="bold", color="#993333", size=14, angle = 45, hjust = 1), 
+		axis.ticks, axis.title.x, legend.position = "none")
 
 ## geom_text(aes(label = var), vjust = +/- 1) # text on top of graphs.
 
+## annotate("text", label = "custom.text",x = x.postition, y = y.position, size = , colour = "text.color")
 
 ==============================================================================================================================
 
@@ -180,7 +182,17 @@
 ## String
 
 		library(stringr)
+
+		lolower(character.variable)
+		toupper(character.variable)
+		strsplit(character.variable, ",") # split at ","
 		str_extract(variable, pattern) # pattern <- "[a-zA-Z]*"
+		gsub("#","%",character.variable) # substitute # with % at all instances. use sub() to replace only the first instance.
+		grepl("substring",character.variable ) # return logical vector whether the substring appears or not.
+		nchar()
+		substr("Amandeep",1,4) # return Aman
+		str_trim()
+
 
 ==============================================================================================================================
 

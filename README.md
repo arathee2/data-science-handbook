@@ -401,20 +401,20 @@
 				filter(new.numerical.var == 1) %>% 
 				select(-new.numerical.var) # oppsoite of one-hot encoding
 
-		spread(data_frame, categorical.var, corresponding.numerical.var) # oppsoite of gather
+		spread(data_frame, categorical.var, corresponding.numerical.var) # opposite of gather
 
 ==============================================================================================================================
 
 ### Date and Time
 	
-		data_frame$date <- strptime(variable, format = "") # format can be - "%d/%m/%Y %H:%M:%S"
+		data_frame$date <- as.POSIXct(strptime(variable, format = "")) # format can be - "%d/%m/%Y %H:%M:%S"
 		data_frame$date <- as.POSIXct(data_frame$date) # dplyr does not handles date in POSIXlt format.
 		data_frame$day <- as.integer(format(data_frame$date, "%d")) # day
-		data_frame$month <- as.integer(format(data_frame$date, "%m")) # month
+		data_frame$month <- as.integer(format(data_frame$date, "%B")) # month
 		data_frame$year <- as.integer(format(data_frame$date, "%Y")) # year
 		data_frame$hour <- as.integer(format(data_frame$date, "%H")) # hour
-		data_frame$weekday <- as.integer(format(data_frame$date, "%w")) # weekday 0(sunday) - 6(saturday)
-
+		data_frame$weekday <- as.integer(format(data_frame$date, "%A")) # weekday
+		
 ==============================================================================================================================
 
 
