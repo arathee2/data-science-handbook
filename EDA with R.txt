@@ -22,7 +22,7 @@
 
 ==============================================================================================================================
 
-## geom_tile() + ggplot(aes(x = , y = , fill = numeric.variable))
+## geom_tile() + ggplot(aes(x = , y = , fill = numeric.variable)) # 2D factor vs factor. Use dplyr group_by(fac1,fac2) and n().
 
 ==============================================================================================================================
 
@@ -169,8 +169,16 @@
 		
 		ggmap(usa) + geom_point(data = data_frame, aes(x = Longitude, y = Latitude))
 		
-		library(leaflet)
+		
+		library(maps)
+		
+		usa <- map_data("state")
+		data_frame <- merge(usa, data_frame, by=" ")
+		
+		ggplot(data_frame, aes(x = long, y = lat, group = group))
 
+		
+		library(leaflet)
 		map <- leaflet() %>%
 				addTiles() %>%  # Add default OpenStreetMap map tiles
 				addMarkers(lng = , lat = , popup = "popup.text")
@@ -195,9 +203,11 @@
 
 ==============================================================================================================================
 
+## Data Table
 
+		datatable(data_frame)
 
-
+==============================================================================================================================
 
 
 
