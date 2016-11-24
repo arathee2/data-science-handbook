@@ -241,9 +241,14 @@
 		which.max(var)
 		which.min(var)
 		outliers <- subset(data_frame, data_frame$var >=< condition)
-		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
 		match("value",var)
 		which(var == "value")
+
+		apply(array/matrix/data_frame, 1/2, function, ...) # need to specify row/column.
+		lapply(list/vector/data_frame, function, ...) # work on columns. return list.
+		sapply(list/vector/data_frame, function, ...) # work on columns. return vector if possible else matrix else list.
+		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
+
 
 	# choosing x random rows from a data set. given that x < nrow(train).
 
