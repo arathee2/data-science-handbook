@@ -69,7 +69,14 @@
 		n <- names(train)
 		f <- as.formula(paste("targetVariable ~", paste(n[!n %in% c("targetVariable")], collapse = " + ")))
 
-		nn.model <- neuralnet(f, data = train.normalized, hidden=c(5,3), linear.output=T)
+		normalize <- function(x)
+		{
+			return((x - min(x)) / (max(x) - min(x)))
+		}
+
+		data_frame.normalized <- as.data.frame(lapply(data_frame, normalize))
+
+		nn.model <- neuralnet(f, data = train.normalized, err.fct = sse/ce, hidden=c(5,3), linear.output=T)
 		# hidden specifies the neurons in hidden layers. Here are 2 hidden layers with 5 and 3 neurons respecively.
 		# a good thumb rule is to have 2/3 hidden layers with 2/3rd of neurons present in previous layer.
 		# linear.output = T is for linear regression. It is set to F for classification.
@@ -123,15 +130,16 @@
 		
 	# model
 
-		rf.model <- randomForest(target ~ ., data = train, ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
+		rf.model <- randomForest(target ~ ., data = train, importance = TRUE,ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
 		rf.predict <- predict(rf.model, cv)
 		table(cv$target, rf.predict)
+		varImpPlot(rf.model)
 
 	# party-cforest
 
 		library(party)
 
-		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000))
+		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000, mtry = root.of.variables))
 
 		cforest.prediction = predict(cforest.model, cv, OOB = TRUE, type = "response")
 
