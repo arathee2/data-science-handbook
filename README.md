@@ -51,6 +51,20 @@
 		glm.auc <- as.numeric(performance(glm.ROCR,"auc")@y.values)
 
 ==============================================================================================================================
+### K-Nearest Neighbor
+
+		library(class)
+
+		knn.train <- train[, -c(target)]
+		knn.cv <- cv[, -c(target)]
+		knn.train.target <- train[, c(target)]
+		knn.cv.target <- cv[, c(target)]
+		
+		set.seed(1)
+		knn.model <- knn(train = knn.train, test = knn.cv, cl = knn.train.target, k = under.root.observations)
+		confusionMatrix(knn.model, cv$target)
+
+==============================================================================================================================
 
 ### Neural Networks
 	
@@ -74,7 +88,7 @@
 			return((x - min(x)) / (max(x) - min(x)))
 		}
 
-		data_frame.normalized <- as.data.frame(lapply(data_frame, normalize))
+		data_frame.normalized <- as.data.frame(lapply(data_frame[,column.names], normalize))
 
 		nn.model <- neuralnet(f, data = train.normalized, err.fct = sse/ce, hidden=c(5,3), linear.output=T)
 		# hidden specifies the neurons in hidden layers. Here are 2 hidden layers with 5 and 3 neurons respecively.
@@ -192,6 +206,16 @@
 	# 3. Now make predictions on test set using each of these models, say pred_test1, pred_test2 and make a data frame called ensemble_test where these are the columns.
 	# 4. Now make a model ensemble_model which is built using ensemble_train and predicts on ensemble_test. This is the final prediction.
 
+	predictions <- data.frame(algo1.prediction = , algo2.prediction = , algo3.prediction = ,
+								final.prediction = rep(0, nrow(cv)), actual.label = cv$target)
+
+    getmode <- function(x) {
+    unique.x <- unique(x)
+    unique.x[which.max(tabulate(match(x, unique.x)))]
+	}
+
+	predictions$final.prediction <- apply(predictions, 1, getmode)
+
 ==============================================================================================================================
 
 ### K-fold cross validation
@@ -208,7 +232,7 @@
 
 ### Splitting data set randomly
 
-	# sample.split balacnes partitions keeping in mind the outcome variable
+	# sample.split balances partitions keeping in mind the outcome variable
 
 		library("caTools")
 		set.seed(10)
@@ -360,7 +384,8 @@
 	    gamma = c(1, 2, 3), 
 	    colsample_bytree = c(0.4, 0.7, 1.0), 
 	    min_child_weight = c(0.5, 1, 1.5),
-	    nrounds = 2)
+	    nrounds = 2,
+	    subsample = 1)
 
 		xgb.control <- trainControl(
 	    method="repeatedcv",
