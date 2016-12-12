@@ -19,7 +19,7 @@
 
 	# ROCR and AUC(area under curve)
 		
-		library("ROCR")
+		library(ROCR)
 		linear.predict <- predict(linear.model, cv)
 		linear.ROCR <- prediction(linear.predict, cv$target)
 		linear.auc <- as.numeric(performance(linear.ROCR,"auc")@y.values)
@@ -36,7 +36,7 @@
 
 	# model
 
-		glm.model <- glm(target ~ ., data = train, family = "binomial")
+		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))
 		glm.predict <- predict(glm.model, cv, type = "response")
 	
 	# confusion matrix for accuracy check
@@ -45,63 +45,84 @@
 	
 	# ROCR and AUC(area under curve)
 	
-		library("ROCR")
+		library(ROCR)
+		library(pROC)
 		glm.predict <- predict(model, cv)
 		glm.ROCR <- prediction(glm.predict, cv$target)
-		glm.auc <- as.numeric(performance(glm.ROCR,"auc")@y.values)
+		glm.AUC <- as.numeric(performance(glm.ROCR,"auc")@y.values)
+
+		glm.prediction <- prediction(abs(glm.predict), cv$target)
+		glm.performance <- performance(glm.prediction,"tpr","fpr")
+		plot(glm.performance)
 
 ==============================================================================================================================
+
 ### K-Nearest Neighbor
 
 		library(class)
 
-		knn.train <- train[, -c(target)]
-		knn.cv <- cv[, -c(target)]
-		knn.train.target <- train[, c(target)]
-		knn.cv.target <- cv[, c(target)]
+		predictors <- names(train)[names(train) != "target"]
+		knn.trainX <- train[, predictors]
+		knn.cvX <- cv[, predictors]
+		knn.trainY <- train$target
+		knn.cvY <- cv$target
 		
 		set.seed(1)
-		knn.model <- knn(train = knn.train, test = knn.cv, cl = knn.train.target, k = under.root.observations)
-		confusionMatrix(knn.model, cv$target)
+		knn.model <- knn(train = knn.trainX, test = knn.cvX, cl = knn.trainY, k = under.root.observations)
+		confusionMatrix(knn.model, knn.cvY)
+
+==============================================================================================================================
+
+### Regularized Regression
+
+		library(glmnet)
+
+		predictors <- names(train)[names(train) != "target"]
+		trainX <- as.matrix(train[ ,predictors])
+		trainY <- train$target
+		cvX <- as.matrix(cv[ ,predictors])
+		cvY <- cv$target
+
+		cv.glmnet.model <- cv.glmnet(trainX, trainY, type.measure = "deviance/mse/mae/class/auc", nfolds = 10, nlambda = 100)
+		cv.glmnet.model
+		plot(cv.glmnet.model)
+		
+		ridge.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
+								alpha = 0, lambda = cv.glmnet.model$lambda.1se/cv.glmnet.model$lambda.min)
+
+		lasso.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
+								alpha = 1, lambda = cv.glmnet.model$lambda.1se/cv.glmnet.model$lambda.min)
+
+		elnet.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
+								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se/cv.glmnet.model$lambda.min)
+
+		ridge.prediction <- predict(ridge.model, cvY, s = lambda.used)
+		lasso.prediction <- predict(lasso.model, cvY, s = lambda.used)
+		elnet.prediction <- predict(elnet.model, cvY, s = lambda.used)
+		rmse/table
 
 ==============================================================================================================================
 
 ### Neural Networks
 	
-	# min-max normalization
-
-		maxs <- apply(data, 2, max) 
-		mins <- apply(data, 2, min)
-		scaled <- as.data.frame(scale(data_frame, center = mins, scale = maxs - mins))
-		train.normalized
-		test.normalized
-
-	# model
-
 		library(neuralnet)
-
-		n <- names(train)
-		f <- as.formula(paste("targetVariable ~", paste(n[!n %in% c("targetVariable")], collapse = " + ")))
 
 		normalize <- function(x)
 		{
 			return((x - min(x)) / (max(x) - min(x)))
 		}
 
-		data_frame.normalized <- as.data.frame(lapply(data_frame[,column.names], normalize))
+		data_frame.normalized <- as.data.frame(lapply(data_frame[ ,column.names], normalize))
 
-		nn.model <- neuralnet(f, data = train.normalized, err.fct = sse/ce, hidden=c(5,3), linear.output=T)
+		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
+		nn.model <- neuralnet(f, data = train.normalized, err.fct = sse/ce, hidden=c(5,3), linear.output = F)
+		
 		# hidden specifies the neurons in hidden layers. Here are 2 hidden layers with 5 and 3 neurons respecively.
 		# a good thumb rule is to have 2/3 hidden layers with 2/3rd of neurons present in previous layer.
 		# linear.output = T is for linear regression. It is set to F for classification.
 		
 		plot(nn.model)
-		nn.predict <- compute(nn.model, cv.normalized[,1:13])
-
-		# de-normalizing the predictions and test set to calculate the accuracy and not to forget to submit denormalized predictions.
-		
-		nn.predict.denormalized <- nn.predict$net.result*(max(data$target)-min(data$target))+min(data$target)
-		test.denormalized <- (test.normalized$target)*(max(data$target)-min(data$target))+min(data$target)
+		nn.predict <- compute(nn.model, cv.normalized[ ,predictors])
 		nn.rmse
 
 ==============================================================================================================================
@@ -144,7 +165,7 @@
 		
 	# model
 
-		rf.model <- randomForest(target ~ ., data = train, importance = TRUE,ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
+		rf.model <- randomForest(target ~ ., data = train, importance = TRUE, ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
 		rf.predict <- predict(rf.model, cv)
 		table(cv$target, rf.predict)
 		varImpPlot(rf.model)
@@ -156,7 +177,6 @@
 		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000, mtry = root.of.variables))
 
 		cforest.prediction = predict(cforest.model, cv, OOB = TRUE, type = "response")
-
 
 ==============================================================================================================================
 
@@ -226,7 +246,8 @@
 		set.seed(1)
 		fitControl = trainControl( method = "cv", number = 10 )
 		cartGrid = expand.grid( .cp = seq(0.002,0.1,0.002))
-		train( targetVariable ~ . , data = train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
+		model <- train( targetVariable ~ . , data = train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
+		summary(model)
 
 ==============================================================================================================================
 
@@ -255,15 +276,8 @@
 
 ### Removing Variables from data frame
 		
-		nonvars <- c("x1","x2","x3")
-		train <- train[, !(names(data_frame) %in% nonvars)]
-		test <- test[, !(names(data_frame) %in% nonvars)]
-					
-					OR
-
+		data_frame <- data_frame[ ,!(names(data_frame) %in% c("x1","x2","x3"))]
 		data_frame$var <- NULL
-
-					OR
 		new_data_frame <- setdiff(names(data_frame),c("x1","x2","x3"))
 
 ==============================================================================================================================
@@ -302,7 +316,7 @@
 	library(corrplot)
 
 		nums <- sapply(data_frame, is.numeric)
-		cordata <- data_frame[,nums]
+		cordata <- data_frame[ ,nums]
 		cordata <- na.omit(cordata)
 		cor_matrix <- cor(cordata) # to see correlation table
 		cor_matrix
@@ -315,10 +329,10 @@
 	library(Boruta)	
 
 		set.seed(13)
-		bor.model <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
-		summary(bor.model)
-		boruta.cor.matrix <- attStats(bor.model)
-		important.features <- features[boruta.model$finalDecision!="Rejected"]
+		boruta.model <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
+		summary(boruta.model)
+		boruta.cor.matrix <- attStats(boruta.model)
+		important.features <- names(data_frame)[boruta.model$finalDecision!="Rejected"]
 		important.features
 
 ==============================================================================================================================
@@ -334,7 +348,7 @@
 ### To check for constant factors
 
 		f <- sapply(data_frame, function(x) is.factor(x))
-		m <- data_frame[,names(which(f == "TRUE"))]
+		m <- data_frame[ ,names(which(f == "TRUE"))]
 		ifelse(n <- sapply(m, function(x) length(levels(x))) == 1,"constant factor","0")
 		table(n)
 
@@ -344,12 +358,13 @@
 
 		library("caret")
 		
-		n <- names(train)
-		f <- as.formula(paste("targetVariable ~", paste(n[!n %in% c("targetVariable")], collapse = " + ")))
+		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
 
-		algo.control = trainControl( method = "repeatedcv", number = 10, repeats = 3 )
-		algo.grid = expand.grid( model specific parameters )
-		algo.model <-train(target ~ ., data = train, method = " ", preProcess = "scale", trControl = algo.control, tuneGrid = algo.grid)
+		algo.control = trainControl(method = "repeatedcv", number = 10, repeats = 3)
+		algo.grid = expand.grid(model specific parameters)
+		algo.model <- train(target ~ ., data = train, method = "", preProcess = c("center","scale"),
+							trControl = algo.control, tuneGrid = algo.grid)
+
 		algo.predict <- predict.train(algo.model, cv)
 		confusionMatrix(algo.predict, cv$target)
 		imp <- varImp(algo.model)
@@ -366,7 +381,7 @@
 		gbmFit <- train(target ~ ., data = train,
                 method = "gbm",
                 trControl = gbm.control,
-                verbose = FALSE,
+                verbose = TRUE,
                 tuneGrid = gbm.grid)
 
 		gbm.predict <- predict(gbmFit, cv)
@@ -404,9 +419,8 @@
 		)
 
 		xgb.predict <- predict(xgb.model, data.matrix(cv))
-
-		imp <- varImp(xgb.model)
 		confusionMatrix(xgb.predict, cv$target)
+		imp <- varImp(xgb.model)
 
 ==============================================================================================================================
 

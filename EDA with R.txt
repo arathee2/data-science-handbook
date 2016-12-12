@@ -155,7 +155,7 @@
 				
 		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
 	    			max.words=1500, random.order=FALSE, rot.per=0.35, 
-        			colors=brewer.pal(8, "Dark2"), scale(5,0.5))
+        			colors=brewer.pal(8, "Dark2"), scale = c(5,0.5))
 
 ==============================================================================================================================
 
