@@ -32,18 +32,21 @@
 
 ### Logistic Regression
 	
-	# check for VIC. VIC to be minimized.
-
-	# model
+	## Binomial
 
 		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))
-		glm.predict <- predict(glm.model, cv, type = "response")
-	
-	# confusion matrix for accuracy check
-	
+		glm.predict <- predict(glm.model, cv, type = "response")	
 		table(cv$target, glm.predict>0.5)
 	
-	# ROCR and AUC(area under curve)
+	## Multinomial
+
+		library (nnet)
+
+		multinom.model <- multinom(target ~ ., data = train)
+		summary(multinom.model)
+		multinom.predict <- predict(multinom.model, cv, "probs")
+
+	## ROCR and AUC(area under curve)
 	
 		library(ROCR)
 		library(pROC)
@@ -271,6 +274,9 @@
 		set.seed(10)
 		imputed <- complete(mice(data_frame))
 		data_frame$var <- imputed$var
+
+		library(DMwR)
+		inputData <- knnImputation(inputData)
 
 ==============================================================================================================================
 

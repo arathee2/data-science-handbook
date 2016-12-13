@@ -115,6 +115,7 @@
 		library(tm)
 		library(SnowballC)
 		library(wordcloud)
+		library(RColorBrewer)
 
 	# cleaning data
 
