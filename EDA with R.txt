@@ -198,8 +198,8 @@
 		str_extract(variable, pattern) # pattern <- "[a-zA-Z]*"
 		gsub("#","%",character.variable) # substitute # with % at all instances. use sub() to replace only the first instance.
 		grepl("substring",character.variable ) # return logical vector whether the substring appears or not.
-		nchar()
 		substr("Amandeep",1,4) # return Aman
+		str_length() or nchar()
 		str_trim()
 
 ==============================================================================================================================

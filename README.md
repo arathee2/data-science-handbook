@@ -70,6 +70,7 @@
 		knn.trainY <- train$target
 		knn.cvY <- cv$target
 		
+		# make sure all variables are numeric
 		set.seed(1)
 		knn.model <- knn(train = knn.trainX, test = knn.cvX, cl = knn.trainY, k = under.root.observations)
 		confusionMatrix(knn.model, knn.cvY)
@@ -468,10 +469,10 @@
 		data_frame$date <- as.POSIXct(strptime(variable, format = "")) # format can be - "%d/%m/%Y %H:%M:%S"
 		data_frame$date <- as.POSIXct(data_frame$date) # dplyr does not handles date in POSIXlt format.
 		data_frame$day <- as.integer(format(data_frame$date, "%d")) # day
-		data_frame$month <- as.integer(format(data_frame$date, "%B")) # month
+		data_frame$month <- as.factor(format(data_frame$date, "%B")) # month
 		data_frame$year <- as.integer(format(data_frame$date, "%Y")) # year
 		data_frame$hour <- as.integer(format(data_frame$date, "%H")) # hour
-		data_frame$weekday <- as.integer(format(data_frame$date, "%A")) # weekday
+		data_frame$weekday <- as.factor(format(data_frame$date, "%A")) # weekday
 		
 ==============================================================================================================================
 
