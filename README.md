@@ -87,18 +87,19 @@
 		cvX <- as.matrix(cv[ ,predictors])
 		cvY <- cv$target
 
+		# for classification add family = "binomial" to the following function.
 		cv.glmnet.model <- cv.glmnet(trainX, trainY, type.measure = "deviance/mse/mae/class/auc", nfolds = 10, nlambda = 100)
 		cv.glmnet.model
 		plot(cv.glmnet.model)
 		
 		ridge.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 0, lambda = cv.glmnet.model$lambda.1se/cv.glmnet.model$lambda.min)
+								alpha = 0, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
 
 		lasso.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 1, lambda = cv.glmnet.model$lambda.1se/cv.glmnet.model$lambda.min)
+								alpha = 1, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
 
 		elnet.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se/cv.glmnet.model$lambda.min)
+								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
 
 		ridge.prediction <- predict(ridge.model, cvY, s = lambda.used)
 		lasso.prediction <- predict(lasso.model, cvY, s = lambda.used)
