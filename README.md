@@ -20,6 +20,7 @@
 	# ROCR and AUC(area under curve)
 		
 		library(ROCR)
+		
 		linear.predict <- predict(linear.model, cv)
 		linear.ROCR <- prediction(linear.predict, cv$target)
 		linear.auc <- as.numeric(performance(linear.ROCR,"auc")@y.values)
@@ -40,7 +41,7 @@
 	
 	## Multinomial
 
-		library (nnet)
+		library ("nnet")
 
 		multinom.model <- multinom(target ~ ., data = train)
 		summary(multinom.model)
@@ -50,6 +51,7 @@
 	
 		library(ROCR)
 		library(pROC)
+
 		glm.predict <- predict(model, cv)
 		glm.ROCR <- prediction(glm.predict, cv$target)
 		glm.AUC <- as.numeric(performance(glm.ROCR,"auc")@y.values)
@@ -62,7 +64,7 @@
 
 ### K-Nearest Neighbor
 
-		library(class)
+		library("class")
 
 		predictors <- names(train)[names(train) != "target"]
 		knn.trainX <- train[, predictors]
@@ -79,7 +81,7 @@
 
 ### Regularized Regression
 
-		library(glmnet)
+		library("glmnet")
 
 		predictors <- names(train)[names(train) != "target"]
 		trainX <- as.matrix(train[ ,predictors])
@@ -110,7 +112,7 @@
 
 ### Neural Networks
 	
-		library(neuralnet)
+		library("neuralnet")
 
 		normalize <- function(x)
 		{
@@ -134,7 +136,7 @@
 
 ### SVM
 
-		library(e1071)
+		library("e1071")
 
 		svm.model <- svm(target ~ ., data = train, kernel = "radial", cost = 1, gamma = 0.1)
 		svm.predict <- predict(svm.model, cv)
@@ -166,10 +168,10 @@
 ### Random Forest
 		
 		library("randomForest")
-		set.seed(10)
 		
 	# model
 
+		set.seed(10)
 		rf.model <- randomForest(target ~ ., data = train, importance = TRUE, ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
 		rf.predict <- predict(rf.model, cv)
 		table(cv$target, rf.predict)
@@ -177,11 +179,11 @@
 
 	# party-cforest
 
-		library(party)
+		library("party")
 
 		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000, mtry = root.of.variables))
-
 		cforest.prediction = predict(cforest.model, cv, OOB = TRUE, type = "response")
+		table(cv$target, cforest.prediction)
 
 ==============================================================================================================================
 
@@ -244,15 +246,37 @@
 ==============================================================================================================================
 
 ### K-fold cross validation
-		
-		# to calculate optimum value of cp for using it in CART.
 
-		library(caret)
-		set.seed(1)
-		fitControl = trainControl( method = "cv", number = 10 )
-		cartGrid = expand.grid( .cp = seq(0.002,0.1,0.002))
-		model <- train( targetVariable ~ . , data = train, method = "rpart", trControl = fitControl, tuneGrid = cartGrid )
-		summary(model)
+		k <- 10
+
+		# Randomly shuffle the data
+		data.frame <- data.frame[sample(nrow(data.frame)), ]
+
+		# Create K equally size folds
+		folds <- cut(seq(1, nrow(data.frame)), breaks = k, labels = FALSE)
+
+		accuracy <- rep(0,k)
+		
+		# Perform K-fold cross validation
+		for(i in 1:k){
+		    
+		    #Segment your data by fold using the which() function 
+		    cv.indices <- which(folds == i, arr.ind=TRUE)
+			train <- data.frame[-cv.indices, ]
+			cv <- data.frame[cv.indices, ]
+
+			# model
+
+			# calculate accuracy for current fold
+			accurate.predictions <- 0
+			confusion.matrix <- as.matrix(table(cv$target, predictions))
+			
+			for(i in 1:nrow(confusion.matrix)){
+				accurate.predictions <- accurate.predictions + confusion.matrix[i,i]
+			}
+
+			print(accuracy[i] <- accurate.predictions/nrow(cv))
+		}
 
 ==============================================================================================================================
 

@@ -2,7 +2,7 @@
 
 ## geom_histogram(binwidth = , color = , fill = ) + ggplot(aes(fill = factor_variable)) # 1D continous
 
-## geom_freqpoly()
+## geom_freqpoly() # 1D
 
 ## geom_density(stat = "identity") + ggplot(aes(color = factor_variable)) # 1D
 
@@ -18,7 +18,7 @@
 
 ==============================================================================================================================
 
-## geom_boxplot(aes(color = factor_variable), alpha = 0.1) # factor vs num
+## geom_boxplot(aes(color = factor_variable), alpha = 0.1) # 2D factor vs num
 
 ==============================================================================================================================
 
