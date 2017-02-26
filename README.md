@@ -110,30 +110,6 @@
 
 ==============================================================================================================================
 
-### Neural Networks
-	
-		library("neuralnet")
-
-		normalize <- function(x)
-		{
-			return((x - min(x)) / (max(x) - min(x)))
-		}
-
-		data_frame.normalized <- as.data.frame(lapply(data_frame[ ,column.names], normalize))
-
-		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
-		nn.model <- neuralnet(f, data = train.normalized, err.fct = sse/ce, hidden=c(5,3), linear.output = F)
-		
-		# hidden specifies the neurons in hidden layers. Here are 2 hidden layers with 5 and 3 neurons respecively.
-		# a good thumb rule is to have 2/3 hidden layers with 2/3rd of neurons present in previous layer.
-		# linear.output = T is for linear regression. It is set to F for classification.
-		
-		plot(nn.model)
-		nn.predict <- compute(nn.model, cv.normalized[ ,predictors])
-		nn.rmse
-
-==============================================================================================================================
-
 ### SVM
 
 		library("e1071")
@@ -184,6 +160,147 @@
 		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000, mtry = root.of.variables))
 		cforest.prediction = predict(cforest.model, cv, OOB = TRUE, type = "response")
 		table(cv$target, cforest.prediction)
+
+==============================================================================================================================
+
+### GBM
+
+		library("gbm")
+
+		gbm.model <- gbm(target ~ .,
+						distribution = c("bernoulli","multinomial","gaussian"),
+						data = train,
+						n.trees = 2000,
+						interaction.depth = 1,
+						n.minobsinnode = 10,
+						shrinkage = 0.001,
+						train.fraction = 1.0,
+						keep.data = TRUE,
+						verbose = TRUE)
+
+		gbm.perf(gbm.model)
+
+		gbm.predict <- predict(gbm.model, cv, n.trees = gbm.perf(gbm.model, plot.it = F)), type = "response")
+		gbm.predict <- apply(gbm.predict, 1, which.max) # choose class with maximum probability
+
+		table(gbm.predict, cv$target)
+
+==============================================================================================================================
+
+### H2O deep-learning
+
+		library(h2o)
+
+		localH2O <- h2o.init(ip = 'localhost', port = 54321, max_mem_size = '2g')
+		
+		names(train) <- NULL # so that the algorithm does not take column name as a separate level in the target variable
+		h2o.train <- as.h2o(train)
+		h2o.cv <- as.h2o(cv)
+
+		h2o.model <- h2o.deeplearning(x = setdiff(names(train), c("target","id")), # predictors names or indices
+							y = "target", # label. check names(h2o.train) to see target variable name
+							training_frame = h2o.train, # data to train
+							activation = "TanhWithDropout", # or 'Tanh'
+							input_dropout_ratio = 0.2, # % of inputs dropout
+							hidden_dropout_ratios = c(0.5,0.5,0.5), # % for nodes dropout
+							balance_classes = TRUE,
+							hidden = c(50,50,50), # two hidden layers with 100 nodes each
+							epochs = 100)
+
+		h2o.predictions <- as.data.frame(h2o.predict(h2o.model, h2o.cv))
+		confusionMatrix(h2o.predictions$predict, cv$target) # remove first row of h2o.predictions if length does not match
+
+==============================================================================================================================
+
+### xgboost
+		
+		library(xgboost)
+
+		xgb.grid <- expand.grid(
+	    eta = c(0.01, 0.001, 0.0001), 
+		max_depth = c(5, 10, 15), 
+	    gamma = c(1, 2, 3), 
+	    colsample_bytree = c(0.4, 0.7, 1.0), 
+	    min_child_weight = c(0.5, 1, 1.5),
+	    nrounds = 2,
+	    subsample = 1)
+
+		xgb.control <- trainControl(
+	    method="repeatedcv",
+	    number = 3,
+	    repeats = 3,
+	    verboseIter = TRUE,
+	    returnData=FALSE,
+	    returnResamp = "all",
+	    allowParallel = TRUE)
+
+		xgb.predictors <- as.matrix(train[, !(names(train) %in% c("target","id"))])
+		xgb.label <- train$target
+
+		xgb.model <- train(x = xgb.predictors,
+	    y = xgb.label,
+	    trControl = xgb.control,
+	    tuneGrid = xgb.grid,
+	    method="xgbTree" # "xgbLinear"
+		)
+
+		xgb.predict <- predict(xgb.model, data.matrix(cv))
+		confusionMatrix(xgb.predict, cv$target)
+		important.features <- varImp(xgb.model)
+		plot(important.features, 20)
+
+==============================================================================================================================
+
+### caret
+
+		library("caret")
+		
+		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
+
+		algo.control = trainControl(method = "repeatedcv", number = 10, repeats = 3)
+		algo.grid = expand.grid(model specific parameters)
+		algo.model <- train(target ~ ., data = train, method = "", preProcess = c("center","scale"),
+							trControl = algo.control, tuneGrid = algo.grid)
+
+		algo.predict <- predict.train(algo.model, cv)
+		confusionMatrix(algo.predict, cv$target)
+		imp <- varImp(algo.model)
+		plot(imp, top = 20))
+
+==============================================================================================================================
+
+### K-fold cross validation
+
+		k <- 10
+
+		# Randomly shuffle the data
+		data.frame <- data.frame[sample(nrow(data.frame)), ]
+
+		# Create K equally size folds
+		folds <- cut(seq(1, nrow(data.frame)), breaks = k, labels = FALSE)
+
+		accuracy <- rep(0,k)
+		
+		# Perform K-fold cross validation
+		for(i in 1:k){
+		    
+		    #Segment your data by fold using the which() function 
+		    cv.indices <- which(folds == i, arr.ind=TRUE)
+			train <- data.frame[-cv.indices, ]
+			cv <- data.frame[cv.indices, ]
+
+			# model
+
+			# calculate accuracy for current fold
+			accurate.predictions <- 0
+			confusion.matrix <- as.matrix(table(cv$target, predictions))
+			
+			for(i in 1:nrow(confusion.matrix)){
+				accurate.predictions <- accurate.predictions + confusion.matrix[i,i]
+			}
+
+			print(accuracy[i] <- accurate.predictions/nrow(cv))
+		}
 
 ==============================================================================================================================
 
@@ -245,41 +362,6 @@
 
 ==============================================================================================================================
 
-### K-fold cross validation
-
-		k <- 10
-
-		# Randomly shuffle the data
-		data.frame <- data.frame[sample(nrow(data.frame)), ]
-
-		# Create K equally size folds
-		folds <- cut(seq(1, nrow(data.frame)), breaks = k, labels = FALSE)
-
-		accuracy <- rep(0,k)
-		
-		# Perform K-fold cross validation
-		for(i in 1:k){
-		    
-		    #Segment your data by fold using the which() function 
-		    cv.indices <- which(folds == i, arr.ind=TRUE)
-			train <- data.frame[-cv.indices, ]
-			cv <- data.frame[cv.indices, ]
-
-			# model
-
-			# calculate accuracy for current fold
-			accurate.predictions <- 0
-			confusion.matrix <- as.matrix(table(cv$target, predictions))
-			
-			for(i in 1:nrow(confusion.matrix)){
-				accurate.predictions <- accurate.predictions + confusion.matrix[i,i]
-			}
-
-			print(accuracy[i] <- accurate.predictions/nrow(cv))
-		}
-
-==============================================================================================================================
-
 ### Splitting data set randomly
 
 	# sample.split balances partitions keeping in mind the outcome variable
@@ -322,14 +404,7 @@
 		match("value",var)
 		which(var == "value")
 
-		apply(array/matrix/data_frame, 1/2, function, ...) # need to specify row/column.
-		lapply(list/vector/data_frame, function, ...) # work on columns. return list.
-		sapply(list/vector/data_frame, function, ...) # work on columns. return vector if possible else matrix else list.
-		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
-
-
-	# choosing x random rows from a data set. given that x < nrow(train).
-
+		# choosing x random rows from a data set. given that x < nrow(train).
 		trainSmall <- train[sample(nrow(train), x), ]
 
 ==============================================================================================================================
@@ -386,73 +461,12 @@
 
 ==============================================================================================================================
 
-### caret
+### apply functions
 
-		library("caret")
-		
-		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
-
-		algo.control = trainControl(method = "repeatedcv", number = 10, repeats = 3)
-		algo.grid = expand.grid(model specific parameters)
-		algo.model <- train(target ~ ., data = train, method = "", preProcess = c("center","scale"),
-							trControl = algo.control, tuneGrid = algo.grid)
-
-		algo.predict <- predict.train(algo.model, cv)
-		confusionMatrix(algo.predict, cv$target)
-		imp <- varImp(algo.model)
-		plot(imp, top = 20))
-
-==============================================================================================================================
-
-### GBM
-
-		gbm.control <- trainControl(method = "repeatedcv", number = 10, repeats = 10)
-
-		gbm.grid <-  expand.grid(interaction.depth = c(1, 5, 9), n.trees = (1:30)*50, shrinkage = 0.1, n.minobsinnode = 10)
-
-		gbmFit <- train(target ~ ., data = train,
-                method = "gbm",
-                trControl = gbm.control,
-                verbose = TRUE,
-                tuneGrid = gbm.grid)
-
-		gbm.predict <- predict(gbmFit, cv)
-		confusionMatrix(gbm.predict, cv$target)
-
-==============================================================================================================================
-
-### xgboost
-		
-		library(xgboost)
-
-		xgb.grid <- expand.grid(
-	    eta = c(0.01, 0.001, 0.0001), 
-		max_depth = c(5, 10, 15), 
-	    gamma = c(1, 2, 3), 
-	    colsample_bytree = c(0.4, 0.7, 1.0), 
-	    min_child_weight = c(0.5, 1, 1.5),
-	    nrounds = 2,
-	    subsample = 1)
-
-		xgb.control <- trainControl(
-	    method="repeatedcv",
-	    number = 10,
-	    repeats = 3,
-	    verboseIter = TRUE,
-	    returnData=FALSE,
-	    returnResamp = "all",
-	    allowParallel = TRUE)
-
-		xgb.model <- train(x = as.matrix(train %>% select(-c(id,target))),
-	    y = train$target,
-	    trControl = xgb.control,
-	    tuneGrid = xgb.grid,
-	    method="xgbTree" # "xgbLinear"
-		)
-
-		xgb.predict <- predict(xgb.model, data.matrix(cv))
-		confusionMatrix(xgb.predict, cv$target)
-		imp <- varImp(xgb.model)
+		apply(array/matrix/data_frame, 1/2, function, ...) # need to specify row/column.
+		lapply(list/vector/data_frame, function, ...) # work on columns. return list.
+		sapply(list/vector/data_frame, function, ...) # work on columns. return vector if possible else matrix else list.
+		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
 
 ==============================================================================================================================
 
