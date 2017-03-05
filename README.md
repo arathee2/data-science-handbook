@@ -82,7 +82,7 @@
 ### Regularized Regression
 
 		library("glmnet")
-
+		# input numerical data only
 		predictors <- names(train)[names(train) != "target"]
 		trainX <- as.matrix(train[ ,predictors])
 		trainY <- train$target
@@ -103,9 +103,9 @@
 		elnet.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
 								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
 
-		ridge.prediction <- predict(ridge.model, cvY, s = lambda.used)
-		lasso.prediction <- predict(lasso.model, cvY, s = lambda.used)
-		elnet.prediction <- predict(elnet.model, cvY, s = lambda.used)
+		ridge.prediction <- predict(ridge.model, cvX, s = lambda.used)
+		lasso.prediction <- predict(lasso.model, cvX, s = lambda.used)
+		elnet.prediction <- predict(elnet.model, cvX, s = lambda.used)
 		rmse/table
 
 ==============================================================================================================================
@@ -167,8 +167,8 @@
 
 		library("gbm")
 
-		gbm.model <- gbm(target ~ .,
-						distribution = c("bernoulli","multinomial","gaussian"),
+		gbm.model <- gbm(target ~ ., # if target doesn't work set to as.integer(target) after converting to numeric manually.
+						distribution = c("bernoulli","multinomial","gaussian"), # multinomial more robust even in binomial case
 						data = train,
 						n.trees = 2000,
 						interaction.depth = 1,
@@ -193,7 +193,7 @@
 
 		localH2O <- h2o.init(ip = 'localhost', port = 54321, max_mem_size = '2g')
 		
-		names(train) <- NULL # so that the algorithm does not take column name as a separate level in the target variable
+		names(train) <- NULL # optional. so that the algorithm does not take column name as a separate level in the target variable
 		h2o.train <- as.h2o(train)
 		h2o.cv <- as.h2o(cv)
 
@@ -280,10 +280,12 @@
 		folds <- cut(seq(1, nrow(data.frame)), breaks = k, labels = FALSE)
 
 		accuracy <- rep(0,k)
-		
+		x <- 0
+
 		# Perform K-fold cross validation
 		for(i in 1:k){
 		    
+		    x <- x + 1
 		    #Segment your data by fold using the which() function 
 		    cv.indices <- which(folds == i, arr.ind=TRUE)
 			train <- data.frame[-cv.indices, ]
@@ -299,7 +301,9 @@
 				accurate.predictions <- accurate.predictions + confusion.matrix[i,i]
 			}
 
-			print(accuracy[i] <- accurate.predictions/nrow(cv))
+			accuracy[x] <- accurate.predictions/nrow(cv)
+			print(paste("Fold",x,"accuracy",round(accuracy[x],4)))
+			if(x == k) print(mean(accuracy))
 		}
 
 ==============================================================================================================================
@@ -422,8 +426,8 @@
 	
 	library(corrplot)
 
-		nums <- sapply(data_frame, is.numeric)
-		cordata <- data_frame[ ,nums]
+		numeric <- sapply(data_frame, is.numeric)
+		cordata <- data_frame[ ,numeric]
 		cordata <- na.omit(cordata)
 		cor_matrix <- cor(cordata) # to see correlation table
 		cor_matrix
