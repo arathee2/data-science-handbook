@@ -378,7 +378,16 @@
 
 ==============================================================================================================================
 
-### Multiple imputation- Filling NA's randomly
+### One-Hot Encoding
+
+		library(caret)
+
+		dummies <- dummyVars(target ~ ., data = data_frame)
+		temp <- as.data.frame(predict(dummies, data_frame))
+
+==============================================================================================================================
+
+### Handling missing values
 
 	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
 		
@@ -392,33 +401,11 @@
 
 ==============================================================================================================================
 
-### Removing Variables from data frame
+### Removing Variables
 		
 		data_frame <- data_frame[ ,!(names(data_frame) %in% c("x1","x2","x3"))]
 		data_frame$var <- NULL
 		new_data_frame <- setdiff(names(data_frame),c("x1","x2","x3"))
-
-==============================================================================================================================
-
-### Misc
-	
-		which.max(var)
-		which.min(var)
-		outliers <- subset(data_frame, data_frame$var >=< condition)
-		match("value",var)
-		which(var == "value")
-
-		# choosing x random rows from a data set. given that x < nrow(train).
-		trainSmall <- train[sample(nrow(train), x), ]
-
-==============================================================================================================================
-
-### One-Hot Encoding
-
-		library(caret)
-
-		dummies <- dummyVars(target ~ ., data = data_frame)
-		temp <- as.data.frame(predict(dummies, data_frame))
 
 ==============================================================================================================================
 
@@ -435,6 +422,23 @@
 
 ==============================================================================================================================
 
+### Binning
+	
+		library("Hmisc")
+
+		bins <- cut2(data_frame$variable, g = number_of_bins) # cuts the variable on basis of quantile.
+
+==============================================================================================================================
+
+### Check constant factors
+
+		logical <- sapply(data_frame, function(x) is.factor(x))
+		factor.variables <- data_frame[ ,names(which(logical == TRUE))]
+		ifelse(factor.variables <- sapply(factor.variables, function(x) length(levels(x))) == 1,"constant factor","0")
+		table(factor.variables)
+
+==============================================================================================================================
+
 ### Boruta Analysis to find importance of variable in a data set
 	
 	library(Boruta)	
@@ -448,24 +452,16 @@
 
 ==============================================================================================================================
 
-### Binning
+### R functions
 	
-		library("Hmisc")
-
-		bins <- cut2(data_frame$variable, g = number_of_bins) # cuts the variable on basis of quantile.
-
-==============================================================================================================================
-
-### To check for constant factors
-
-		f <- sapply(data_frame, function(x) is.factor(x))
-		m <- data_frame[ ,names(which(f == "TRUE"))]
-		ifelse(n <- sapply(m, function(x) length(levels(x))) == 1,"constant factor","0")
-		table(n)
-
-==============================================================================================================================
-
-### apply functions
+		which.max(vector)
+		which.min(vector)
+		which(vector == "value")
+		match("value",var)
+		subset(data_frame, condition)
+		rep(x, times)
+		sample(vector/number, size, replace = FALSE, prob = NULL) # trainSmall <- train[sample(nrow(train), x), ]
+		rnorm(n, mean = 0, sd = 1)
 
 		apply(array/matrix/data_frame, 1/2, function, ...) # need to specify row/column.
 		lapply(list/vector/data_frame, function, ...) # work on columns. return list.
@@ -519,6 +515,5 @@
 		data_frame$minute <- as.integer(format(data_frame$date, "%M")) # minute
 
 ==============================================================================================================================
-
 
 
