@@ -409,16 +409,22 @@
 
 ==============================================================================================================================
 
-### Correlation matrix
+### Correlation and scatterplot matrix
 	
-	library(corrplot)
+	# correlation matrix
 
+		library(corrplot)
+		
 		numeric <- sapply(data_frame, is.numeric)
 		cordata <- data_frame[ ,numeric]
 		cordata <- na.omit(cordata)
 		cor_matrix <- cor(cordata) # to see correlation table
 		cor_matrix
 		corrplot(cor_matrix, method = "square", type = "lower") # to visualize correlation matrix
+
+	# scatterplot matrix
+
+		pairs(cordata) # scatterplot matrix
 
 ==============================================================================================================================
 
