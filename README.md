@@ -52,6 +52,8 @@
 		library(ROCR)
 		library(pROC)
 
+		roc_curve <- roc(cv$target, algo.predict, plot=TRUE, auc=TRUE, grid=TRUE, col="blue")
+
 		glm.predict <- predict(model, cv)
 		glm.ROCR <- prediction(glm.predict, cv$target)
 		glm.AUC <- as.numeric(performance(glm.ROCR,"auc")@y.values)
@@ -103,9 +105,9 @@
 		elnet.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
 								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
 
-		ridge.prediction <- predict(ridge.model, cvX, s = lambda.used)
-		lasso.prediction <- predict(lasso.model, cvX, s = lambda.used)
-		elnet.prediction <- predict(elnet.model, cvX, s = lambda.used)
+		ridge.predict <- predict(ridge.model, cvX, s = lambda.used)
+		lasso.predict <- predict(lasso.model, cvX, s = lambda.used)
+		elnet.predict <- predict(elnet.model, cvX, s = lambda.used)
 		rmse/table
 
 ==============================================================================================================================
