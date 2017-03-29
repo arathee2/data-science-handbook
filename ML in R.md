@@ -12,10 +12,20 @@
 
 	# calc RMSE and R-squared
 
-		linear.sse <- sum((linear.predict - cv$target)^2)
-		linear.sst <- sum((mean(train$target) - cv$target)^2)
-		linear.r.squared <- 1-(linear.sse/linear.sst)
-		linear.rmse <- sqrt(sse/nrow(cv))
+		rmse <- function(predicted, actual)
+		{
+    		sum.of.squared.error <- sum((predicted - actual)^2)
+    		root.mean.squared.error <- sqrt(sum.of.squared.error/length(actual))
+    		return(root.mean.squared.error)
+		}
+
+		rsquared <- function(predicted, cv.label, train.label)
+		{
+    		sse <- sum((predicted - cv.label)^2)
+			sst <- sum((mean(train.label) - cv.label)^2)
+			r.squared <- 1-(sse/sst)
+			return(r.squared)
+		}
 
 	# ROCR and AUC(area under curve)
 		
@@ -86,9 +96,9 @@
 		library("glmnet")
 		# input numerical data only
 		predictors <- names(train)[names(train) != "target"]
-		trainX <- as.matrix(train[ ,predictors])
+		trainX <- data.matrix(train[ ,predictors])
 		trainY <- train$target
-		cvX <- as.matrix(cv[ ,predictors])
+		cvX <- data.matrix(cv[ ,predictors])
 		cvY <- cv$target
 
 		# for classification add family = "binomial" to the following function.
@@ -182,7 +192,7 @@
 
 		gbm.perf(gbm.model)
 
-		gbm.predict <- predict(gbm.model, cv, n.trees = gbm.perf(gbm.model, plot.it = F)), type = "response")
+		gbm.predict <- predict(gbm.model, cv, n.trees = gbm.perf(gbm.model, plot.it = F), type = "response")
 		gbm.predict <- apply(gbm.predict, 1, which.max) # choose class with maximum probability
 
 		table(gbm.predict, cv$target)
