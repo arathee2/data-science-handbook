@@ -332,7 +332,22 @@
 		}
 
 ==============================================================================================================================
+### PCA
 
+		pca <- prcomp(data_frame, center = TRUE, scale = TRUE)
+		summary(pca)
+		plot(pca, type="l")
+		pca.data <- pca$x
+
+==============================================================================================================================
+### PCR
+
+		library(pls)
+		pcr.model <- pcr(target ~ ., data = train, scale =T, center = T, validation = "CV")
+		pcr.predict <- predict(pcr.model, cv)
+		rmse(pcr.predict, cv$target)
+
+==============================================================================================================================
 ### Clustering
 
 	data_frame -> as.matrix -> as.vector -> clustering -> dim(vector) -> image.output
@@ -404,8 +419,8 @@
 	# using sample
 
 		indices <- sample(2, nrow(data_frame), replace = T, prob = c(0.75, 0.25))
-		train <- glass[indices == 1, ]
-		cv <- glass[indices == 2, ]
+		train <- data_frame[indices == 1, ]
+		cv <- data_frame[indices == 2, ]
 
 ==============================================================================================================================
 
