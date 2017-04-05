@@ -284,7 +284,7 @@
 		algo.control = trainControl(method = "cv", number = 10)
 		algo.grid = expand.grid(model specific parameters)
 		algo.model <- train(target ~ ., data = train, method = "", preProcess = c("center","scale"),
-							trControl = algo.control, tuneGrid = algo.grid)
+							metric = "", trControl = algo.control, tuneGrid = algo.grid)
 
 		algo.predict <- predict.train(algo.model, cv)
 		confusionMatrix(algo.predict, cv$target)
