@@ -6,6 +6,7 @@
 	# and see if that makes sense. check for multicollinearity among independent vars(>0.7) and remove accordingly one of the two.
 
 	# model
+		library(Metrics)
 
 		linear.model <- lm(target ~ ., data = train)
 		linear.predict <- predict(linear.model, cv)
@@ -26,6 +27,8 @@
 			r.squared <- 1-(sse/sst)
 			return(r.squared)
 		}
+
+		error <- rmse(cv$target, linear.predict)
 
 	# ROCR and AUC(area under curve)
 		
@@ -48,6 +51,7 @@
 		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))
 		glm.predict <- predict(glm.model, cv, type = "response")	
 		table(cv$target, glm.predict>0.5)
+		error <- ce(cv$target, glm.predict)
 	
 	## Multinomial
 
@@ -107,13 +111,13 @@
 		plot(cv.glmnet.model)
 		
 		ridge.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 0, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
+								alpha = 0, lambda = cv.glmnet.model$lambda.1se) # cv.glmnet.model$lambda.minbucket
 
 		lasso.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 1, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
+								alpha = 1, lambda = cv.glmnet.model$lambda.1se) # cv.glmnet.model$lambda.min
 
 		elnet.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se or cv.glmnet.model$lambda.min)
+								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se) # cv.glmnet.model$lambda.min
 
 		ridge.predict <- predict(ridge.model, cvX, s = lambda.used)
 		lasso.predict <- predict(lasso.model, cvX, s = lambda.used)
@@ -213,11 +217,14 @@
 							y = "target", # label. check names(h2o.train) to see target variable name
 							training_frame = h2o.train, # data to train
 							activation = "TanhWithDropout", # or 'Tanh'
+							standardize = TRUE,
 							input_dropout_ratio = 0.2, # % of inputs dropout
 							hidden_dropout_ratios = c(0.5,0.5,0.5), # % for nodes dropout
-							balance_classes = TRUE,
+							balance_classes = TRUE, # for classification tasks only
 							hidden = c(50,50,50), # two hidden layers with 100 nodes each
-							epochs = 100)
+							epochs = 100, # number of iterations on data
+							seed = 1, # for reproducability
+							variable_importances = T)
 
 		h2o.predictions <- as.data.frame(h2o.predict(h2o.model, h2o.cv))
 		confusionMatrix(h2o.predictions$predict, cv$target) # remove first row of h2o.predictions if length does not match
@@ -228,23 +235,28 @@
 		
 		library(xgboost)
 
+		# for regression, only nrounds, alpha and lambda are tuned.
+
 		xgb.grid <- expand.grid(
-	    eta = c(0.01, 0.001, 0.0001), 
-		max_depth = c(5, 10, 15), 
-	    gamma = c(1, 2, 3), 
-	    colsample_bytree = c(0.4, 0.7, 1.0), 
-	    min_child_weight = c(0.5, 1, 1.5),
-	    nrounds = 2,
-	    subsample = 1)
+	    eta = c(0.3,0.2,0.1,0.01), # learning rate. [default=0.3][range: (0,1)]
+		max_depth = c(6, 10), # depth of tree. [default=6][range: (0,Inf)]
+		nrounds = 100, # iterations. [default=100]
+		colsample_bytree = 1, # number of features supplied to a tree. [default=1][range: (0,1)]
+	    subsample = 1 # number of samples supplied to a tree. [default=1][range: (0,1)]
+	    min_child_weight = 1, # minimum number of instances required in a child node. [default=1][range:(0,Inf)]
+	    gamma = c(0,5), # increased gammma to increase levele of regularization. [default=0][range: (0,Inf)]
+	    #lambda = 0, # L2 regularization(Ridge). [default=0]
+	    #alpha = 1, # L1 regularization(Lasso). more useful on high dimensional data sets. [default=1]
+	    )
 
 		xgb.control <- trainControl(
-	    method="repeatedcv",
-	    number = 3,
-	    repeats = 3,
+	    method="cv",
+	    number = 10,
 	    verboseIter = TRUE,
 	    returnData=FALSE,
 	    returnResamp = "all",
-	    allowParallel = TRUE)
+	    allowParallel = TRUE
+	    )
 
 		xgb.predictors <- as.matrix(train[, !(names(train) %in% c("target","id"))])
 		xgb.label <- train$target
@@ -269,7 +281,7 @@
 		
 		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
 
-		algo.control = trainControl(method = "repeatedcv", number = 10, repeats = 3)
+		algo.control = trainControl(method = "cv", number = 10)
 		algo.grid = expand.grid(model specific parameters)
 		algo.model <- train(target ~ ., data = train, method = "", preProcess = c("center","scale"),
 							trControl = algo.control, tuneGrid = algo.grid)
@@ -277,7 +289,7 @@
 		algo.predict <- predict.train(algo.model, cv)
 		confusionMatrix(algo.predict, cv$target)
 		imp <- varImp(algo.model)
-		plot(imp, top = 20))
+		plot(imp, top = 20)
 
 ==============================================================================================================================
 
@@ -314,8 +326,9 @@
 			}
 
 			accuracy[x] <- accurate.predictions/nrow(cv)
-			print(paste("Fold",x,"accuracy",round(accuracy[x],4)))
-			if(x == k) print(mean(accuracy))
+			print(paste("Fold",x,"accuracy:",round(accuracy[x],4)))
+			print("===============================================")
+			if(x == k) print("Mean accuracy:", mean(accuracy))
 		}
 
 ==============================================================================================================================
@@ -388,6 +401,12 @@
 		train <- subset(data_frame,split == TRUE)
 		cv <- subset(data_frame, split == FALSE)
 
+	# using sample
+
+		indices <- sample(2, nrow(data_frame), replace = T, prob = c(0.75, 0.25))
+		train <- glass[indices == 1, ]
+		cv <- glass[indices == 2, ]
+
 ==============================================================================================================================
 
 ### One-Hot Encoding
@@ -403,7 +422,12 @@
 
 	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
 		
+		# check missing values
+		colSums(is.na(data_frame))
+		sapply(train, function(x) sum(is.na(x))/length(x))*100
+
 		library("mice")
+		
 		set.seed(10)
 		imputed <- complete(mice(data_frame))
 		data_frame$var <- imputed$var
