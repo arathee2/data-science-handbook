@@ -9,7 +9,7 @@
 ==============================================================================================================================
 
 ## geom_bar(position = , color = ) + ggplot(aes(x = , fill = factor)) # 1D category
-## geom_bar(stat = "identity") + ggplot(aes(x = , y = )) # 2D category vs num
+## geom_bar(stat = "identity") + ggplot(aes(x = reorder(categorical.var, numeric.var), y = )) # 2D category vs num
 ## stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")  	
 
 ==============================================================================================================================
@@ -81,7 +81,7 @@
 ## scale_fill/color_manual/continuous/discrete(guide = guide_legend("legend.title"),
 		labels = c("legend.names"), values = c("legend.colors"))
 
-## theme(axis.line, axis.text.x = element_text(face="bold", color="#993333", size=14, angle = 45, hjust = 1), 
+## theme(axis.line, axis.text.x = element_text(angle = 45, hjust = 1, face="bold", color="#993333", size=14), 
 		axis.ticks, axis.title.x, legend.position = "none")
 
 ## geom_text(aes(label = var), vjust = +/- 1) # text on top of graphs.
