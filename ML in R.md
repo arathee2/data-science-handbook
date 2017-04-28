@@ -132,6 +132,7 @@
 
 		svm.model <- svm(target ~ ., data = train, kernel = "radial", cost = 1, gamma = 0.1)
 		svm.predict <- predict(svm.model, cv)
+		plot(svm.model, train)
 		table(cv$target, svm.predict)
 
 ==============================================================================================================================
@@ -224,11 +225,13 @@
 							hidden = c(50,50,50), # two hidden layers with 100 nodes each
 							epochs = 100, # number of iterations on data
 							seed = 1, # for reproducability
-							variable_importances = T)
+							variable_importances = T,
+							nfolds = 5)
 
 		h2o.predictions <- as.data.frame(h2o.predict(h2o.model, h2o.cv))
 		confusionMatrix(h2o.predictions$predict, cv$target) # remove first row of h2o.predictions if length does not match
-
+		h2o.varimp_plot(h2o.model,num_of_features = 20)
+		h2o.performance(h2o.model,xval = T) 
 ==============================================================================================================================
 
 ### xgboost
@@ -242,9 +245,9 @@
 		max_depth = c(6, 10), # depth of tree. [default=6][range: (0,Inf)]
 		nrounds = 100, # iterations. [default=100]
 		colsample_bytree = 1, # number of features supplied to a tree. [default=1][range: (0,1)]
-	    subsample = 1 # number of samples supplied to a tree. [default=1][range: (0,1)]
+	    subsample = 1, # number of samples supplied to a tree. [default=1][range: (0,1)]
 	    min_child_weight = 1, # minimum number of instances required in a child node. [default=1][range:(0,Inf)]
-	    gamma = c(0,5), # increased gammma to increase levele of regularization. [default=0][range: (0,Inf)]
+	    gamma = c(0,5) # increased gammma to increase levele of regularization. [default=0][range: (0,Inf)]
 	    #lambda = 0, # L2 regularization(Ridge). [default=0]
 	    #alpha = 1, # L1 regularization(Lasso). more useful on high dimensional data sets. [default=1]
 	    )
@@ -424,6 +427,33 @@
 
 ==============================================================================================================================
 
+### Sampling Techniques
+
+		# sampling is to be done in case of highly unbalanced class. Only training data has to be sampled.
+
+		library(ROSE)
+
+		# oversampling
+		oversampled_train_data <- ovun.sample(Class ~ ., data = train, method = "over",
+                                    	N = 2*length(train$target[train$target == "class_with_more_observations"]),
+                                      	seed = 1)$data
+		
+		# undersampling
+		undersampled_train_data <- ovun.sample(Class ~ ., data = train, method = "under",
+                                    	N = 2*length(train$target[train$target == "class_with_less_observations"]),
+                                      	seed = 1)$data
+
+		# mixed sampling
+		mix_sampled_train_data <- ovun.sample(Class ~ ., data = train, method = "both", p=0.5, 
+                                  		N=nrow(train),
+                                  		seed = 1)$data
+
+		# ROSE (type of mixed sampling)
+		rose_train_data <- ROSE(Class ~ ., data = train, seed = 1)$data
+
+
+==============================================================================================================================
+
 ### One-Hot Encoding
 
 		library(caret)
@@ -438,8 +468,8 @@
 	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
 		
 		# check missing values
-		colSums(is.na(data_frame))
-		sapply(train, function(x) sum(is.na(x))/length(x))*100
+		colSums(is.na(data_frame))*100/nrow(data_frame)
+		sapply(train, function(x) sum(is.na(x))*100/length(x))
 
 		library("mice")
 		
