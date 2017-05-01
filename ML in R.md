@@ -49,7 +49,7 @@
 	## Binomial
 
 		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))
-		glm.predict <- predict(glm.model, cv, type = "response")	
+		glm.predict <- predict(glm.model, cv, type = "response")
 		table(cv$target, glm.predict>0.5)
 		error <- ce(cv$target, glm.predict)
 	
@@ -238,18 +238,18 @@
 		
 		library(xgboost)
 
-		# for regression, only nrounds, alpha and lambda are tuned.
+		# for regression: only eta, nrounds, alpha and lambda are tuned.
 
 		xgb.grid <- expand.grid(
 	    eta = c(0.3,0.2,0.1,0.01), # learning rate. [default=0.3][range: (0,1)]
 		max_depth = c(6, 10), # depth of tree. [default=6][range: (0,Inf)]
 		nrounds = 100, # iterations. [default=100]
-		colsample_bytree = 1, # number of features supplied to a tree. [default=1][range: (0,1)]
-	    subsample = 1, # number of samples supplied to a tree. [default=1][range: (0,1)]
+		colsample_bytree = 1, # proportion of features supplied to a tree. [default=1][range: (0,1)]
+	    subsample = 1, # proportion of samples supplied to a tree. [default=1][range: (0,1)]
 	    min_child_weight = 1, # minimum number of instances required in a child node. [default=1][range:(0,Inf)]
 	    gamma = c(0,5) # increased gammma to increase levele of regularization. [default=0][range: (0,Inf)]
 	    #lambda = 0, # L2 regularization(Ridge). [default=0]
-	    #alpha = 1, # L1 regularization(Lasso). more useful on high dimensional data sets. [default=1]
+	    #alpha = 1 # L1 regularization(Lasso). more useful on high dimensional data sets. [default=1]
 	    )
 
 		xgb.control <- trainControl(
@@ -421,6 +421,7 @@
 
 	# using sample
 
+		set.seed(123)
 		indices <- sample(2, nrow(data_frame), replace = T, prob = c(0.75, 0.25))
 		train <- data_frame[indices == 1, ]
 		cv <- data_frame[indices == 2, ]
@@ -469,7 +470,7 @@
 		
 		# check missing values
 		colSums(is.na(data_frame))*100/nrow(data_frame)
-		sapply(train, function(x) sum(is.na(x))*100/length(x))
+		sapply(data_frame, function(x) sum(is.na(x))*100/length(x))
 
 		library("mice")
 		
@@ -528,7 +529,7 @@
 
 ### Boruta Analysis to find importance of variable in a data set
 	
-	library(Boruta)	
+	library(Boruta)
 
 		set.seed(13)
 		boruta.model <- Boruta(targetVariable ~ ., data = train, maxRuns=101, doTrace=0)
