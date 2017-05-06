@@ -180,9 +180,9 @@
 
 		
 		library(leaflet)
-		map <- leaflet() %>%
+		map <- leaflet(data) %>%
 				addTiles() %>%  # Add default OpenStreetMap map tiles
-				addMarkers(lng = , lat = , popup = "popup.text")
+				addMarkers(lng = , lat = , popup = )
 		
 		print(map)
 		
@@ -206,7 +206,11 @@
 
 ## Data Table
 
+		library(DT)
 		datatable(data_frame)
+
+		# table in R markdown
+		kable(data_frame)
 
 ==============================================================================================================================
 

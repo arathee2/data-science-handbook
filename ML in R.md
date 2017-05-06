@@ -452,6 +452,8 @@
 		# ROSE (type of mixed sampling)
 		rose_train_data <- ROSE(Class ~ ., data = train, seed = 1)$data
 
+		# SMOTE
+		smote_train_data <- SMOTE(target ~ ., train, perc.over = 100, perc.under = 200)
 
 ==============================================================================================================================
 
