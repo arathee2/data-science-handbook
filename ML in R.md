@@ -306,7 +306,7 @@
 		# Create K equally size folds
 		folds <- cut(seq(1, nrow(data.frame)), breaks = k, labels = FALSE)
 
-		accuracy <- rep(0,k)
+		accuracy <- vector(mode = "integer", length = k)
 		x <- 0
 
 		# Perform K-fold cross validation
@@ -331,7 +331,7 @@
 			accuracy[x] <- accurate.predictions/nrow(cv)
 			print(paste("Fold",x,"accuracy:",round(accuracy[x],4)))
 			print("===============================================")
-			if(x == k) print("Mean accuracy:", mean(accuracy))
+			if(x == k) print(paste("Mean accuracy:", round(mean(accuracy), 6)))
 		}
 
 ==============================================================================================================================
