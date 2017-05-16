@@ -185,15 +185,16 @@
 		library("gbm")
 
 		gbm.model <- gbm(target ~ ., # if target doesn't work set to as.integer(target) after converting to numeric manually.
-						distribution = c("bernoulli","multinomial","gaussian"), # multinomial more robust even in binomial case
-						data = train,
-						n.trees = 2000,
-						interaction.depth = 1,
-						n.minobsinnode = 10,
-						shrinkage = 0.001,
-						train.fraction = 1.0,
-						keep.data = TRUE,
-						verbose = TRUE)
+						 distribution = c("bernoulli","multinomial","gaussian"), # multinomial more robust even in binomial case
+						 data = train,
+						 n.trees = 2000,
+						 interaction.depth = 1,
+						 n.minobsinnode = 10,
+						 shrinkage = 0.001,
+						 train.fraction = 1.0,
+						 keep.data = TRUE,
+						 verbose = TRUE
+						 )
 
 		gbm.perf(gbm.model)
 
@@ -231,50 +232,82 @@
 		h2o.predictions <- as.data.frame(h2o.predict(h2o.model, h2o.cv))
 		confusionMatrix(h2o.predictions$predict, cv$target) # remove first row of h2o.predictions if length does not match
 		h2o.varimp_plot(h2o.model,num_of_features = 20)
-		h2o.performance(h2o.model,xval = T) 
+		h2o.performance(h2o.model,xval = T)
+
 ==============================================================================================================================
 
 ### xgboost
 		
 		library(xgboost)
 
-		# for regression: only eta, nrounds, alpha and lambda are tuned.
+		# xgboost caret
 
 		xgb.grid <- expand.grid(
-	    eta = c(0.3,0.2,0.1,0.01), # learning rate. [default=0.3][range: (0,1)]
-		max_depth = c(6, 10), # depth of tree. [default=6][range: (0,Inf)]
-		nrounds = 100, # iterations. [default=100]
-		colsample_bytree = 1, # proportion of features supplied to a tree. [default=1][range: (0,1)]
-	    subsample = 1, # proportion of samples supplied to a tree. [default=1][range: (0,1)]
-	    min_child_weight = 1, # minimum number of instances required in a child node. [default=1][range:(0,Inf)]
-	    gamma = c(0,5) # increased gammma to increase levele of regularization. [default=0][range: (0,Inf)]
-	    #lambda = 0, # L2 regularization(Ridge). [default=0]
-	    #alpha = 1 # L1 regularization(Lasso). more useful on high dimensional data sets. [default=1]
-	    )
+		    eta = c(0.3,0.2,0.1,0.01),  # learning rate. [default=0.3][range: (0,1)]
+			max_depth = c(6, 10),       # depth of tree. [default=6][range: (0,Inf)]
+			nrounds = 100,              # iterations. [default=100]
+			colsample_bytree = 1,       # proportion of features supplied to a tree. [default=1][range: (0,1)]
+		    subsample = 1,              # proportion of samples supplied to a tree. [default=1][range: (0,1)]
+		    min_child_weight = 1,       # minimum number of instances required in a child node. [default=1][range:(0,Inf)]
+		    gamma = c(0,5)              # increased gamma to increase level of regularization. [default=0][range: (0,Inf)]
+		    lambda = 0,                 # L2 regularization(Ridge). [default=0]
+		    alpha = 1                   # L1 regularization(Lasso). more useful on high dimensional data sets. [default=1]
+		    )
 
 		xgb.control <- trainControl(
-	    method="cv",
-	    number = 10,
-	    verboseIter = TRUE,
-	    returnData=FALSE,
-	    returnResamp = "all",
-	    allowParallel = TRUE
-	    )
+		    method="cv",
+		    number = 5,
+		    verboseIter = TRUE,
+		    returnData=FALSE,
+		    returnResamp = "all",
+		    allowParallel = TRUE
+			)
 
 		xgb.predictors <- as.matrix(train[, !(names(train) %in% c("target","id"))])
 		xgb.label <- train$target
 
 		xgb.model <- train(x = xgb.predictors,
-	    y = xgb.label,
-	    trControl = xgb.control,
-	    tuneGrid = xgb.grid,
-	    method="xgbTree" # "xgbLinear"
+		    y = xgb.label,
+		    trControl = xgb.control,
+		    tuneGrid = xgb.grid,
+		    method="xgbTree" # "xgbLinear"
 		)
 
 		xgb.predict <- predict(xgb.model, data.matrix(cv))
 		confusionMatrix(xgb.predict, cv$target)
 		important.features <- varImp(xgb.model)
 		plot(important.features, 20)
+
+		# xgboost manual
+
+		data.train <- xgb.DMatrix(data = train$data, label = train$label)
+		data.cv <- xgb.DMatrix(data = cv$data, label = cv$label)
+
+		watchlist <- list(train  = data.train, test = data.cv)
+
+		parameters <- list(
+      # General Parameters
+          booster            = "gbtree",          # default = "gbtree"
+          silent             = 0,                 # default = 0
+      # Booster Parameters
+          eta                = 0.3,               # default = 0.3, range: [0,1]
+          gamma              = 0,                 # default = 0,   range: [0,∞]
+          max_depth          = 6,                 # default = 6,   range: [1,∞]
+          min_child_weight   = 1,                 # default = 1,   range: [0,∞]
+          subsample          = 1,                 # default = 1,   range: (0,1]
+          colsample_bytree   = 1,                 # default = 1,   range: (0,1]
+          colsample_bylevel  = 1,                 # default = 1,   range: (0,1]
+          lambda             = 1,                 # default = 1
+          alpha              = 0,                 # default = 0
+      # Task Parameters
+          objective          = "reg:logistic",    # default = "reg:linear"
+          eval_metric        = "error"
+          seed               = 1234				  # reproducability seed
+          )
+
+		xgb.model <- xgb.train(parameters, data.train, nrounds = 20, watchlist)
+		xgb.predict <- predict(xgb.model, data.cv)
+		confusionMatrix(xgb.predict, cv$target)
 
 ==============================================================================================================================
 
