@@ -301,7 +301,7 @@
           alpha              = 0,                 # default = 0
       # Task Parameters
           objective          = "reg:logistic",    # default = "reg:linear"
-          eval_metric        = "error"
+          eval_metric        = "error",
           seed               = 1234				  # reproducability seed
           )
 
