@@ -331,6 +331,7 @@
 
 ### K-fold cross validation
 
+		# Set number of folds
 		k <- 10
 
 		# Randomly shuffle the data
@@ -344,7 +345,8 @@
 
 		# Perform K-fold cross validation
 		for(i in 1:k){
-		    
+		    if(i == 1) cat("Fold", "\t", "Accuracy", "\n")
+
 		    x <- x + 1
 		    #Segment your data by fold using the which() function 
 		    cv.indices <- which(folds == i, arr.ind=TRUE)
@@ -362,9 +364,12 @@
 			}
 
 			accuracy[x] <- accurate.predictions/nrow(cv)
-			print(paste("Fold",x,"accuracy:",round(accuracy[x],4)))
-			print("===============================================")
-			if(x == k) print(paste("Mean accuracy:", round(mean(accuracy), 6)))
+			cat(x, "\t", round(accuracy[x], 4), "\n")
+			if(x == k)
+			{
+				cat("Mean Accuracy", "\n")
+				cat(round(mean(accuracy), 4))
+			}
 		}
 
 ==============================================================================================================================
