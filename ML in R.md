@@ -145,9 +145,10 @@
 		
 	# model
 		
-		tree.model <- rpart(target ~ ., data = train, method = "class", minbucket/cp = ) # large min bucket=> overfitting, smaller minbucket => biasing.
+		tree.model <- rpart(target ~ ., data = train, method = "class/anova",
+							control = rpart.control(cp = , minsplit = , minbucket = ))
 		prp(tree.model) 
-		tree.predict <- predict(tree.model, cv, type = "class")
+		tree.predict <- predict(tree.model, cv, type = "class") # no need to specify "class" for regression
 		table(cv$target, tree.predict)
 
 	# ROCR and AUC(area under curve)
@@ -165,7 +166,8 @@
 	# model
 
 		set.seed(10)
-		rf.model <- randomForest(target ~ ., data = train, importance = TRUE, ntree = 200, nodesize = 20) # nodesize similar to minbucket here.
+		rf.model <- randomForest(target ~ ., data = train, importance = TRUE,
+								 ntree = 1000, mtry = root.of.variables)
 		rf.predict <- predict(rf.model, cv)
 		table(cv$target, rf.predict)
 		varImpPlot(rf.model)
@@ -174,7 +176,7 @@
 
 		library("party")
 
-		cforest.model = cforest(target ~ . , data = train, controls=cforest_unbiased(ntree=1000, mtry = root.of.variables))
+		cforest.model = cforest(target ~ ., data = train, controls = cforest_unbiased(ntree = 1000, mtry = root.of.variables))
 		cforest.prediction = predict(cforest.model, cv, OOB = TRUE, type = "response")
 		table(cv$target, cforest.prediction)
 
@@ -240,7 +242,7 @@
 		
 		library(xgboost)
 
-		# xgboost caret
+		# XGBOOST caret
 
 		xgb.grid <- expand.grid(
 		    eta = c(0.3,0.2,0.1,0.01),  # learning rate. [default=0.3][range: (0,1)]
@@ -278,7 +280,7 @@
 		important.features <- varImp(xgb.model)
 		plot(important.features, 20)
 
-		# xgboost manual
+		# XGBOOST manual
 
 		data.train <- xgb.DMatrix(data = train$data, label = train$label)
 		data.cv <- xgb.DMatrix(data = cv$data, label = cv$label)
