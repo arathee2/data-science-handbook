@@ -194,13 +194,20 @@
 
 		lolower(character.variable)
 		toupper(character.variable)
-		strsplit(character.variable, ",") # split at ","
-		str_extract(variable, pattern) # pattern <- "[a-zA-Z]*"
-		gsub("#","%",character.variable) # substitute # with % at all instances. use sub() to replace only the first instance.
-		grepl("substring",character.variable) # return logical vector whether the substring appears or not.
-		substr("Amandeep",1,4) # return Aman
+
+		strsplit(character.variable, ",")  # split at ","
+		str_extract(variable, pattern)  # pattern <- "[a-zA-Z]*"
+		
+		gsub("#","%",character.variable)  # substitute # with % at all instances. Use sub() to replace only the first instance.
+		str_replace(character.variable, "#", "%")  # same as above
+		
+		grepl("substring", character.variable)  # return logical vector whether the substring appears or not.
+		str_detect(character.variable, "substring")  # check if same as above
+		
+		substr("Amandeep", 1, 4)  # return Aman
 		str_length() or nchar()
-		str_trim()
+		str_trim(character.vector)
+		str_pad(character.vector, width = , side = "", pad = "")
 
 ==============================================================================================================================
 

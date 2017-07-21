@@ -590,13 +590,16 @@
 		match("value",var)
 		subset(data_frame, condition)
 		rep(x, times)
-		sample(vector/number, size, replace = FALSE, prob = NULL) # trainSmall <- train[sample(nrow(train), x), ]
 		rnorm(n, mean = 0, sd = 1)
+		sample(vector/number, size, replace = FALSE, prob = NULL) # trainSmall <- train[sample(nrow(train), x), ]
 
 		apply(array/matrix/data_frame, 1/2, function, ...) # need to specify row/column.
 		lapply(list/vector/data_frame, function, ...) # work on columns. return list.
 		sapply(list/vector/data_frame, function, ...) # work on columns. return vector if possible else matrix else list.
 		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
+
+		rowSums(vector, na.rm = T)
+		colSums(vector, na.rm = T)
 
 ==============================================================================================================================
 
@@ -621,9 +624,9 @@
 
 		library(tidyr)
 
-		separate(data_frame, variable, c("new","names"), sep = ", ") # separate rohtak, haryana
+		separate(data_frame, variable.to.separate, c("new","names"), sep = ", ") # separate rohtak, haryana. Quotations important.
 		
-		unite(data_frame, new.variable, c(var1, var2), sep = " ") # combine first name and last name into name
+		unite(data_frame, new.variable, c(var1, var2), sep = " ") # combine first name and last name into name. No quotations for new variable names.
 
 		gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) %>%
 				filter(new.numerical.var == 1) %>% 
@@ -644,5 +647,53 @@
 		data_frame$minute <- as.integer(format(data_frame$date, "%M")) # minute
 
 ==============================================================================================================================
+==============================================================================================================================
+==============================================================================================================================
 
+# Efficient Code
+	
+	# Never grow a vector. Always use matrices instead of data frames whenever possible.
 
+		# check time taken by code
+		system.time(
+			# code
+			)
+
+	library(microbenchmark)
+
+		# evaluate and compare time taken by multiple expressions expressions
+		microbenchmark(rnorm(1000), 1:1000, times = )  # times to run each expression
+
+	library(benchmarkme)
+
+		# time taken to read and write csv files
+		benchmark_io(runs = , size = )  # size in MBs
+
+	library(profvis)
+
+		# show memory used and CPU time taken by code
+		profvis({
+			# code
+			})
+
+	library(parallel)
+
+		# Print no_of_cores
+		detectCores()
+
+		# assign cores to use
+		num_cores <- detectCores()
+
+		# start cluster
+		cluster <- makeCluster(num_cores)
+
+		# optional: makeCluster does not include functions present in the envinronment.
+		clusterExport(cluster, "function name as string")  # only pass function name within quotations.
+
+		# code
+		parApply(cluster, array/matrix/data_frame, 1/2, function, ...)
+		parSapply(cluster, list/vector/data_frame, function, ...)
+		parLapply(cluster, list/vector/data_frame, function, ...)
+
+		# close cluster
+		stopCluster(cluster)
