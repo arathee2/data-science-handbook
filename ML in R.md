@@ -67,6 +67,8 @@
 		library(pROC)
 
 		roc_curve <- roc(cv$target, algo.predict, plot=TRUE, auc=TRUE, grid=TRUE, col="blue")
+		plot(roc_curve)
+		lines(roc_curve2)  # add roc_curve2 to roc_curve plot
 
 		glm.predict <- predict(model, cv)
 		glm.ROCR <- prediction(glm.predict, cv$target)
@@ -98,6 +100,7 @@
 ### Regularized Regression
 
 		library("glmnet")
+		
 		# input numerical data only
 		predictors <- names(train)[names(train) != "target"]
 		trainX <- data.matrix(train[ ,predictors])
@@ -105,24 +108,21 @@
 		cvX <- data.matrix(cv[ ,predictors])
 		cvY <- cv$target
 
-		# for classification add family = "binomial" to the following function.
-		cv.glmnet.model <- cv.glmnet(trainX, trainY, type.measure = "deviance/mse/mae/class/auc", nfolds = 10, nlambda = 100)
+		cv.glmnet.model <- cv.glmnet(trainX, trainY,
+									 type.measure = "deviance/mse/mae/class/auc",
+									 family = "binomial",  # remove if not a classification problem
+									 nfolds = 10, nlambda = 100)
 		cv.glmnet.model
 		plot(cv.glmnet.model)
 		
-		ridge.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 0, lambda = cv.glmnet.model$lambda.1se) # cv.glmnet.model$lambda.minbucket
+		glmnet.model <- glmnet(trainX, trainY,
+								family = "gaussian","binomial","multinomial",
+								alpha = ,  # 0 - ridge, 1 - lasso, 0.5 - elnet
+								lambda = cv.glmnet.model$lambda.1se  # or cv.glmnet.model$lambda.min
+								)
 
-		lasso.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 1, lambda = cv.glmnet.model$lambda.1se) # cv.glmnet.model$lambda.min
-
-		elnet.model <- glmnet(trainX, trainY, family = "gaussian","binomial","multinomial",
-								alpha = 0.5, lambda = cv.glmnet.model$lambda.1se) # cv.glmnet.model$lambda.min
-
-		ridge.predict <- predict(ridge.model, cvX, s = lambda.used)
-		lasso.predict <- predict(lasso.model, cvX, s = lambda.used)
-		elnet.predict <- predict(elnet.model, cvX, s = lambda.used)
-		rmse/table
+		glmnet.predict <- predict(glmnet.model, cvX, s = cv.glmnet.model$lambda.1se)  # or cv.glmnet.model$lambda.min
+		table(cv$target, glmnet.predict)
 
 ==============================================================================================================================
 
@@ -260,7 +260,7 @@
 		    method="cv",
 		    number = 5,
 		    verboseIter = TRUE,
-		    returnData=FALSE,
+		    returnData = FALSE,
 		    returnResamp = "all",
 		    allowParallel = TRUE
 			)
@@ -317,17 +317,48 @@
 
 		library("caret")
 		
-		f <- as.formula(paste("targetVariable ~", paste(names(train)[!names(train) %in% c("targetVariable")], collapse = " + ")))
+		f <- as.formula(paste("target ~", paste(names(train)[!names(train) %in% c("target")], collapse = " + ")))
 
-		algo.control = trainControl(method = "cv", number = 10)
-		algo.grid = expand.grid(model specific parameters)
-		algo.model <- train(target ~ ., data = train, method = "", preProcess = c("center","scale"),
-							metric = "", trControl = algo.control, tuneGrid = algo.grid)
+		algo.control = trainControl(method = "cv", 
+									number = 5,
+									classProbs = T,
+									summaryFunction = defaultSummary,  # twoClassSummary for binary classification
+									verboseIter = T,
+									allowParallel = T
+									)
 
-		algo.predict <- predict.train(algo.model, cv)
-		confusionMatrix(algo.predict, cv$target)
+		algo.grid = expand.grid(model_specific_parameters)
+
+		algo.model <- train(target ~ .,
+							data = train,
+							method = "",
+							preProcess = c("center","scale"),  # zv/nzv, medianImpute/knnImpute, center, scale, pca - imp for linear models
+							metric = "",
+							trControl = algo.control,
+							tuneGrid = algo.grid
+							)
+
+		trellis.par.set(caretTheme())
+		plot(algo.model, metric = "Accuracy")  # look at ?plot.train
+
+		algo.predict <- predict.train(algo.model, cv, type = "class or prob")
+		confusionMatrix(algo.predict, cv$target, mode = "prec_recall")
+
 		imp <- varImp(algo.model)
 		plot(imp, top = 20)
+
+		# compare models
+		model_list <- list(RF = rf.model,
+						   GBM = gbm.model,
+						   )
+		resamps <- resamples(model_list)
+		resamps
+		summary(resamps)
+
+		bwplot(resamps, layout = c(3, 1))
+		dotplot(resamps, metric = "ROC")
+		densityplot(resamps, metric = "ROC")
+		xyplot(resamps, metric = "ROC")
 
 ==============================================================================================================================
 
@@ -466,12 +497,19 @@
 		train <- data_frame[indices == 1, ]
 		cv <- data_frame[indices == 2, ]
 
+	# caret
+
+		train_indices <- createDataPartition(train$target, p = 0.75, list = FALSE)
+		train <- Sonar[train_indices, ]
+		cv  <- Sonar[-train_indices, ]
+
 ==============================================================================================================================
 
 ### Sampling Techniques
 
-		# sampling is to be done in case of highly unbalanced class. Only training data has to be sampled.
+	# sampling is to be done in case of highly unbalanced class. Only training data has to be sampled.
 
+		# ROSE
 		library(ROSE)
 
 		# oversampling
@@ -493,7 +531,16 @@
 		rose_train_data <- ROSE(Class ~ ., data = train, seed = 1)$data
 
 		# SMOTE
-		smote_train_data <- SMOTE(target ~ ., train, perc.over = 100, perc.under = 200)
+		library(DMwR)
+
+		smote_train_data <- SMOTE(target ~ ., data = train, perc.over = 100, perc.under = 200, k = 5)
+
+		# caret
+		library(caret)
+
+		set.seed(4)
+		down_train <- downSample(x = train[, -ncol(train)], y = train$target)
+		up_train <- upSample(x = train[, -ncol(train)], y = train$target)
 
 ==============================================================================================================================
 
@@ -527,9 +574,9 @@
 
 ### Removing Variables
 		
-		data_frame <- data_frame[ ,!(names(data_frame) %in% c("x1","x2","x3"))]
+		data_frame <- data_frame[ , !(names(data_frame) %in% c("x1","x2","x3"))]
 		data_frame$var <- NULL
-		new_data_frame <- setdiff(names(data_frame),c("x1","x2","x3"))
+		new_data_frame <- setdiff(names(data_frame), c("x1","x2","x3"))  # check if setdiff() or data_frame[, setdiff()]
 
 ==============================================================================================================================
 
