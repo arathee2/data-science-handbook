@@ -677,9 +677,9 @@
 
 		gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) %>%
 				filter(new.numerical.var == 1) %>% 
-				select(-new.numerical.var) # oppsoite of one-hot encoding
+				select(-new.numerical.var) # wide to long
 
-		spread(data_frame, categorical.var, corresponding.numerical.var) # opposite of gather
+		spread(data_frame, categorical.var, corresponding.numerical.var) # long to wide
 
 ==============================================================================================================================
 
@@ -697,7 +697,7 @@
 ==============================================================================================================================
 ==============================================================================================================================
 
-# Efficient Code
+### Efficient Code
 	
 	# Never grow a vector. Always use matrices instead of data frames whenever possible.
 
