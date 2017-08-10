@@ -48,7 +48,7 @@
 	
 	## Binomial
 
-		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))
+		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))  # OR family = multinomial()
 		glm.predict <- predict(glm.model, cv, type = "response")
 		table(cv$target, glm.predict>0.5)
 		error <- ce(cv$target, glm.predict)
@@ -145,7 +145,7 @@
 		
 	# model
 		
-		tree.model <- rpart(target ~ ., data = train, method = "class/anova",
+		tree.model <- rpart(target ~ ., data = train, method = "class/anova", parms = list(split = "gini/information"),
 							control = rpart.control(cp = , minsplit = , minbucket = ))
 		prp(tree.model) 
 		tree.predict <- predict(tree.model, cv, type = "class") # no need to specify "class" for regression
@@ -342,7 +342,7 @@
 		plot(algo.model, metric = "Accuracy")  # look at ?plot.train
 
 		algo.predict <- predict.train(algo.model, cv, type = "class or prob")
-		confusionMatrix(algo.predict, cv$target, mode = "prec_recall")
+		confusionMatrix(algo.predict, cv$target, mode = "prec_recall", positive = "class_name")
 
 		imp <- varImp(algo.model)
 		plot(imp, top = 20)
