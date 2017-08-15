@@ -304,8 +304,9 @@
       # Task Parameters
           objective          = "reg:logistic",    # default = "reg:linear"
           eval_metric        = "error",
+          num_classes        = 2,                 # number of classes in case of multi class classification
           seed               = 1234				  # reproducability seed
-          )
+        )
 
 		xgb.model <- xgb.train(parameters, data.train, nrounds = 20, watchlist)
 		xgb.predict <- predict(xgb.model, data.cv)
@@ -742,3 +743,6 @@
 
 		# close cluster
 		stopCluster(cluster)
+
+==============================================================================================================================
+		
