@@ -75,7 +75,13 @@
 		glm.AUC <- as.numeric(performance(glm.ROCR,"auc")@y.values)
 
 		glm.prediction <- prediction(abs(glm.predict), cv$target)
-		glm.performance <- performance(glm.prediction,"tpr","fpr")
+		glm.performance <- performance(glm.prediction,"tpr", "fpr")
+		plot(glm.performance)
+
+	## Lift chart
+
+		glm.prediction <- prediction(abs(glm.predict), cv$target)
+		glm.performance <- performance(glm.prediction,"lift", "rpp")  # google ROCR performance functions for more charts
 		plot(glm.performance)
 
 ==============================================================================================================================
