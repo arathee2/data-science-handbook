@@ -172,12 +172,17 @@
 	# model
 
 		set.seed(10)
-		rf.model <- randomForest(target ~ ., data = train, importance = TRUE,
-								 ntree = 1000, mtry = root.of.variables)
+		rf.model <- randomForest(target ~ ., data = train,
+								 importance = TRUE,
+								 ntree = 1000,
+								 mtry = root.of.variables,
+								 do.trace = TRUE,
+								 na.action = na.omit
+								)
+		varImpPlot(rf.model)
 		rf.predict <- predict(rf.model, cv)
 		table(cv$target, rf.predict)
-		varImpPlot(rf.model)
-
+		
 	# party-cforest
 
 		library("party")
