@@ -1,0 +1,1198 @@
+### NumPy
+	
+	import numpy as np
+
+		array = np.array([1, 2, 3, 4], dtype = )  # creates a numpy array
+		array.shape  # print shape of array
+		array.size  # number of elements
+		array.dtype  # data type of array
+		array.itemsize  # size of each element in memory
+
+		np.zeros( [dimensions] )
+		np.ones( [dimensions] )
+		np.empty( [dimensions] )
+		
+		random.seed(4)  # set seed for random number
+		random.rand()  # create random number between [0,1]
+		random.random((3, 4))  # create 3x4 array with random numbers
+		
+		np.arange(start, end, step)  # similar to seq() in R. arange(n) starts goes from 0 to n with single increment
+		np.linspace(start, end, number of elements)  # similar to arange()
+		
+		array.reshape((3, 4))  # returns an array of changed size
+		arrray.resize((3, 4))  # changes the array itself
+		array.transpose()
+		array.sum(axis = 0/1)  # 0 for column, 1 for row
+		array.cumsum(axis = 0/1)  # cumulative sum across column/row
+		
+		sin(array)
+		cos(array)
+		exp(array)
+		sqrt(array)
+		max(array, axis)
+		min(array, axis)
+		mean(array, axis)
+		median(array, axis)
+		std(array, axis)
+		
+
+		column_stack((a, b))  # similar to cbind in R. 
+		row_stack((a, b))  # similar to rbind in R
+		vstack((a, b))  # vertically stack array a and b.
+		hstack((a, b))  # horizontally stack array a and b
+
+		a = array( [1, 2, 3, 4])
+		b = a  # not a copy. If "b" changes, "a" changes
+		c = a.copy()  # deep copy. If "c" hanges, "a" remains unchanged
+
+		# indexing and slicing
+		array[start:end:jump,start:end:jump]  # for 2D array
+
+		# boolean operations
+		logical_and(array1, array2)  # returns an array with boolean values
+		logical_or(array1, array2)
+		logical_not(array1, array2)
+
+==============================================================================================================================
+### Pandas
+
+	import pandas as pd
+
+		# set print options
+		pd.set_option('display.max_columns', None)  # set display limit to all columns
+
+		df = pd.read_csv("", index_col = )  # read a csv
+		df = pd.DataFrame(python_dictionary)  # read python dictionary as dataframe
+		
+		df.dtypes
+		df.categorical_column.nunique()  # return number of levels in a categorical variable
+		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
+		df.describe()  # similar to summary() in R
+		df["column_name"].max()
+		df["column_name"].mean()
+		df["column_name"].std()  # standard deviation of column
+		df.column_name.cumsum()  # cumulative sum
+		df.column_name.cumprod()  # cumulative product
+
+		df.shape()  # return shape as tuple
+		df.head(n)  # similar to head() in R. Print first "n" rows of df
+		df.tail(n)  # print last "n" rows of df
+
+		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
+		
+		df.index = index_variable  # index variable must be equal to the number of rows in the dataframe
+		df.index.name = "index name"
+
+		# hierarchical indexing
+		df.set_index(["school", "rollno"])
+		df.sort_index()
+		df.loc["dgv":"dav"]  # outer indexing (on "school")
+		df.loc[1:10]  		 # inner indexing (on "rollno")
+		df.loc[(["dgv", "dav"], slice(1, 10)),:]  # colon slicing not permitted inside tuple, instead use slice()
+
+		df.reindex()  # conform data frame to new index. arrange rows or add new rows
+		
+		# set primary key column
+		df.set_index("column", inplace = True)
+
+		# print rows
+		df[:]  # print all rows
+		df[1:7]  # slicing
+		
+		# print columns
+		df.columns  # print all columns
+		df["column_name"]  # print specific column. Return panda series object.
+		df.column_name  # print specific column
+		df[["column_A","column_B"]]  # print multiple columns. Pass a list of column names. Return pandas dataframe object.
+		
+		type(df["column_name"])  # similar to class() in R
+		
+		# conditions
+		df[df.age > 10]
+		df[df.age == df.age.max()]
+
+		# loc, iloc
+		df.loc[1:5,:]  # print row [1,5]. need to specify the row and column header names
+		df.loc[[1, 4, 7], ["column1", "column2"]]
+		df.loc[1:10, "column1":"column2"]
+		df.loc[age == df.age.max(),:]
+
+		df.iloc[1:10, 2:4]  # print row [1, 10). need to specify the row and column indices
+
+		# dates
+		df = pd.read_csv("", parse_dates = True)  # use parse_dates = ["column_names"] to read only specific columns as date
+
+		# check missing values
+		df.isnull().any()  # check missing values
+		df.isnull().sum()  # check number of missing values
+		df.notnull().all()
+
+		# fill NAs
+		df.column_name.fillna(df.column_name.mean(), axis = "index or columns", method = "ffil/bfil", limit = 1)
+		df.fillna(df.mean())
+		df.fillna({
+			"column_name": value,
+			"column_name": value
+			})
+
+		df.interpolate(method = "linear")
+
+		df.dropna(subset = ["list of columns"], how = "any/all", thresh = )
+
+		df.replace({"column_name": "value to be replaced", "column_name": "value to be replaced with"}, "value to replace with")
+		df.replace({"value to be replaced": "value to replace with", "value to be replaced": "value to replace with"})  # mapping
+		df.replace(["list of values to be replaced"], ["list of values to replace with"])  # mapping
+
+		# group by
+		group = df.groupby("categorical_column")  # returns GroupBy object
+		group.function()  # apply function to each group separately
+
+		# group by and summarize
+		df.groupby("categorical_column").another_column.function_name()  # min(), max(), sum(), mean()
+		df.groupby(["categorical_columns"]).agg({
+			"col2": [max, min], 
+			"col3": [min, "count"]
+			})  # "count" is a numpy function. see numpy functions
+		
+		df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
+
+		df.groupby(["categorical_column", boolean_filter]).another_column.function_name()
+		
+		# change GroupBy to DataFrame
+		df = pd.DataFrame(df.groupby())
+		df = df.add_suffix('_Count').reset_index()
+		
+		# sort dataframe
+		df.sort_values(by = ["column_name", "column_name"], ascending = False)
+
+		# Melt: wide to long dataframe
+		pd.melt(df,
+				id_vars = ["columns_to_keep"],
+				value_vars = ["columns to melt"],  # optional, if not provided, function will melt all vars except id_vars
+				var_name = ,  					   # new categorical column name
+				value_name =                       # new numerical column name
+		)  										   # similar to gather in tidyr
+		
+		# Unmelt: long to wide dataframe
+		df.pivot_table(index = ,    # do not unmelt
+					   columns = ,  # categorical column name
+					   values =     # numerical column name
+		)  						    # in case of duplicate values, use aggfunc to aggregate
+
+		# concatinate dataframes
+		pd.concat([df1, df2], ignore_index = True, axis = )
+
+		# merge/join dataframe
+		df.merge(df1, df2, on = "common_column", how = "inner")  # how - type of join. Similar to merge in R.
+
+		# stacking and unstacking
+		df.stack()
+		df.stack.unstack()
+
+		# crosstabs
+		pd.crosstabs(df.categorical_column1, df.categorical_column2,  # could pass column lists as well
+					 margins = True,
+					 normalize = {0, 1} or {"all", "index", "columns"}  # similar to prop.table() in R
+		)  # similar to table(category1, catedory2) in R
+
+		pd.crosstabs(df.categorical_column1, df.categorical_column2
+					 values = df.numerical_column,
+					 aggfunc = np.average
+		)  # similar to group by and summarize
+
+		# filtering
+		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # print teenagers
+		df[(df.age < 13) & (df.age > 19)]  # print non-teenagers
+		df[df.name == "Aman" | df.name = "Arjun"]  # print Aman and Arjun both
+		df.all()  # google
+		df.any()  # google
+
+		# apply functions to dataframe
+		df.apply(function, axis = )  # apply to dataframe, function takes data frame as input
+		df.column_name.apply(function)  # apply to series, function takes series as input
+		df.age.apply(np.argmax, axis = 1)  # max to get max value, np.argmax to get column name with max value
+		df.column_name.apply(lambda x:)
+		df["gender"].map({"male": 0, "female": 1})  # similar to ifelse() in R
+
+		# rename columns
+		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
+		df.columns = ["column1", "column2"]  # rename all columns
+
+		# find and delete duplicate rows
+		df.duplicated()  # boolean ouput
+		df.duplicated().sum()  # return number of duplicate entries
+
+		df.drop_duplicates(keep = "first", inplace = True)  # keep first entry and delete rest of the duplicate entries
+
+		# drop column
+		df.drop("column_name", axis = 1)
+
+		# one hot encoding
+		df_dummy = pd.get_dummies(df, columns = [column for column in categorical_columns if column not in ["target_column"]])
+
+==============================================================================================================================
+### matplotlib
+
+	import matplotlib.pyplot as plt
+
+		# line plot
+		plt.plot(x, y, marker = "", linestyle = "")
+		
+		# scatter plot
+		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
+		
+		# histogram
+		plt.hist(x, bins = 30)  # or pass a list of bin cutoff points
+		
+		# 2-D histogram
+		plt.hist2d(x, y, bins = (30, 30), range=((xmin, xmax), (ymin, ymax)))  # range used for zooming
+		plt.colorbar()
+		plt.show()
+
+		plt.hexbin(x, y, gridsize=(), extent=(xmin, xmax, ymin, ymax))  # extent similar to range in hist2d()
+		plt.colorbar()
+		plt.show()
+
+		# plotting images
+		image = plt.imread("image.jpg")
+		plt.imshow(image, extent = , aspect = )
+		plt.axis("off")
+		plt.show()
+
+		collapsed = image.mean(axis=2)  # average out all pixel intensities to get one channel color instead of three
+		plt.set_cmap("gray")            # change printing color to black and white
+		plt.imshow(collapsed, cmap="gray")
+		plt.axis("off")
+		plt.show()
+
+		# customization
+		plt.xlabel("x")      # use of latex equations possible
+		plt.ylabel("y")
+		plt.title("title")
+		plt.xticks()         # customize x-axis ticks
+		plt.yticks()         # customize y-axis ticks
+		plt.tick_params()
+		
+		# transformation
+		plt.xscale("log")    # transform x-axis to log scale
+		plt.yscale("log")    # transform y-axis to log scale
+
+		plt.show()           # display plot
+		plt.clf()            # clear plot
+
+		# multiple plots using axes()
+		plt.axes([x_lo, y_lo, width, height])  # all parameters between 0 and 1
+		plt.plot(x, y, color = "red")
+		plt.axes([x_lo, y_lo, width, height])
+		plt.plot(a, b, color = "blue")
+		plt.show()
+
+		# multiple plots using subplot()
+		plt.subplot(nrows, ncols, nsubplot)  # all parameters indexed from 1
+		plt.plot(x, y, color = "red")
+		plt.subplot(nrows, ncols, nsubplot)  # activate nth subplot
+		plt.plot(a, b, color = "blue")
+		plt.tight_layout()                   # pad space between two plots
+		plt.show()
+
+		# zooming and axis
+		plt.xlim([xmin, xmax])  	         # zoom in
+		plt.ylim([ylim, ymax])
+		plt.axis([xmin, xmax, ymin, ymax])
+		plt.axis("off/equal/square/tight")
+		plt.figure(figsize=(10,10))
+
+		# legends
+		plt.scatter(x, y, color = "red", label = "male")
+		plt.scatter(x, y, color = "blue", label = "female")
+		plt.legend(loc = "upper right")  # google legend locations
+		plt.show()
+
+		# text and arrows
+		plt.annotate("text",
+					 xy = (10, 10),                    # text coordinates
+					 xytext = (15, 15),		           # arrow pointer coordinates
+					 arrowprops = {"color": "green"}   # arrow properties
+		)
+
+		OR
+		
+		plt.text(x, y, s = "text to display on x,y coordinates")  # display text on x,y point
+		plt.grid(True)  # to enable the text
+
+		# themes and styles
+		plt.style.available
+		plt.style.use("ggplot")
+
+==============================================================================================================================
+### seaborn
+
+		import seaborn as sns
+
+	## univariate plots
+
+		# regression line
+		sns.lmplot(x = "column_name", y = "column_name", hue = "categorical_column", data = df, palette = "Set1")
+		sns.lmplot(x = "column_name", y = "column_name", col/row = "categorical_column", data = df)  # two plots based on gender
+		plt.show()
+
+		# higher order regression line - polynomial regression
+		sns.regplot(x = , y = , data = auto, color = "color_name", order = 2, scatter_kws = {"alpha": 0.5, "s":2})  # s-size
+		sns.regplot(x = , y = , data = auto, color = "color_name", order = 3, scatter = None)  # scatter = None avoids plotting the points again
+		plt.show()
+
+		# residual plot
+		sns.residplot(x = , y = , data = , color = "color_name")
+
+		# strip plot
+		mycolors = sns.color_palette("seaborn palette names or matplotlib colormap or list of colors", n_colors = )  # return n_colors
+		sns.stripplot(x = "categorical_column",                 # optional
+					  y = "numeric variable",
+					  data = df,
+					  jitter = True,                            # same as in ggplot2
+					  hue = "categorical_column",
+					  orient = "v/h",                           # change orientation to vertical/horizontal
+					  size = ,                                  # point size
+					  palette = {"male": "g", "female": "r"},   # color correspoding to categorical value of variable
+					  palette = mycolors                        # color for each value of x or hue
+		)
+
+		# swarm plot
+		sns.swarmplot("same arguments as strip plot")  # visualize repeated value differently
+
+		# boxplot
+		sns.boxplot("same arguments as strip plot")
+		
+		# violin plot
+		sns.violinplot("same arguments as strip plot")
+		
+	## bivariate plots
+
+		# joint plot
+		sns.jointplot(x = "numeric_column", y = "numeric_column", data = df, kind = "kde")
+
+		# pair plot
+		sns.pairplot(df)  # pair plots between all numeric variables
+		sns.pairplot(df, hue = "categorical_column", kind = )
+
+		# covariance heat map
+		mycmap = sns.diverging_palette(h_neg=20, h_pos=220, s=75, l=50, sep=10, center='light', as_cmap=True)
+		sns.heatmap(df.corr(), cmap = mycmap, annot = True)
+
+		# ECDF plot - make custom function
+		x = np.sort(df.column_name)
+		y = np.arange(1, len(x) + 1) / len(x)
+		plt.plot(x, y, marker = ".", linestyle = "none")
+		plt.margins(0.02)  # keep data off plot edges
+
+==============================================================================================================================
+### bokeh
+
+		from bokeh.io import output_notebook, show
+		from bokeh.plotting import figure
+
+		# glyphs - shapes like markers, lines, wedges and patches. google bokeh glyphs
+		plot = figure(plot_width = 400, tools = "pan, box_zoom")  # initialize empty plot
+		plot.circle(x = [1,2,3,4,5],			# sequences, numpy arrays, pandas dataframes supported (df.column_name)
+					y = [8,6,5,2,3],			# sequences, numpy arrays, pandas dataframes supported (df.column_name)
+					x_axis_label = "",
+					y_axis_label = ""
+					color = ,
+					size = ,
+					alpha = ,
+					legend = ,					# label to display on legend when plotting multiple plots on same figure
+					source = 				    # in case you are passing source only mention column names in x and y
+		)  # draw on plot
+		output_file("circle.html")  # plot to be output in a web browser. Use if output_file is imported.
+		show(plot)  # display the plot
+
+		# glyphs accept python sequences for every parameter. If single value is provided instead of a sequence, it is used throughout.
+		plot.circle([1,2,3,4,5], [8,6,5,2,3], size = [1,2,3,4,5])  # different size for each circle
+
+		# add multiple markers over each other
+		plot.x()
+		plot.circle()
+		plot.triangle()
+		show(plot)
+
+		# lines
+		plot.line(x = , y = , line_width = )
+
+		# patches - useful to draw geographic regions
+		plot.patches(x = [[1,2,3,4], [1,2], [1,2,3]],
+					 y = [[7,5,3,6], [5,1], [8,3,6]],
+					 color = ["red","blue","green"],
+					 line_color = "white"
+		)
+
+		# ColumnDataSource - main data frame central to bokeh
+		from bokeh.plotting import ColumnDataSource
+
+		cds = ColumnDataSource(df)
+		plot.circle(x = "column_name", y = "column_name", source = cds)
+
+	## animations
+
+		# selection appearance
+		plot = figure(tools = "box_select, lasso_select")
+		plot.circle(x = ,
+					y = ,
+					selection_color = "red",
+					nonselection_fill_alpha = ,
+					nonselection_fill_color = 
+		)
+
+		# hover appearence
+		from bokeh.models import HoverTool
+
+		hover = HoverTool(tooltips = None, mode = "hline")
+		plot = figure(tools = [hover, "crosshair"])
+		plot.circle(x = ,
+					y = ,
+					hover_color = "red"
+		)
+
+		# color mapping
+		from bokeh.models import CategoricalColorMapper
+
+		mapper = CategoricalColorMapper(factors = ["male", "female"], palette = ["red", "green"])
+		plot.circle(x = "column_name",
+					y = "column_name",
+					source = cds,
+					color = {"field": "gender",
+							 "transform: mapper"
+					}
+		)
+
+	## layouts
+
+		# row/column layout
+		from bokeh.layouts import row, column
+		layout = row(p1, p2, p3)  # arrange in row
+		layout = column(p1, p2, p3)  # arrange in column
+		output_file("layout.html")
+		show(layout)
+
+		# nested row/column layout
+		column_layout = column(p1, p2)
+		nested_layout = row(column_layout, p3, sizing_mode='scale_width')
+
+		# grid layout
+		from bokeh.layouts import  gridplot
+		layout = gridplot([p1, p2], [p3, None], toolbar_location = None)  # same output as the nested row-column shown above
+
+		# tabbed layout
+		from bokeh.models.widgets import Tabs, Panel
+		
+		first = Panel(child = row(p1, p2), title = "first")
+		second = Panel(child = row(p3), title = "second")
+
+		tabs = Tabs(tabs = [first, second])
+		show(tabs)
+
+		# linking plots
+
+	## annotations and guide
+		
+		# legend locatiion
+		plot = plot.circle()
+		plot.legend.location = "top_left"
+		plot.legend.background_fill_color = 'lightgray'  # google more legend properties
+
+		# hover tooltips
+		from bokeh.models import HoverTool
+
+		hover = HoverTool(tooltips = [
+				("label", "@column_name"),  # ("length of petal", "@petal_length")
+				("label", "@column_name"),
+				("label", "@column_name")
+				])
+		
+		plot = figure(tools = [hover, "pan", "wheel_zoom"])  # or plot.add_tools(hover)
+		show(plot)
+
+	## charts
+
+		# histogram
+		from bokeh.charts import Histogram  # google bokeh charts
+		plot = Histogram(df, "column_name", bins = , color = "categorical_column", title = )
+		p.xaxis.axis_label = ""
+		p.xaxis.axis_label = ""
+		show(plot)
+
+		# boxplot
+		from bokeh.charts import BoxPlot
+		plot = BoxPlot(df, values = "column_name", label = "categorical_column", color = "categorical_column", title = "")
+
+		# scatter plot
+		from bokeh.charts import Scatter
+		plot = Scatter(df, x = "column_name", y = "column_name", color/marker = "categorical_column", title = "")
+
+==============================================================================================================================
+### python
+
+		# if-else condition
+		if condition:
+			code
+		elif condition:
+			code
+		else:
+			code
+
+		# while loop
+		while condition:
+			code
+
+		# for loop
+		for var in seq:
+			print(var)
+
+		for index, var in enumerate(seq):
+			print(str(index) + "-" + str(var))
+
+		for x, y, z in zip(sequence1, sequence2, sequence3):
+			print(x, y, z)
+
+		# for loops for dictionaries
+		for key, value in dict.items():
+			print(str(key) + "-" + str(value))
+
+		# for loops for numpy arrays
+		for var in np.nditer(numpy_array):
+			print(var)
+
+		global var  # use global variable instead of local variable inside a function
+		nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
+
+		# default arguments
+		def function_name(x = 0):
+			print(x)
+
+		# multiple arguments
+		def function_name(*args):
+		""" print all the parameters """
+			for param in args:
+				print(param)
+		function_name(1, 2, "hi")
+
+		def functions_name(**kwargs): # keyword args
+		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
+			for key, value in kwargs.itmes():
+				print(str(key) + ":" + str(value))
+		function_name(first_name = "Amandeep", last_name = "Rathee")
+
+		# lambda functions
+		lambda variables: operations  # the operation result is returned
+		square = lambda x: x**2  # returns square of a number
+
+		map(function, sequence)  # useful for applying lambda functions to sequences like lists. extract reults by list(map())
+		filter(function, sequence)  # use to filter out elements of sequence. access the result using list(filter())
+		from functools import reduce
+		reduce(function, sequence)  # returns a single value unlike map() and filter()
+
+		# error handling
+		def root(number):
+			if root < 0
+				raise ValueError("negative numbers not allowed.")
+
+			try:
+				return number ** 0.5
+			except:
+				print("Please enter an int or float.")
+
+		# iterators and iterables
+		iterator = iter(iterable)  # iterable can be any sequence-lists, string, dictonaries etc.
+		next(iteration)  # print the next item in iterable
+
+		list(enumerate(sequence, start = 0))  # return a list of tuples with index and the item of sequence
+		list(zip(sequence1, sequence2, sequence3))  # return a list of tuples. each tuple has corresponding items from each sequence
+
+		# load dataframe in chunks
+		for df in pd.read_csv("", chunksize = n)  # load "n" rows in chunks. use next(df) to iterate over chunks
+
+		# list comprehension
+		squares = [num**2 for num in range(5)]  # produce a list of squares of 1 through 5
+		squares = [num**2 for num in range(5) if num % 2 == 0]  # return squares only for even numbers. condition for iterable
+		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]  # return square if number is even else 0. condition for iterator
+		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
+
+		# dictionary comprehension
+		result = {number: number**2 for number in range(5)}
+
+		# generators
+		generator = (num for num in range(10))  # generator can be iterated over. instead of returning a list at once it returns number as and when required.
+		def generator_function(n):
+			""" return numbers upto n """
+			i = 0
+			while i < n
+			yield i  # generates i and returns as the while loop runs
+			i += 1
+
+	# importing data
+
+		# import text file
+		file = open("filename.txt", mode = "r")  # open file in read-only mode
+		fulltext = file.read()
+		firstline = file.readline()  # read line iteratively
+		file.close()
+		print(file.closed)  # check if file is closed
+
+		OR
+
+		with open("filename.txt", "r") as file:
+			print(file.readline())
+
+		# import flat file using numpy
+		np.loadtxt("filename", delimiter = ",", skiprows = 1, usecols = [1:10], dtype = )
+		np.genfromtxt("filename", delimiter = ",", names = True, dtype = None)
+		np.recfromcsv("filename")  # Same as genfromtxt() with parameters shown above as default
+
+		# import flat file using pandas
+		df = pd.read_csv("filename", nrows = , header = , sep = "", names = ["column names"],
+						 comment = ["", ""], na_values = ["", ""], parse_dates = , index_col = )
+
+		array = df.values  # extract numpy array from dataframe
+
+		# pickled files - python specific
+		import pickle
+		
+		with open("data.pkl", "rb") as file:  # rb - readonly binary
+    			  data = pickle.load(file)
+    	print(data)
+
+		# import excel file
+		df = pd.ExcelFile("filename")
+		df.sheet_names()  # print sheet names
+		df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])  # extract sheet by specifying sheet name
+		df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
+
+==============================================================================================================================
+### web scraping
+
+		from urllib.request import urlretrieve
+		urlretrieve("url", "filename.csv")  # save url file to csv
+
+		pd.read_csv("url", sep = )
+		pd.read_excel("url", sheetname = None)  # read all sheets of excel file from url as a dictionary with sheet names as keys
+		
+==============================================================================================================================
+### data cleaning
+
+		df.shape
+		df.columns
+		df.head()
+		df.info()  # to see information like null values
+		df.describe()
+		df.plot(kind="hist/bar/scatter/box", x = , y = )
+		
+		pd.melt()
+		df.pivot_table()
+		
+		df.reset.index()
+		df.index
+
+		df.column.str[0]  # extract first letter from df.column
+		df.column.str.split("_")  # split column on "_"
+		df.column.str.get(0)  # get 0th index of column
+
+		# importing files from current directory
+		import glob
+		files = glob.glob("*.csv")  # return list of all csv file names from current working directory
+
+		df.dtypes  # get types of each column of dataframe
+		df.column.astype(str/"category")  # change column to string/categorical variable
+		pd.to_numeric(df.column, errors = "coerce")  # change column to numeric
+
+		# string matching
+		## to extract "I have $1767.89 and that"s a lot of money", use - "^\$[0-9]*\.[0-9]{2}$"
+		import re
+		pattern = re.compile("^\$[0-9]*\.[0-9]{2}$")
+		result = pattern.match("I have $1767.89 and that is a lot of money!")
+		re.split(pattern, string)  # split string at given pattern
+		re.findall("pattern", "string") # return all matched patterns
+		df.column.replace(",", ";")  # replace "," with ";" 
+		df.column.str.contains("pattern")  # return True if pattern found in column
+
+		# To remove $ sign from the column
+		df.amount.apply(lambda x: x.replace("$", ""))
+		df.amount.apply(lambda x: re.findall("\d+\.\d+", x)[0])  # if [0] is not used result will be [28.45] instead of 28.45
+
+		# drop duplicate
+		df.drop_duplicates()
+
+		# assert
+		assert condition  # if condition is true, do nothing, if false, throw error
+
+		# write csv
+		df.to_csv("filename.csv", sep = )
+
+==============================================================================================================================
+### time series with pandas
+
+		# resampling - change (increase - upsampling or decrease - downsampling) frequency of timeseries data
+		# frequencies - T(minute), H(hour), D(day), B(business day), W(week), M(month), Q(quarter), A(year)
+
+		frequency = "2Q"  # change frequency to half yearly - upsample
+		df.resample(frequency).function()  # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
+
+		# date methods
+		df.data_column.dt.hour          # extract hour
+		df.data_column.dt.dayofweek     # extract dayofweek
+		df.data_column.dt.dayofyear     # extract dayofyear
+		df.data_column.dt.weekofyear    # extract weekofyear
+		df.data_column.dt.month         # extract month
+		df.data_column.dt.year          # extract year
+
+		# visualize time series
+		df.column.plot(style = "k.-")  # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
+
+==============================================================================================================================
+### statistics
+
+		import numpy as np
+
+		np.mean(df.column_name)
+		np.median(df.column_name)
+		np.percentile(df.column_name, [10, 40, 90])  # similar to quartile() in R
+		np.var(df.column_name)
+		np.std(df.column_name)
+		np.cov(x, y)
+		np.corrcoef(x, y)  # pearson correlation coefficient
+
+		# random numbers
+		np.random.seed(4)
+		np.random.random(size = n)  # generate n random numbers between 0 and 1
+		np.random.choice(a = [1,2,3,4,5], size = 2, replace = True)  # similar to sample() in R
+
+		# distributions - google numpy distribution functions
+		np.random.normal(mean, std, size)
+		np.random.binomial(n, p, size)
+		np.random.poisson(n, size)
+		np.random.exponential(tau, size)
+
+		# linear regression in numpy
+		slope, intercept = np.polyfit(x, y, 1)  # degree of polynomial is 1 to specify linear regression
+
+==============================================================================================================================
+### scikit-learn
+
+	## supervised learning
+
+		# make artificial dataset
+		from sklearn.datasets import make_classification
+		X, y = make_classification(n_samples = , n_features = ,
+								   n_informative = , n_redundant = ,
+								   n_repeated = , random_state = ,
+								   weights = [0.5, 0.5]
+			   )
+
+		# divide data into X and y
+		X = df.drop("target_column", axis = 1).values
+		y = df.target_column.values
+
+		# split data into train and test
+		from sklearn.model_selection import train_test_split
+		X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 4, stratify = y)
+		
+		# cross validation
+		from sklearn.model_selection import cross_val_score
+		cv_results = cross_val_score(model, X_train, y_train, cv = 5, scoring = )  # pass model/pipeline after instantiating it
+
+		# hyperparameter tuning
+		from sklearn.model_selection import GridSearchCV
+		params = {"parameter_name": parameter_values}
+		model_cv = GridSearchCV(model, params, cv = 5)  # pass model/pipeline after instantiating it
+		model_cv.fit(X_train, y_train)  # grid search takes place here
+		model_cv.best_params_
+		model_cv.best_score_
+
+		from sklearn.model_selection import RandomizedSearchCV
+		params = {"parameter_name": parameter_values}
+		model_cv = RandomizedSearchCV(model, params, cv = 5)  # pass model/pipeline after instantiating it
+		model_cv.fit(X_train, y_train)  # grid search takes place here
+		model_cv.best_params_
+		model_cv.best_score_
+
+	## models
+
+		# linear regression
+		from sklearn.linear_model import LinearRegression
+		model = LinearRegression()             # instantiate model
+		model.fit(X_train, y_train)            # fit model
+		y_pred = model.predict(X_test)         # predict using model
+		model.score(X_test, y_test)            # evaluate model
+
+		# regularization
+		from sklearn.linear_model import Lasso  # l1-regularization
+		model = Lasso(alpha = , normalize = )
+		model.fit(X_train, y_train)
+		coefficients = model.fit(X_train, y_train).coef_  # extract coefficients for each feature
+		plt.plot(range(len(names)), coefficients)  # variable importance
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+
+		from sklearn.linear_model import Ridge  # l2-regularization
+		model = Ridge(alpha = , normalize = )
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+
+		from sklearn.linear_model import ElasticNet  # mix of l1 and l2 regularization
+		model = ElasticNet(alpha = , normalize = )
+		model.fit(X_train, y_train)
+		coefficients = model.fit(X_train, y_train).coef_  # extract coefficients for each feature
+		plt.plot(range(len(names)), coefficients)  # variable importance
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+
+		# logistic regression
+		from sklearn.linear_model import LogisticRegression
+		model = LogisticRegression()
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+
+		# multiclass logistic regression
+		from sklearn.multiclass import OneVsRestClassifier
+		model = OneVsRestClassifier(LogisticRegression())  # also used when the target column is changed to dummy target columns
+
+		# knn
+		from sklearn.neighbors import KNeighborsClassifier
+		model = KNeighborsClassifier(n_neighbors = 6)
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+
+		# support vector machines
+		from sklearn.svm import SVC, SVR
+		model = SVC(C = , kernel = "")
+		model = SVR(C, = , kernel = "")
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+
+		# decision tree
+		from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
+		import graphviz
+		model = DecisionTreeClassifier()
+		model = DecisionTreeRegressor()
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+		graph_data = export_graphviz(model, out_file       = None,
+									 feature_names       = ,
+									 class_names         = ,
+									 filled              = True,
+									 rounded             = True,  
+									 special_characters  = True
+					 )
+		graph = graphviz.Source(graph_data) 
+		graph.render("tree")  # save tree as tree.pdf file
+
+		# random forest
+		from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+		model = RandomForestClassifier(n_estimators        = ,            # number of trees
+									   max_features        = ,            # number of features at each node split
+									   oob_score           = True,
+									   random_state        = 4,            # random seed
+
+				)
+		model = RandomForestRegressor()  # same parameters as RandomForestClassifier()
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+		model.feature_importances_
+		model.oob_score_
+
+		# gradient boosting
+		from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
+		model = GradientBoostingClassifier(loss                = "deviance",
+										   learning_rate       = 0.1,
+										   n_estimators        = 100,         # number fo trees
+										   max_depth           = 3,           # depth of tree
+										   min_samples_split   = 2,
+										   min_samples_leaf    = 1,
+										   subsample           = 1.0,
+										   max_features        = None,
+										   verbose             = 0,
+										   random_state        = 4,
+
+				)
+		model = GradientBoostingRegressor()  # same parameters as GradientBoostingClassifier()
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+		model.feature_importances_
+		model.train_score_[i]  # train score of i-th iteration
+
+		# xgboost
+		from xgboost import XGBClassifier
+		model = XGBClassifier()
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		predictions = [round(value) for value in y_pred]
+		model.score(X_test, y_test)
+		
+		OR
+
+		import xgboost as xgb
+		dtrain = xgb.DMatrix(X_train, label = y_train)
+		dtest = xgb.DMatrix(X_test, label = y_test)
+		parameters = [
+      # General Parameters
+          booster            = "gbtree",          		# default = "gbtree"
+          silent             = 0,                 		# default = 0
+      # Booster Parameters
+          eta                = 0.3,               		# default = 0.3, range: [0,1]
+          gamma              = 0,                 		# default = 0,   range: [0,∞]
+          max_depth          = 6,                 		# default = 6,   range: [1,∞]
+          min_child_weight   = 1,                 		# default = 1,   range: [0,∞]
+          subsample          = 1,                 		# default = 1,   range: (0,1]
+          colsample_bytree   = 1,                 		# default = 1,   range: (0,1]
+          colsample_bylevel  = 1,                 		# default = 1,   range: (0,1]
+          lambda             = 1,                 		# default = 1
+          alpha              = 0,                 		# default = 0
+      # Task Parameters
+          objective          = "binary:logistic", 		# default = "reg:linear"
+          eval_metric        = ["error", "logloss"],
+          num_classes        = 2,                 		# number of classes in case of multi class classification
+          seed               = 4				  		# reproducability seed
+        ]
+
+        eval_list  = [(dtest,'eval'), (dtrain,'train')]
+        model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
+        y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
+        xgb.plot_importance(model)  # import matplotlib for this
+        xgb.plot_tree(model, num_trees=2) # import graphviz for this
+        model.save_model("model_name")
+
+	## model performance
+
+		# return default metric
+		model.score(X_test, y_test)  # return accuracy/r-squared
+		
+		from sklearn.metrics import accuracy_score
+		accuracy_score(y_test, y_pred)
+
+		from sklearn import confusion_matrix
+		confusion_matrix(y_test, y_pred)
+
+		from sklearn import classification_report
+		classification_report(y_test, y_pred)
+
+		from sklearn import roc_curve
+		y_pred_prob = model.predict_proba(X_test)[:, 0/1]  # return probabilites of class 0/1
+		fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
+
+		from sklearn.metrics import roc_auc_score  # google scikit learn metrics
+		y_pred_prob = model.predict_proba(X_test)[:, 0/1]
+		roc_auc_score(y_test, y_pred_prob)
+
+	## handling missing values
+
+		from sklearn.preprocessing import Imputer
+		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
+		imputer.fit(X)
+		X = imputer.transform(X)  # return imputed dataframe
+
+		# pipeline - imputing and modelling in one go
+		from sklearn.pipeline import Pipeline  # alternative - import make_pipeline
+		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
+		steps = [("imputer", imputer),
+				 ("model_name", model)]
+		pipeline = Pipeline(steps)
+		pipeline.fit(X_train, y_train)
+		y_pred = pipeline.predict(X_test)
+
+	## scaling
+
+		# standardization
+		from sklearn.preprocessing import scale
+		X_scaled = scale(X)
+
+		# pipeline - scale and model
+		from sklearn.preprocessing import StandardScaler  # google - preprocessing types in scikit-learn
+		steps = [("scaler", StandardScaler()),
+				 ("model_name", model)]
+		pipeline = Pipeline(steps)
+		pipeline.fit(X_train, y_train)  # pipeline can be passed to GridSearchCV() instead of directly fitting
+		y_pred = pipeline.predict(X_test)
+
+	## NLP
+
+		# CountVectorizer() creates tokens, builds vocabulary and counts frequency of each word
+		from sklearn.feature_extraction.text import CountVectorizer  # for large text datasets, use HashingVectorizer
+		word_vector = CountVectorizer(token_pattern = "", ngram_range = (1))  # split tokens based on given pattern
+		word_vector.fit(df.text_column)  # learn vocabulary from the given Series
+		word_vector.transform(df.text_column)  # create document term matrix
+		word_vector.fit_transform(df.text_column)  # fit and transform in one go
+
+		# combining text and numeric pipelines for them to be ready for final common pipeline
+		from sklearn.preprocessing import FunctionTransformer
+		from sklearn.feature_selection import chi2, SelectKBest
+		from sklearn.preprocessing import SparseInteractions
+
+		get_text_data = FunctionTransformer(lambda x: x.text_column, validate = False)  # validate checks for NaN values
+		get_numeric_data = FunctionTransformer(lambda x: x.numeric_column, validate = False)
+
+		numeric_pipeline = Pipeline([
+						       ("selector": get_numeric_data),
+						       ("imputer": Imputer())
+						   ])
+
+		text_pipeline = Pipeline([
+							("selector": get_text_data),
+							("vectorizer": CountVectorizer()),
+							("dim_red": SelectKBest(chi2, 100))  # select 100 best features using chi-squared test
+						])
+
+		from sklearn.pipeline import FeatureUnion
+		union = FeatureUnion([
+					("numeric": numeric_pipeline),
+					("text": text_pipeline)
+				])
+
+		final_pipeline = Pipeline([
+						 	("union": union),
+						 	('int', SparseInteractions(degree=2)),
+						 	("scale": MaxAbsScaler()),
+						 	("model": model)
+						 ])
+
+		final_pipeline.fit(X_train, y_train)
+
+	## unsupervised learning
+
+		# k-means clustering
+		from sklearn.cluster import KMeans
+		model = KMeans(n_clusters = )
+		model.fit(X)
+		model.inertia_
+		model.cluster_centers_
+		clusters = model.predict(X)
+		new_labels = model.predict(X_new)
+
+		# hierarchical clustering
+		# In complete linkage, the distance between clusters is the distance between the furthest points of the clusters.
+		# In single linkage, the distance between clusters is the distance between the closest points of the clusters.
+		
+		from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+		mergings = linkage(X, method = "complete")
+		clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
+		pd.DataFrame({"labels": y, "cluster": clusters})  # cluster number starts from index 1
+
+		dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
+		plt.show()
+
+		# t-SNE - visualize n-dimensional data into 2-dimensional
+		from sklearn.manifold import TSNE
+		model = TSNE(learning_rate = 100)  # Optimal choice [50,200]. Points should appear in clusters i.e. not intermingled.
+		transformed = model.fit_transform(X)
+		plt.scatter(transformed.iloc[:, 0], transformed.iloc[:, 1], c = y)
+		plt.show()
+
+		# PCA
+		from sklearn.decomposition import PCA
+		model = PCA(n_components = )  # First do model = PCA(). n_components is known after plotting the bar plot shown below.
+		df_pca = model.fit_transform(df)  # Or use fit() and transform() separately. It is better to scale data before applying PCA.
+		model.components_
+		features = range(model.n_components_)
+		plt.bar(features, model.explained_variance_)
+		plt.xticks(features)
+		plt.show()
+
+		# pca for sparse matrices like word frequencies. google - TfidfVectorizer
+		from sklearn.decomposition import TruncatedSVD
+		model = TruncatedSVD(n_components = )
+		df_pca = model.fit_transform(sparse_df)  # sparse_df is scipy.sparse.csr_matrix instead of numpy array.
+
+		# non negative matrix factorization - interpretable unlike pca
+		from sklearn.decomposition import NMF
+		model = NMF(n_components = n)  # always specify n_components unlike PCA()
+		nmf_features = model.fit_transform(df)  # data should have non-negative entries only
+		model.components_
+
+		# recommendor system using NMF
+		nmf_features = normalize(nmf_features)
+		df = pd.DataFrame(nmf_features, index = "article_names")
+		current_article = df.loc("article_name")
+		similarities = df.dot(current_article)  # cosine similarity. the more the similar
+		print(similarities.nlargest())  # See similarities between current article and other articles. Recommend the most similar article.
+
+==============================================================================================================================
+### keras -- deep learning
+
+		X = df.drop(["target_column"], axis = 1).as_matrix()
+
+		# one hot encoding the outcome variable
+		from keras.utils import to_categorical
+		y = to_categorical(df.target_column)
+
+		# Steps in keras modelling
+		1. Create architecture
+		2. Compile model
+		3. Fit model
+		4. Predict using model
+
+	## 1. Create architecture
+
+		from keras.layers import Dense
+		from keras.models import Sequential
+
+		# Save the number of columns in predictors: n_cols
+		n_cols = X.shape[1]
+
+		# Set up the model
+		model = Sequential()
+
+		# Add the first layer
+		model.add(Dense(n_nodes, activation = "", input_shape = (n_cols,), kernel_initializer = , bias_initializer = ))
+
+		# Add the second layer
+		model.add(Dense(n_nodes, activation = ""))
+
+		# Add the output layer
+		model.add(Dense(1))                          # for regression
+		model.add(Dense(2, activation = "softmax"))  # for classification, one node for each class and a separate activation function
+
+		# visualize model
+		from keras.utils import plot_model
+		plot_model(model, to_file = "model.png", show_shapes = False, show_layer_names = True, rankdir = "TB/LR")
+
+	## 2. Compile the model
+
+		from keras.optimizers import SGD
+		optimizer = SGD(lr = 0.01)  # stochastic gradient descent
+		model.compile(optimizer = "adam"/optimizer,  # google - optimizers available in keras
+					  loss = "categorical_crossentropy",  # categorical_crossentropy is the log loss. google - loss functions in keras
+					  metrics = ["accuracy"]
+		)
+
+	## 3. Fit the model
+
+		# stop when there is no improvement in validation set score
+		from keras.callbacks import EarlyStopping
+		early_stopping_monitor = EarlyStopping(patience = 2)  # stop when there is no improvement for 3 consecutive epochs
+		
+		model.fit(X_train, y_train,
+				  validation_split = 0.25,
+				  epochs = 10,
+				  callbacks = [early_stopping_monitor]  # google keras callbacks techniques for advanced deep learning
+		)
+		model.summary()
+		model.history
+		
+	## 4. Predict using the model
+
+		y_pred = model.predict(X_test)
+
+	## save and load model
+
+		# save model
+		model.save("my_model.h5")
+		
+		# load model
+		from keras.models import load_model
+		model = load_model("my_model.h5")
+
+==============================================================================================================================
