@@ -1,4 +1,4 @@
-### NumPy
+### numpy
 	
 	import numpy as np
 
@@ -54,7 +54,8 @@
 		logical_not(array1, array2)
 
 ==============================================================================================================================
-### Pandas
+
+### pandas
 
 	import pandas as pd
 
@@ -231,6 +232,7 @@
 		df_dummy = pd.get_dummies(df, columns = [column for column in categorical_columns if column not in ["target_column"]])
 
 ==============================================================================================================================
+
 ### matplotlib
 
 	import matplotlib.pyplot as plt
@@ -325,6 +327,7 @@
 		plt.style.use("ggplot")
 
 ==============================================================================================================================
+
 ### seaborn
 
 		import seaborn as sns
@@ -386,6 +389,7 @@
 		plt.margins(0.02)  # keep data off plot edges
 
 ==============================================================================================================================
+
 ### bokeh
 
 		from bokeh.io import output_notebook, show
@@ -529,6 +533,7 @@
 		plot = Scatter(df, x = "column_name", y = "column_name", color/marker = "categorical_column", title = "")
 
 ==============================================================================================================================
+
 ### python
 
 		# if-else condition
@@ -667,6 +672,7 @@
 		df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
 
 ==============================================================================================================================
+
 ### web scraping
 
 		from urllib.request import urlretrieve
@@ -676,6 +682,7 @@
 		pd.read_excel("url", sheetname = None)  # read all sheets of excel file from url as a dictionary with sheet names as keys
 		
 ==============================================================================================================================
+
 ### data cleaning
 
 		df.shape
@@ -727,6 +734,7 @@
 		df.to_csv("filename.csv", sep = )
 
 ==============================================================================================================================
+
 ### time series with pandas
 
 		# resampling - change (increase - upsampling or decrease - downsampling) frequency of timeseries data
@@ -747,6 +755,7 @@
 		df.column.plot(style = "k.-")  # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
 
 ==============================================================================================================================
+
 ### statistics
 
 		import numpy as np
@@ -774,6 +783,7 @@
 		slope, intercept = np.polyfit(x, y, 1)  # degree of polynomial is 1 to specify linear regression
 
 ==============================================================================================================================
+
 ### scikit-learn
 
 	## supervised learning
@@ -1120,6 +1130,7 @@
 		print(similarities.nlargest())  # See similarities between current article and other articles. Recommend the most similar article.
 
 ==============================================================================================================================
+
 ### keras -- deep learning
 
 		X = df.drop(["target_column"], axis = 1).as_matrix()
@@ -1196,3 +1207,46 @@
 		model = load_model("my_model.h5")
 
 ==============================================================================================================================
+
+### NLP
+
+		import re
+		pattern = r""
+		re.match(pattern, string)      # look for the pattern from the start of the string
+		match.start(); match.end()
+		re.search(pattern, string)     # look for the pattern in the whole string and returns the first occurence
+		re.findall(pattern, string)    # look for and returns all the occurences of patterns present in the string
+		re.split(pattern, string)      # split the string at given pattern
+		re.sub(pattern, repl, string)  # replace first occurence of pattern by repl in the string
+
+		from nltk.tokenize import word_tokenize
+		word_tokenize(string, pattern)  # tokenize string into words
+
+		from nltk.tokenize import sent_tokenize
+		sent_tokenize(string, pattern)  # tokenize string into sentences
+
+		from nltk.tokenize import regexp_tokenize
+		regexp_tokenize(string, pattern)  # tokenize string based on pattern
+
+		from nltk.tokenize import TweetTokenizer
+		tokenizer = TweetTokenizer()
+		tokenizer.tokenize(string)
+
+		# plot word count
+		words = [word_tokenize(line) for line in book]   # return list of words of the entire book
+		word_lengths = [len(word) for word in words]     # return word length of each word
+		plt.hist(word_lengths)
+
+		# bag of words
+		from collections import Counter
+		word_frequencies = Counter(word_tokenize(string))  # return the word along with their count
+		print(word_frequencies.most_common(5))             # return the top 5 words occuring in the string
+
+		# text preprocessing
+		from nltk.corpus import stopwords
+		alpha_only = [t for t in word_tokenize(text.lower()) if t.isalpha()]      # return lowercase alphabetic token
+		no_stops = [t for t in tokens if t not in stopwords.words("english")]   # remove stop words
+
+		from nltk.stem import WordNetLemmatizer
+		wordnet_lemmatizer = WordNetLemmatizer()
+		lemmatized = [wordnet_lemmatizer.lemmatize(t) for t in no_stops]
