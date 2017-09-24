@@ -162,6 +162,9 @@
 		# change GroupBy to DataFrame
 		df = pd.DataFrame(df.groupby())
 		df = df.add_suffix('_Count').reset_index()
+
+		# set column names after groupby
+		df.columns = ["_".join(colname) for colname in df.columns]
 		
 		# sort dataframe
 		df.sort_values(by = ["column_name", "column_name"], ascending = False)
@@ -180,10 +183,10 @@
 					   values =     # numerical column name
 		)  						    # in case of duplicate values, use aggfunc to aggregate
 
-		# concatinate dataframes
+		# concatinate dataframes - column + column
 		pd.concat([df1, df2], ignore_index = True, axis = )
 
-		# merge/join dataframe
+		# merge/join dataframe - row + row
 		df.merge(df1, df2, on = "common_column", how = "inner")  # how - type of join. Similar to merge in R.
 
 		# stacking and unstacking
@@ -1250,3 +1253,12 @@
 		from nltk.stem import WordNetLemmatizer
 		wordnet_lemmatizer = WordNetLemmatizer()
 		lemmatized = [wordnet_lemmatizer.lemmatize(t) for t in no_stops]
+
+	## gensim - create bag of words
+
+		from gensim.corpora.dictionary import Dictionary
+		dictionary = Dictionary(articles)       # articles is preprocessed and tokenized
+		dictionary.token2id                     # each token is given a unique id
+		corpus = [dictionary.doc2bow(article) for article in articles]
+		corpus[0][:10]  # print first 10 word ids from first document
+		
