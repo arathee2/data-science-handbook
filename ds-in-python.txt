@@ -35,7 +35,6 @@
 		median(array, axis)
 		std(array, axis)
 		
-
 		column_stack((a, b))  # similar to cbind in R. 
 		row_stack((a, b))  # similar to rbind in R
 		vstack((a, b))  # vertically stack array a and b.
@@ -149,7 +148,7 @@
 		group.function()  # apply function to each group separately
 
 		# group by and summarize
-		df.groupby("categorical_column").another_column.function_name()  # min(), max(), sum(), mean()
+		df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
 		df.groupby(["categorical_columns"]).agg({
 			"col2": [max, min], 
 			"col3": [min, "count"]
