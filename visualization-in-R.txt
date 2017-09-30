@@ -181,15 +181,46 @@
 		library(maps)
 		
 		usa <- map_data("state")
-		data_frame <- merge(usa, data_frame, by=" ")
+		data_frame <- merge(usa, data_frame, by = "")
 		
 		ggplot(data_frame, aes(x = long, y = lat, group = group))
 
 		
 		library(leaflet)
 		map <- leaflet(data) %>%
+				setView(lng = -71.0589, lat = 42.3601, zoom = 12) %>%
 				addTiles() %>%  # Add default OpenStreetMap map tiles
-				addMarkers(lng = , lat = , popup = )
+				addMarkers(lng = ~long_var, lat = ~lat_var, popup/label = ~popup_var,
+						   clusterOptions = markerClusterOptions()
+						  ) %>%
+				# circular markers instead of normal ones
+				addCircleMarkers(radius = , color = "red", stroke = F, fillOpacity = 0.5) %>%
+				addCircles(weight = 1, opacity = 1, color = "blue", fillOpacity = 0.7,,
+						   highlight = highlightOptions(weight = 5, color = "red", dashArray = "",
+						   								fillOpacity = 0.7, bringToFront = TRUE),
+						   radius = ~population, stroke = F
+						  ) %>%
+				addRectangles(lng1 = -118.456554, lat1 = 34.078039, 
+							  lng2 = -118.436383, lat2 = 34.062717,
+							  fillColor = "transparent"
+							 ) %>%
+				addLegend(position = "bottomright",
+						  pal = pal <- colorNumeric(palette = "YlGnBu", domain = data$gdp),
+						  values = ~gdp,
+						  title = "GDP", 
+						  labFormat = labelFormat(prefix = "$"),
+						  opacity = 1
+						 ) %>%
+				# plugin: measure distance between two points on map
+				addMeasure(position = "bottomleft",
+    					   primaryLengthUnit = "meters",
+    					   primaryAreaUnit = "sqmeters",
+    					   activeColor = "#3D535D",
+    					   completedColor = "#7D4479"
+    					  ) %>%
+				# plugin: mini map to navigate easily
+				addMiniMap(toggleDisplay = TRUE)
+
 		
 		print(map)
 		
@@ -199,7 +230,7 @@
 
 		library(stringr)
 
-		lolower(character.variable)
+		tolower(character.variable)
 		toupper(character.variable)
 
 		strsplit(character.variable, ",")  # split at ","
