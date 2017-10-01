@@ -2,55 +2,69 @@
 	
 	import numpy as np
 
-		array = np.array([1, 2, 3, 4], dtype = )  # creates a numpy array
-		array.shape  # print shape of array
-		array.size  # number of elements
-		array.dtype  # data type of array
-		array.itemsize  # size of each element in memory
+		array = np.array([1, 2, 3, 4], dtype = )      # creates a numpy array
+		array.shape                                   # print shape of array
+		array.size                                    # number of elements
+		array.itemsize                                # size of each element in memory
+		array.dtype                                   # data type of array
+		
+		np.zeros((5,3))
+		np.ones((5,3))
+		np.empty((5,3))
+		
+		random.seed(4)                                # set seed for random number
+		random.rand()                                 # create random number in [0.0,1.0)
+		random.randint(low, high, size)               # create random integer between in [low, high)
+		random.random((3, 4))                         # create 3x4 array with random numbers in [0.0,1.0)
+		random.choice([0,1,2], size, replace, p)      # generate random numbers of size from array with probability p
+		random.shuffle(array)                         # modify a sequence in-place by shuffling its contents
+		
+		np.arange(start, stop, step)                  # similar to seq() in R
+		np.linspace(start, stop, num, endpoint=True)  # generate "num" elements between [start, stop]
+		
+		array.reshape((3, 4))                         # return an array of changed size
+		arrray.resize((3, 4))                         # changes the array in-place
+		array.transpose()                             # return transpose of matrix
+		array.sum(axis = 0/1)                         # 0 - column, 1 - row
+		array.cumsum(axis = 0/1)                      # cumulative sum across column/row
+		
+		np.exp(array)                                 # array or pandas Series
+		np.sqrt(array)
+		np.max(array, axis)
+		np.min(array, axis)
+		np.mean(array)
+		np.median(array)
+		np.var(array)
+		np.std(array)
+		np.percentile(array, [10, 40, 90])            # similar to quartile() in R
+		np.cov(x, y)
+		np.corrcoef(x, y)                             # pearson correlation coefficient
 
-		np.zeros( [dimensions] )
-		np.ones( [dimensions] )
-		np.empty( [dimensions] )
-		
-		random.seed(4)  # set seed for random number
-		random.rand()  # create random number between [0,1]
-		random.random((3, 4))  # create 3x4 array with random numbers
-		
-		np.arange(start, end, step)  # similar to seq() in R. arange(n) starts goes from 0 to n with single increment
-		np.linspace(start, end, number of elements)  # similar to arange()
-		
-		array.reshape((3, 4))  # returns an array of changed size
-		arrray.resize((3, 4))  # changes the array itself
-		array.transpose()
-		array.sum(axis = 0/1)  # 0 for column, 1 for row
-		array.cumsum(axis = 0/1)  # cumulative sum across column/row
-		
-		sin(array)
-		cos(array)
-		exp(array)
-		sqrt(array)
-		max(array, axis)
-		min(array, axis)
-		mean(array, axis)
-		median(array, axis)
-		std(array, axis)
-		
-		column_stack((a, b))  # similar to cbind in R. 
-		row_stack((a, b))  # similar to rbind in R
-		vstack((a, b))  # vertically stack array a and b.
-		hstack((a, b))  # horizontally stack array a and b
+		column_stack((a, b))  						  # similar to cbind in R. 
+		row_stack((a, b))                             # similar to rbind in R
+		vstack((a, b))                                # vertically stack array a and b.
+		hstack((a, b))         						  # horizontally stack array a and b
 
-		a = array( [1, 2, 3, 4])
-		b = a  # not a copy. If "b" changes, "a" changes
-		c = a.copy()  # deep copy. If "c" hanges, "a" remains unchanged
+		a = array([1, 2, 3, 4])
+		b = a                 						  # not a copy. If "b" changes, "a" changes
+		c = a.copy()           						  # deep copy. If "c" changes, "a" remains unchanged
 
 		# indexing and slicing
-		array[start:end:jump,start:end:jump]  # for 2D array
+		array[start:end:jump, start:end:jump]         # for 2D array
 
 		# boolean operations
-		logical_and(array1, array2)  # returns an array with boolean values
+		logical_and(array1, array2)                   # returns an array with boolean values
 		logical_or(array1, array2)
 		logical_not(array1, array2)
+	
+		# distributions - google numpy distribution functions
+		np.random.normal(mean, std, size)
+		np.random.binomial(n, p, size)
+		np.random.poisson(n, size)
+		np.random.exponential(tau, size)
+
+		# linear regression in numpy
+		slope, intercept = np.polyfit(x, y, 1)        # degree of polynomial is 1 to specify linear regression
 
 ==============================================================================================================================
 
@@ -61,71 +75,71 @@
 		# set print options
 		pd.set_option('display.max_columns', None)  # set display limit to all columns
 
-		df = pd.read_csv("", index_col = )  # read a csv
-		df = pd.DataFrame(python_dictionary)  # read python dictionary as dataframe
+		df = pd.read_csv("", index_col = )          # read a csv
+		df = pd.DataFrame(python_dictionary)        # read python dictionary as dataframe
 		
 		df.dtypes
-		df.categorical_column.nunique()  # return number of levels in a categorical variable
+		df.categorical_column.nunique()             # return number of levels in a categorical variable
 		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
-		df.describe()  # similar to summary() in R
+		df.describe()                               # similar to summary() in R
 		df["column_name"].max()
 		df["column_name"].mean()
-		df["column_name"].std()  # standard deviation of column
-		df.column_name.cumsum()  # cumulative sum
-		df.column_name.cumprod()  # cumulative product
+		df["column_name"].std()                     # standard deviation of column
+		df.column_name.cumsum()                     # cumulative sum
+		df.column_name.cumprod()                    # cumulative product
 
-		df.shape()  # return shape as tuple
-		df.head(n)  # similar to head() in R. Print first "n" rows of df
-		df.tail(n)  # print last "n" rows of df
+		df.shape()                                  # return shape as tuple
+		df.head(n)                                  # return first "n" rows of df
+		df.tail(n)                                  # return last "n" rows of df
 
 		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
 		
-		df.index = index_variable  # index variable must be equal to the number of rows in the dataframe
+		df.index = index_variable                   # index variable must be equal to the number of rows in the dataframe
 		df.index.name = "index name"
 
 		# hierarchical indexing
 		df.set_index(["school", "rollno"])
 		df.sort_index()
-		df.loc["dgv":"dav"]  # outer indexing (on "school")
-		df.loc[1:10]  		 # inner indexing (on "rollno")
-		df.loc[(["dgv", "dav"], slice(1, 10)),:]  # colon slicing not permitted inside tuple, instead use slice()
+		df.loc["dgv":"dav"]                         # outer indexing (on "school")
+		df.loc[1:10]  		                        # inner indexing (on "rollno")
+		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
 
-		df.reindex()  # conform data frame to new index. arrange rows or add new rows
+		df.reindex()                                # conform data frame to new index. arrange rows or add new rows
 		
 		# set primary key column
 		df.set_index("column", inplace = True)
 
 		# print rows
-		df[:]  # print all rows
-		df[1:7]  # slicing
+		df[:]                                       # print all rows
+		df[1:7]                                     # slicing
 		
 		# print columns
-		df.columns  # print all columns
-		df["column_name"]  # print specific column. Return panda series object.
-		df.column_name  # print specific column
-		df[["column_A","column_B"]]  # print multiple columns. Pass a list of column names. Return pandas dataframe object.
+		df.columns                                  # print all columns
+		df["column_name"]                           # print specific column. Return panda series object.
+		df.column_name                              # print specific column
+		df[["column_A","column_B"]]                 # print multiple columns. Pass a list of column names. Return pandas dataframe object.
 		
-		type(df["column_name"])  # similar to class() in R
+		type(df["column_name"])                     # similar to class() in R
 		
 		# conditions
 		df[df.age > 10]
 		df[df.age == df.age.max()]
 
 		# loc, iloc
-		df.loc[1:5,:]  # print row [1,5]. need to specify the row and column header names
+		df.loc[1:5,:]                               # print row [1,5]. need to specify the row and column header names
 		df.loc[[1, 4, 7], ["column1", "column2"]]
 		df.loc[1:10, "column1":"column2"]
 		df.loc[age == df.age.max(),:]
 
-		df.iloc[1:10, 2:4]  # print row [1, 10). need to specify the row and column indices
+		df.iloc[1:10, 2:4]                          # print row [1, 10). need to specify the row and column indices
 
 		# dates
-		df = pd.read_csv("", parse_dates = True)  # use parse_dates = ["column_names"] to read only specific columns as date
+		df = pd.read_csv("", parse_dates = True)    # use parse_dates = ["column_names"] to read only specific columns as date
 
 		# check missing values
-		df.isnull().any()  # check missing values
-		df.isnull().sum()  # check number of missing values
-		df.notnull().all()
+		df.isnull().any()                           # return True if any of the values is missing
+		df.isnull().sum()                           # check number of missing values
+		df.notnull().all()                          # return True only if no missing values prsent
 
 		# fill NAs
 		df.column_name.fillna(df.column_name.mean(), axis = "index or columns", method = "ffil/bfil", limit = 1)
@@ -144,8 +158,8 @@
 		df.replace(["list of values to be replaced"], ["list of values to replace with"])  # mapping
 
 		# group by
-		group = df.groupby("categorical_column")  # returns GroupBy object
-		group.function()  # apply function to each group separately
+		group = df.groupby("categorical_column")    # returns GroupBy object
+		group.function()                            # apply function to each group separately
 
 		# group by and summarize
 		df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
@@ -171,29 +185,29 @@
 		# Melt: wide to long dataframe
 		pd.melt(df,
 				id_vars = ["columns_to_keep"],
-				value_vars = ["columns to melt"],  # optional, if not provided, function will melt all vars except id_vars
-				var_name = ,  					   # new categorical column name
-				value_name =                       # new numerical column name
-		)  										   # similar to gather in tidyr
+				value_vars = ["columns to melt"],   # optional, if not provided, function will melt all vars except id_vars
+				var_name = ,  					    # new categorical column name
+				value_name =                        # new numerical column name
+		)  										    # similar to gather in tidyr
 		
 		# Unmelt: long to wide dataframe
-		df.pivot_table(index = ,    # do not unmelt
-					   columns = ,  # categorical column name
-					   values =     # numerical column name
-		)  						    # in case of duplicate values, use aggfunc to aggregate
+		df.pivot_table(index = ,                    # columns not to unmelt
+					   columns = ,                  # categorical column name
+					   values =                     # numerical column name
+		)  						                    # in case of duplicate values, use aggfunc to aggregate
 
 		# concatinate dataframes - column + column
 		pd.concat([df1, df2], ignore_index = True, axis = )
 
 		# merge/join dataframe - row + row
-		df.merge(df1, df2, on = "common_column", how = "inner")  # how - type of join. Similar to merge in R.
+		df.merge(df1, df2, on = "common_column", how = "inner")
 
 		# stacking and unstacking
 		df.stack()
 		df.stack.unstack()
 
 		# crosstabs
-		pd.crosstabs(df.categorical_column1, df.categorical_column2,  # could pass column lists as well
+		pd.crosstabs(df.categorical_column1, df.categorical_column2,    # could pass column lists as well
 					 margins = True,
 					 normalize = {0, 1} or {"all", "index", "columns"}  # similar to prop.table() in R
 		)  # similar to table(category1, catedory2) in R
@@ -204,26 +218,26 @@
 		)  # similar to group by and summarize
 
 		# filtering
-		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # print teenagers
-		df[(df.age < 13) & (df.age > 19)]  # print non-teenagers
-		df[df.name == "Aman" | df.name = "Arjun"]  # print Aman and Arjun both
-		df.all()  # google
-		df.any()  # google
+		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
+		df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
+		df[df.name == "Aman" | df.name = "Arjun"]      # return Aman and Arjun both
+		df.all()                                       # return True if all the elements are True
+		df.any()                                       # return True if any of the elements is True
 
 		# apply functions to dataframe
-		df.apply(function, axis = )  # apply to dataframe, function takes data frame as input
-		df.column_name.apply(function)  # apply to series, function takes series as input
-		df.age.apply(np.argmax, axis = 1)  # max to get max value, np.argmax to get column name with max value
-		df.column_name.apply(lambda x:)
-		df["gender"].map({"male": 0, "female": 1})  # similar to ifelse() in R
+		df.apply(function, axis = )                    # apply to dataframe, function takes data frame as input
+		df.column_name.apply(function)                 # apply to series, function takes series as input
+		df.age.apply(np.argmax, axis = 1)              # max to get max value, np.argmax to get column name with max value
+		df.column_name.apply(lambda x: x**2)           # return x**2
+		df["gender"].map({"male": 0, "female": 1})     # similar to ifelse() in R
 
 		# rename columns
 		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
-		df.columns = ["column1", "column2"]  # rename all columns
+		df.columns = ["column1", "column2"]            # rename all columns
 
 		# find and delete duplicate rows
-		df.duplicated()  # boolean ouput
-		df.duplicated().sum()  # return number of duplicate entries
+		df.duplicated()                                # boolean ouput
+		df.duplicated().sum()                          # return number of duplicate entries
 
 		df.drop_duplicates(keep = "first", inplace = True)  # keep first entry and delete rest of the duplicate entries
 
@@ -246,14 +260,14 @@
 		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
 		
 		# histogram
-		plt.hist(x, bins = 30)  # or pass a list of bin cutoff points
+		plt.hist(x, bins = 30)                         # or pass a list of bin cutoff points
 		
 		# 2-D histogram
 		plt.hist2d(x, y, bins = (30, 30), range=((xmin, xmax), (ymin, ymax)))  # range used for zooming
 		plt.colorbar()
 		plt.show()
 
-		plt.hexbin(x, y, gridsize=(), extent=(xmin, xmax, ymin, ymax))  # extent similar to range in hist2d()
+		plt.hexbin(x, y, gridsize=(), extent=(xmin, xmax, ymin, ymax))         # extent similar to range in hist2d()
 		plt.colorbar()
 		plt.show()
 
@@ -263,53 +277,53 @@
 		plt.axis("off")
 		plt.show()
 
-		collapsed = image.mean(axis=2)  # average out all pixel intensities to get one channel color instead of three
-		plt.set_cmap("gray")            # change printing color to black and white
+		collapsed = image.mean(axis=2)                 # average out all pixel intensities to get one channel color instead of three
+		plt.set_cmap("gray")                           # change printing color to black and white
 		plt.imshow(collapsed, cmap="gray")
 		plt.axis("off")
 		plt.show()
 
 		# customization
-		plt.xlabel("x")      # use of latex equations possible
+		plt.xlabel("x")                                # use of latex equations possible
 		plt.ylabel("y")
 		plt.title("title")
-		plt.xticks()         # customize x-axis ticks
-		plt.yticks()         # customize y-axis ticks
+		plt.xticks()                                   # customize x-axis ticks
+		plt.yticks()                                   # customize y-axis ticks
 		plt.tick_params()
 		
 		# transformation
-		plt.xscale("log")    # transform x-axis to log scale
-		plt.yscale("log")    # transform y-axis to log scale
+		plt.xscale("log")                              # transform x-axis to log scale
+		plt.yscale("log")                              # transform y-axis to log scale
 
-		plt.show()           # display plot
-		plt.clf()            # clear plot
+		plt.show()                                     # display plot
+		plt.clf()                                      # clear plot
 
 		# multiple plots using axes()
-		plt.axes([x_lo, y_lo, width, height])  # all parameters between 0 and 1
+		plt.axes([x_lo, y_lo, width, height])          # all parameters between 0 and 1
 		plt.plot(x, y, color = "red")
 		plt.axes([x_lo, y_lo, width, height])
 		plt.plot(a, b, color = "blue")
 		plt.show()
 
 		# multiple plots using subplot()
-		plt.subplot(nrows, ncols, nsubplot)  # all parameters indexed from 1
+		plt.subplot(nrows, ncols, nsubplot)            # all parameters indexed from 1
 		plt.plot(x, y, color = "red")
-		plt.subplot(nrows, ncols, nsubplot)  # activate nth subplot
+		plt.subplot(nrows, ncols, nsubplot)            # activate nth subplot
 		plt.plot(a, b, color = "blue")
-		plt.tight_layout()                   # pad space between two plots
+		plt.tight_layout()                             # pad space between two plots
 		plt.show()
 
 		# zooming and axis
-		plt.xlim([xmin, xmax])  	         # zoom in
+		plt.xlim([xmin, xmax])  	                   # zoom in
 		plt.ylim([ylim, ymax])
 		plt.axis([xmin, xmax, ymin, ymax])
 		plt.axis("off/equal/square/tight")
 		plt.figure(figsize=(10,10))
 
 		# legends
-		plt.scatter(x, y, color = "red", label = "male")
-		plt.scatter(x, y, color = "blue", label = "female")
-		plt.legend(loc = "upper right")  # google legend locations
+		plt.scatter(x, y, color = "green", label = "male")
+		plt.scatter(x, y, color = "red", label = "female")
+		plt.legend(loc = "upper right")                # google legend locations
 		plt.show()
 
 		# text and arrows
@@ -322,7 +336,7 @@
 		OR
 		
 		plt.text(x, y, s = "text to display on x,y coordinates")  # display text on x,y point
-		plt.grid(True)  # to enable the text
+		plt.grid(True)                                 # to enable the text
 
 		# themes and styles
 		plt.style.available
@@ -474,7 +488,7 @@
 
 		# row/column layout
 		from bokeh.layouts import row, column
-		layout = row(p1, p2, p3)  # arrange in row
+		layout = row(p1, p2, p3)     # arrange in row
 		layout = column(p1, p2, p3)  # arrange in column
 		output_file("layout.html")
 		show(layout)
@@ -503,13 +517,13 @@
 		# legend locatiion
 		plot = plot.circle()
 		plot.legend.location = "top_left"
-		plot.legend.background_fill_color = 'lightgray'  # google more legend properties
+		plot.legend.background_fill_color = 'lightgray'      # google more legend properties
 
 		# hover tooltips
 		from bokeh.models import HoverTool
 
 		hover = HoverTool(tooltips = [
-				("label", "@column_name"),  # ("length of petal", "@petal_length")
+				("label", "@column_name"),                   # ("length of petal", "@petal_length")
 				("label", "@column_name"),
 				("label", "@column_name")
 				])
@@ -568,7 +582,7 @@
 		for var in np.nditer(numpy_array):
 			print(var)
 
-		global var  # use global variable instead of local variable inside a function
+		global var    # use global variable instead of local variable inside a function
 		nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
 
 		# default arguments
@@ -582,20 +596,20 @@
 				print(param)
 		function_name(1, 2, "hi")
 
-		def functions_name(**kwargs): # keyword args
+		def functions_name(**kwargs):                 # keyword args
 		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
 			for key, value in kwargs.itmes():
 				print(str(key) + ":" + str(value))
 		function_name(first_name = "Amandeep", last_name = "Rathee")
 
 		# lambda functions
-		lambda variables: operations  # the operation result is returned
-		square = lambda x: x**2  # returns square of a number
+		lambda variables: operations                  # return result of operation
+		square = lambda x: x**2                       # return square of x
 
-		map(function, sequence)  # useful for applying lambda functions to sequences like lists. extract reults by list(map())
-		filter(function, sequence)  # use to filter out elements of sequence. access the result using list(filter())
+		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract reults by list(map())
+		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
 		from functools import reduce
-		reduce(function, sequence)  # returns a single value unlike map() and filter()
+		reduce(function, sequence)                    # returns a single value unlike map() and filter()
 
 		# error handling
 		def root(number):
@@ -608,41 +622,41 @@
 				print("Please enter an int or float.")
 
 		# iterators and iterables
-		iterator = iter(iterable)  # iterable can be any sequence-lists, string, dictonaries etc.
-		next(iteration)  # print the next item in iterable
+		iterator = iter(iterable)                     # iterable can be any sequence-lists, string, dictonaries etc.
+		next(iteration)                               # print the next item in iterable
 
-		list(enumerate(sequence, start = 0))  # return a list of tuples with index and the item of sequence
-		list(zip(sequence1, sequence2, sequence3))  # return a list of tuples. each tuple has corresponding items from each sequence
+		list(enumerate(sequence, start = 0))          # return a list of tuples with index and the item of sequence
+		list(zip(sequence1, sequence2, sequence3))    # return a list of tuples. each tuple has corresponding items from each sequence
 
 		# load dataframe in chunks
-		for df in pd.read_csv("", chunksize = n)  # load "n" rows in chunks. use next(df) to iterate over chunks
+		for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
 
 		# list comprehension
-		squares = [num**2 for num in range(5)]  # produce a list of squares of 1 through 5
-		squares = [num**2 for num in range(5) if num % 2 == 0]  # return squares only for even numbers. condition for iterable
-		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]  # return square if number is even else 0. condition for iterator
+		squares = [num**2 for num in range(5)]        # produce a list of squares of 1 through 5
+		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
+		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
 		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
 
 		# dictionary comprehension
 		result = {number: number**2 for number in range(5)}
 
 		# generators
-		generator = (num for num in range(10))  # generator can be iterated over. instead of returning a list at once it returns number as and when required.
+		generator = (num for num in range(10))        # generator can be iterated over. instead of returning a list at once it returns number as and when required.
 		def generator_function(n):
 			""" return numbers upto n """
 			i = 0
 			while i < n
-			yield i  # generates i and returns as the while loop runs
+			yield i                                   # generates i and returns as the while loop runs
 			i += 1
 
 	# importing data
 
 		# import text file
-		file = open("filename.txt", mode = "r")  # open file in read-only mode
+		file = open("filename.txt", mode = "r")       # open file in read-only mode
 		fulltext = file.read()
-		firstline = file.readline()  # read line iteratively
+		firstline = file.readline()                   # read line iteratively
 		file.close()
-		print(file.closed)  # check if file is closed
+		print(file.closed)                            # check if file is closed
 
 		OR
 
@@ -652,25 +666,25 @@
 		# import flat file using numpy
 		np.loadtxt("filename", delimiter = ",", skiprows = 1, usecols = [1:10], dtype = )
 		np.genfromtxt("filename", delimiter = ",", names = True, dtype = None)
-		np.recfromcsv("filename")  # Same as genfromtxt() with parameters shown above as default
+		np.recfromcsv("filename")                     # same as genfromtxt() with parameters shown above as default
 
 		# import flat file using pandas
 		df = pd.read_csv("filename", nrows = , header = , sep = "", names = ["column names"],
 						 comment = ["", ""], na_values = ["", ""], parse_dates = , index_col = )
 
-		array = df.values  # extract numpy array from dataframe
+		array = df.values                             # extract numpy array from dataframe
 
 		# pickled files - python specific
 		import pickle
 		
-		with open("data.pkl", "rb") as file:  # rb - readonly binary
+		with open("data.pkl", "rb") as file:          # rb - readonly binary
     			  data = pickle.load(file)
     	print(data)
 
 		# import excel file
 		df = pd.ExcelFile("filename")
 		df.sheet_names()  # print sheet names
-		df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])  # extract sheet by specifying sheet name
+		df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])        # extract sheet by specifying sheet name
 		df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
 
 ==============================================================================================================================
@@ -678,10 +692,10 @@
 ### web scraping
 
 		from urllib.request import urlretrieve
-		urlretrieve("url", "filename.csv")  # save url file to csv
+		urlretrieve("url", "filename.csv")            # save url file to csv
 
 		pd.read_csv("url", sep = )
-		pd.read_excel("url", sheetname = None)  # read all sheets of excel file from url as a dictionary with sheet names as keys
+		pd.read_excel("url", sheetname = None)        # read all sheets of excel file from url as a dictionary with sheet names as keys
 		
 ==============================================================================================================================
 
@@ -690,7 +704,7 @@
 		df.shape
 		df.columns
 		df.head()
-		df.info()  # to see information like null values
+		df.info()                                     # to see information like null values
 		df.describe()
 		df.plot(kind="hist/bar/scatter/box", x = , y = )
 		
@@ -700,27 +714,27 @@
 		df.reset.index()
 		df.index
 
-		df.column.str[0]  # extract first letter from df.column
-		df.column.str.split("_")  # split column on "_"
-		df.column.str.get(0)  # get 0th index of column
+		df.column.str[0]                              # extract first letter from df.column
+		df.column.str.split("_")                      # split column on "_"
+		df.column.str.get(0)                          # get 0th item from each value of the column
 
 		# importing files from current directory
 		import glob
-		files = glob.glob("*.csv")  # return list of all csv file names from current working directory
+		files = glob.glob("*.csv")                    # return list of all csv file names from current working directory
 
-		df.dtypes  # get types of each column of dataframe
-		df.column.astype(str/"category")  # change column to string/categorical variable
-		pd.to_numeric(df.column, errors = "coerce")  # change column to numeric
+		df.dtypes                                     # get types of each column of dataframe
+		df.column.astype(str/"category")              # change column to string/categorical variable
+		pd.to_numeric(df.column, errors = "coerce")   # change column to numeric
 
 		# string matching
 		## to extract "I have $1767.89 and that"s a lot of money", use - "^\$[0-9]*\.[0-9]{2}$"
 		import re
 		pattern = re.compile("^\$[0-9]*\.[0-9]{2}$")
 		result = pattern.match("I have $1767.89 and that is a lot of money!")
-		re.split(pattern, string)  # split string at given pattern
-		re.findall("pattern", "string") # return all matched patterns
-		df.column.replace(",", ";")  # replace "," with ";" 
-		df.column.str.contains("pattern")  # return True if pattern found in column
+		re.split(pattern, string)                     # split string at given pattern
+		re.findall("pattern", "string")               # return all matched patterns
+		df.column.replace(",", ";")                   # replace "," with ";" 
+		df.column.str.contains("pattern")             # return True if pattern found in column
 
 		# To remove $ sign from the column
 		df.amount.apply(lambda x: x.replace("$", ""))
@@ -730,7 +744,7 @@
 		df.drop_duplicates()
 
 		# assert
-		assert condition  # if condition is true, do nothing, if false, throw error
+		assert condition                              # if condition is true, do nothing, if false, throw error
 
 		# write csv
 		df.to_csv("filename.csv", sep = )
@@ -742,48 +756,20 @@
 		# resampling - change (increase - upsampling or decrease - downsampling) frequency of timeseries data
 		# frequencies - T(minute), H(hour), D(day), B(business day), W(week), M(month), Q(quarter), A(year)
 
-		frequency = "2Q"  # change frequency to half yearly - upsample
+		frequency = "2Q"                   # change frequency to half yearly - upsample
 		df.resample(frequency).function()  # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
 
 		# date methods
-		df.data_column.dt.hour          # extract hour
-		df.data_column.dt.dayofweek     # extract dayofweek
-		df.data_column.dt.dayofyear     # extract dayofyear
-		df.data_column.dt.weekofyear    # extract weekofyear
-		df.data_column.dt.month         # extract month
-		df.data_column.dt.year          # extract year
+		df.data_column.dt.hour             # extract hour
+		df.data_column.dt.dayofweek        # extract dayofweek
+		df.data_column.dt.dayofyear        # extract dayofyear
+		df.data_column.dt.weekofyear       # extract weekofyear
+		df.data_column.dt.month            # extract month
+		df.data_column.dt.year             # extract year
 
 		# visualize time series
-		df.column.plot(style = "k.-")  # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
-
-==============================================================================================================================
-
-### statistics
-
-		import numpy as np
-
-		np.mean(df.column_name)
-		np.median(df.column_name)
-		np.percentile(df.column_name, [10, 40, 90])  # similar to quartile() in R
-		np.var(df.column_name)
-		np.std(df.column_name)
-		np.cov(x, y)
-		np.corrcoef(x, y)  # pearson correlation coefficient
-
-		# random numbers
-		np.random.seed(4)
-		np.random.random(size = n)  # generate n random numbers between 0 and 1
-		np.random.choice(a = [1,2,3,4,5], size = 2, replace = True)  # similar to sample() in R
-
-		# distributions - google numpy distribution functions
-		np.random.normal(mean, std, size)
-		np.random.binomial(n, p, size)
-		np.random.poisson(n, size)
-		np.random.exponential(tau, size)
-
-		# linear regression in numpy
-		slope, intercept = np.polyfit(x, y, 1)  # degree of polynomial is 1 to specify linear regression
-
+		df.column.plot(style = "k.-")      # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
+		
 ==============================================================================================================================
 
 ### scikit-learn
@@ -813,15 +799,15 @@
 		# hyperparameter tuning
 		from sklearn.model_selection import GridSearchCV
 		params = {"parameter_name": parameter_values}
-		model_cv = GridSearchCV(model, params, cv = 5)  # pass model/pipeline after instantiating it
-		model_cv.fit(X_train, y_train)  # grid search takes place here
+		model_cv = GridSearchCV(model, params, cv = 5)     # pass model/pipeline after instantiating it
+		model_cv.fit(X_train, y_train)                     # grid search takes place here
 		model_cv.best_params_
 		model_cv.best_score_
 
 		from sklearn.model_selection import RandomizedSearchCV
 		params = {"parameter_name": parameter_values}
 		model_cv = RandomizedSearchCV(model, params, cv = 5)  # pass model/pipeline after instantiating it
-		model_cv.fit(X_train, y_train)  # grid search takes place here
+		model_cv.fit(X_train, y_train)                        # grid search takes place here
 		model_cv.best_params_
 		model_cv.best_score_
 
@@ -829,31 +815,31 @@
 
 		# linear regression
 		from sklearn.linear_model import LinearRegression
-		model = LinearRegression()             # instantiate model
-		model.fit(X_train, y_train)            # fit model
-		y_pred = model.predict(X_test)         # predict using model
-		model.score(X_test, y_test)            # evaluate model
+		model = LinearRegression()                         # instantiate model
+		model.fit(X_train, y_train)                        # fit model
+		y_pred = model.predict(X_test)                     # predict using model
+		model.score(X_test, y_test)                        # evaluate model
 
 		# regularization
-		from sklearn.linear_model import Lasso  # l1-regularization
+		from sklearn.linear_model import Lasso             # l1-regularization
 		model = Lasso(alpha = , normalize = )
 		model.fit(X_train, y_train)
-		coefficients = model.fit(X_train, y_train).coef_  # extract coefficients for each feature
-		plt.plot(range(len(names)), coefficients)  # variable importance
+		coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
+		plt.plot(range(len(names)), coefficients)          # variable importance
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
 
-		from sklearn.linear_model import Ridge  # l2-regularization
+		from sklearn.linear_model import Ridge             # l2-regularization
 		model = Ridge(alpha = , normalize = )
 		model.fit(X_train, y_train)
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
 
-		from sklearn.linear_model import ElasticNet  # mix of l1 and l2 regularization
+		from sklearn.linear_model import ElasticNet        # mix of l1 and l2 regularization
 		model = ElasticNet(alpha = , normalize = )
 		model.fit(X_train, y_train)
-		coefficients = model.fit(X_train, y_train).coef_  # extract coefficients for each feature
-		plt.plot(range(len(names)), coefficients)  # variable importance
+		coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
+		plt.plot(range(len(names)), coefficients)          # variable importance
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
 
@@ -878,7 +864,7 @@
 		# support vector machines
 		from sklearn.svm import SVC, SVR
 		model = SVC(C = , kernel = "")
-		model = SVR(C, = , kernel = "")
+		model = SVR(C = , kernel = "")
 		model.fit(X_train, y_train)
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
@@ -891,7 +877,7 @@
 		model.fit(X_train, y_train)
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
-		graph_data = export_graphviz(model, out_file       = None,
+		graph_data = export_graphviz(model, out_file     = None,
 									 feature_names       = ,
 									 class_names         = ,
 									 filled              = True,
@@ -906,7 +892,7 @@
 		model = RandomForestClassifier(n_estimators        = ,            # number of trees
 									   max_features        = ,            # number of features at each node split
 									   oob_score           = True,
-									   random_state        = 4,            # random seed
+									   random_state        = 4,           # random seed
 
 				)
 		model = RandomForestRegressor()  # same parameters as RandomForestClassifier()
@@ -930,12 +916,12 @@
 										   random_state        = 4,
 
 				)
-		model = GradientBoostingRegressor()  # same parameters as GradientBoostingClassifier()
+		model = GradientBoostingRegressor()             # same parameters as GradientBoostingClassifier()
 		model.fit(X_train, y_train)
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
 		model.feature_importances_
-		model.train_score_[i]  # train score of i-th iteration
+		model.train_score_[i]                           # train score of i-th iteration
 
 		# xgboost
 		from xgboost import XGBClassifier
@@ -974,14 +960,14 @@
         eval_list  = [(dtest,'eval'), (dtrain,'train')]
         model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
         y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
-        xgb.plot_importance(model)  # import matplotlib for this
-        xgb.plot_tree(model, num_trees=2) # import graphviz for this
+        xgb.plot_importance(model)                      # import matplotlib for this
+        xgb.plot_tree(model, num_trees=2)               # import graphviz for this
         model.save_model("model_name")
 
 	## model performance
 
 		# return default metric
-		model.score(X_test, y_test)  # return accuracy/r-squared
+		model.score(X_test, y_test)                     # return accuracy/r-squared
 		
 		from sklearn.metrics import accuracy_score
 		accuracy_score(y_test, y_pred)
@@ -996,7 +982,7 @@
 		y_pred_prob = model.predict_proba(X_test)[:, 0/1]  # return probabilites of class 0/1
 		fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
 
-		from sklearn.metrics import roc_auc_score  # google scikit learn metrics
+		from sklearn.metrics import roc_auc_score          # google scikit learn metrics
 		y_pred_prob = model.predict_proba(X_test)[:, 0/1]
 		roc_auc_score(y_test, y_pred_prob)
 
@@ -1005,10 +991,10 @@
 		from sklearn.preprocessing import Imputer
 		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
 		imputer.fit(X)
-		X = imputer.transform(X)  # return imputed dataframe
+		X = imputer.transform(X)                           # return imputed dataframe
 
 		# pipeline - imputing and modelling in one go
-		from sklearn.pipeline import Pipeline  # alternative - import make_pipeline
+		from sklearn.pipeline import Pipeline              # alternative - import make_pipeline
 		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
 		steps = [("imputer", imputer),
 				 ("model_name", model)]
@@ -1023,21 +1009,21 @@
 		X_scaled = scale(X)
 
 		# pipeline - scale and model
-		from sklearn.preprocessing import StandardScaler  # google - preprocessing types in scikit-learn
+		from sklearn.preprocessing import StandardScaler   # google - preprocessing types in scikit-learn
 		steps = [("scaler", StandardScaler()),
 				 ("model_name", model)]
 		pipeline = Pipeline(steps)
-		pipeline.fit(X_train, y_train)  # pipeline can be passed to GridSearchCV() instead of directly fitting
+		pipeline.fit(X_train, y_train)                     # pipeline can be passed to GridSearchCV() instead of directly fitting
 		y_pred = pipeline.predict(X_test)
 
 	## NLP
 
 		# CountVectorizer() creates tokens, builds vocabulary and counts frequency of each word
-		from sklearn.feature_extraction.text import CountVectorizer  # for large text datasets, use HashingVectorizer
+		from sklearn.feature_extraction.text import CountVectorizer           # for large text datasets, use HashingVectorizer
 		word_vector = CountVectorizer(token_pattern = "", ngram_range = (1))  # split tokens based on given pattern
-		word_vector.fit(df.text_column)  # learn vocabulary from the given Series
-		word_vector.transform(df.text_column)  # create document term matrix
-		word_vector.fit_transform(df.text_column)  # fit and transform in one go
+		word_vector.fit(df.text_column)                    # learn vocabulary from the given Series
+		word_vector.transform(df.text_column)              # create document term matrix
+		word_vector.fit_transform(df.text_column)          # fit and transform in one go
 
 		# combining text and numeric pipelines for them to be ready for final common pipeline
 		from sklearn.preprocessing import FunctionTransformer
@@ -1091,7 +1077,7 @@
 		from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 		mergings = linkage(X, method = "complete")
 		clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
-		pd.DataFrame({"labels": y, "cluster": clusters})  # cluster number starts from index 1
+		pd.DataFrame({"labels": y, "cluster": clusters})           # cluster number starts from index 1
 
 		dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
 		plt.show()
@@ -1105,7 +1091,7 @@
 
 		# PCA
 		from sklearn.decomposition import PCA
-		model = PCA(n_components = )  # First do model = PCA(). n_components is known after plotting the bar plot shown below.
+		model = PCA(n_components = )      # First do model = PCA(). n_components is known after plotting the bar plot shown below.
 		df_pca = model.fit_transform(df)  # Or use fit() and transform() separately. It is better to scale data before applying PCA.
 		model.components_
 		features = range(model.n_components_)
@@ -1121,7 +1107,7 @@
 		# non negative matrix factorization - interpretable unlike pca
 		from sklearn.decomposition import NMF
 		model = NMF(n_components = n)  # always specify n_components unlike PCA()
-		nmf_features = model.fit_transform(df)  # data should have non-negative entries only
+		nmf_features = model.fit_transform(df)   # data should have non-negative entries only
 		model.components_
 
 		# recommendor system using NMF
@@ -1129,7 +1115,7 @@
 		df = pd.DataFrame(nmf_features, index = "article_names")
 		current_article = df.loc("article_name")
 		similarities = df.dot(current_article)  # cosine similarity. the more the similar
-		print(similarities.nlargest())  # See similarities between current article and other articles. Recommend the most similar article.
+		print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
 
 ==============================================================================================================================
 
@@ -1176,7 +1162,7 @@
 
 		from keras.optimizers import SGD
 		optimizer = SGD(lr = 0.01)  # stochastic gradient descent
-		model.compile(optimizer = "adam"/optimizer,  # google - optimizers available in keras
+		model.compile(optimizer = "adam"/optimizer,       # google - optimizers available in keras
 					  loss = "categorical_crossentropy",  # categorical_crossentropy is the log loss. google - loss functions in keras
 					  metrics = ["accuracy"]
 		)
@@ -1190,7 +1176,7 @@
 		model.fit(X_train, y_train,
 				  validation_split = 0.25,
 				  epochs = 10,
-				  callbacks = [early_stopping_monitor]  # google keras callbacks techniques for advanced deep learning
+				  callbacks = [early_stopping_monitor]     # google keras callbacks techniques for advanced deep learning
 		)
 		model.summary()
 		model.history
@@ -1214,29 +1200,29 @@
 
 		import re
 		pattern = r""
-		re.match(pattern, string)      # look for the pattern from the start of the string
+		re.match(pattern, string)                          # look for the pattern from the start of the string
 		match.start(); match.end()
-		re.search(pattern, string)     # look for the pattern in the whole string and returns the first occurence
-		re.findall(pattern, string)    # look for and returns all the occurences of patterns present in the string
-		re.split(pattern, string)      # split the string at given pattern
-		re.sub(pattern, repl, string)  # replace first occurence of pattern by repl in the string
+		re.search(pattern, string)                         # look for the pattern in the whole string and returns the first occurence
+		re.findall(pattern, string)                        # look for and returns all the occurences of patterns present in the string
+		re.split(pattern, string)                          # split the string at given pattern
+		re.sub(pattern, repl, string)                      # replace first occurence of pattern by repl in the string
 
 		from nltk.tokenize import word_tokenize
-		word_tokenize(string, pattern)  # tokenize string into words
+		word_tokenize(string, pattern)                     # tokenize string into words
 
 		from nltk.tokenize import sent_tokenize
-		sent_tokenize(string, pattern)  # tokenize string into sentences
+		sent_tokenize(string, pattern)                     # tokenize string into sentences
 
 		from nltk.tokenize import regexp_tokenize
-		regexp_tokenize(string, pattern)  # tokenize string based on pattern
+		regexp_tokenize(string, pattern)                   # tokenize string based on pattern
 
 		from nltk.tokenize import TweetTokenizer
 		tokenizer = TweetTokenizer()
 		tokenizer.tokenize(string)
 
 		# plot word count
-		words = [word_tokenize(line) for line in book]   # return list of words of the entire book
-		word_lengths = [len(word) for word in words]     # return word length of each word
+		words = [word_tokenize(line) for line in book]     # return list of words of the entire book
+		word_lengths = [len(word) for word in words]       # return word length of each word
 		plt.hist(word_lengths)
 
 		# bag of words
@@ -1246,7 +1232,7 @@
 
 		# text preprocessing
 		from nltk.corpus import stopwords
-		alpha_only = [t for t in word_tokenize(text.lower()) if t.isalpha()]      # return lowercase alphabetic token
+		alpha_only = [t for t in word_tokenize(text.lower()) if t.isalpha()]    # return lowercase alphabetic token
 		no_stops = [t for t in tokens if t not in stopwords.words("english")]   # remove stop words
 
 		from nltk.stem import WordNetLemmatizer
@@ -1256,8 +1242,8 @@
 	## gensim - create bag of words
 
 		from gensim.corpora.dictionary import Dictionary
-		dictionary = Dictionary(articles)       # articles is preprocessed and tokenized
-		dictionary.token2id                     # each token is given a unique id
+		dictionary = Dictionary(articles)                  # articles is preprocessed and tokenized
+		dictionary.token2id                                # each token is given a unique id
 		corpus = [dictionary.doc2bow(article) for article in articles]
-		corpus[0][:10]  # print first 10 word ids from first document
+		corpus[0][:10]                                     # print first 10 word ids from first document
 		
