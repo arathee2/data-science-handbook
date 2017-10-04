@@ -1177,6 +1177,7 @@
 				  validation_split = 0.25,
 				  epochs = 10,
 				  callbacks = [early_stopping_monitor]     # google keras callbacks techniques for advanced deep learning
+				  batch_size = 64
 		)
 		model.summary()
 		model.history
