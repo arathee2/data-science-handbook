@@ -1,6 +1,6 @@
 ==============================================================================================================================
 
-## geom_histogram(binwidth = , color = , fill = ) + ggplot(aes(fill = factor_variable)) # 1D continous
+## geom_histogram(binwidth = , color = , fill = ) + ggplot(aes(fill = factor_variable), color = "boundary_color") # 1D continuous
 
 ## geom_freqpoly() # 1D
 
