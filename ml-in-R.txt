@@ -30,7 +30,7 @@
 
 		error <- rmse(cv$target, linear.predict)
 
-	# ROCR and AUC(area under curve)
+	# ROCR and AUC (Area Under Curve)
 		
 		library(ROCR)
 		
@@ -41,6 +41,21 @@
 	# step model
 
 		step.model <- step(linear.model)
+
+	## Variable Selection
+
+		# 1. Select important variables using stepAIC()
+		linear.model <- stepAIC(linear.model, direction = "both/backward/forward")
+
+		# 2. Remove one variable which has high vif (more than 2, 3 or 4) and high p-value (more than 0.01, 0.05 or 0.1).
+		vif(linear.model)        # check vif values
+		summary(linear.model)    # check p-values
+
+		# 3. Rebuild model after removing one variable at a time, using the above step
+		linear.model <- lm(formula = , data = train)
+
+		# Step 2 and 3 are repeated until all the variables have a required vif (say, less than 3), and a required p-value (say, less than 0.001)
+		# Tip: When vif values are low enough, you can skip checking vif values. Only check the p-values.
 
 ==============================================================================================================================
 
@@ -81,7 +96,7 @@
 	## Lift chart
 
 		glm.prediction <- prediction(abs(glm.predict), cv$target)
-		glm.performance <- performance(glm.prediction,"lift", "rpp")  # google ROCR performance functions for more charts
+		glm.performance <- performance(glm.prediction, "lift", "rpp")  # google ROCR performance functions for more charts
 		plot(glm.performance)
 
 ==============================================================================================================================
