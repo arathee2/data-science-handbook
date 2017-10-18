@@ -66,6 +66,10 @@
 		# linear regression in numpy
 		slope, intercept = np.polyfit(x, y, 1)        # degree of polynomial is 1 to specify linear regression
 
+		# print options
+		from numpy import set_printoptions
+		set_printoptions(precision=3)
+
 ==============================================================================================================================
 
 ### pandas
@@ -78,19 +82,31 @@
 		df = pd.read_csv("", index_col = )          # read a csv
 		df = pd.DataFrame(python_dictionary)        # read python dictionary as dataframe
 		
-		df.dtypes
+		df.shape                                    # return shape as tuple
+		df.head(n)                                  # return first "n" rows of df
+		df.tail(n)                                  # return last "n" rows of df
+		df.dtypes                                   # return data type of each column
+		df.describe()                               # similar to summary() in R
+		df.info()
+
+		df.corr(method="pearson")                   # return correlation matrix
+		df.skew()                                   # return skewness of numeric variables
 		df.categorical_column.nunique()             # return number of levels in a categorical variable
 		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
-		df.describe()                               # similar to summary() in R
 		df["column_name"].max()
 		df["column_name"].mean()
 		df["column_name"].std()                     # standard deviation of column
 		df.column_name.cumsum()                     # cumulative sum
 		df.column_name.cumprod()                    # cumulative product
-
-		df.shape()                                  # return shape as tuple
-		df.head(n)                                  # return first "n" rows of df
-		df.tail(n)                                  # return last "n" rows of df
+		
+		# visualise
+		df.hist()
+		df.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
+		df.plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
+		
+		from pandas.tools.plotting import scatter_matrix
+		scatter_matrix(df)
+		
 
 		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
 		
@@ -165,7 +181,7 @@
 		df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
 		df.groupby(["categorical_columns"]).agg({
 			"col2": [max, min], 
-			"col3": [min, "count"]
+			"col3": [size, "count"]
 			})  # "count" is a numpy function. see numpy functions
 		
 		df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
@@ -196,10 +212,10 @@
 					   values =                     # numerical column name
 		)  						                    # in case of duplicate values, use aggfunc to aggregate
 
-		# concatinate dataframes - column + column
+		# concatinate dataframes - column + column or row + row
 		pd.concat([df1, df2], ignore_index = True, axis = )
 
-		# merge/join dataframe - row + row
+		# merge/join dataframe
 		df.merge(df1, df2, on = "common_column", how = "inner")
 
 		# stacking and unstacking
@@ -552,6 +568,11 @@
 
 ### python
 
+		# print
+		print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+		print("Value of x is: {1} and value of y is: {0}".format(y, x))
+		print("Value of x is:", x, "and value of y is:", y)
+
 		# if-else condition
 		if condition:
 			code
@@ -598,7 +619,7 @@
 
 		def functions_name(**kwargs):                 # keyword args
 		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
-			for key, value in kwargs.itmes():
+			for key, value in kwargs.items():
 				print(str(key) + ":" + str(value))
 		function_name(first_name = "Amandeep", last_name = "Rathee")
 
@@ -793,23 +814,44 @@
 		X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 4, stratify = y)
 		
 		# cross validation
+		from sklearn.model_selection import KFold
+		from sklearn.model_selection import LeaveOneOut
+		from sklearn.model_selection import ShuffleSplit     # multiple train/test sets
 		from sklearn.model_selection import cross_val_score
-		cv_results = cross_val_score(model, X_train, y_train, cv = 5, scoring = )  # pass model/pipeline after instantiating it
+		
+		folds = KFold(n_splits = 5, random_state = 4)
+		folds = LeaveOneOut()
+		folds = ShuffleSplit(n_splits = 5, test_size = 0.3, random_state = 4)
+
+		score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
+		cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)  # pass model/pipeline after instantiating it
+		cv_results.mean()*100
+		cv_results.std()*100
 
 		# hyperparameter tuning
 		from sklearn.model_selection import GridSearchCV
-		params = {"parameter_name": parameter_values}
-		model_cv = GridSearchCV(model, params, cv = 5)     # pass model/pipeline after instantiating it
-		model_cv.fit(X_train, y_train)                     # grid search takes place here
-		model_cv.best_params_
-		model_cv.best_score_
-
 		from sklearn.model_selection import RandomizedSearchCV
-		params = {"parameter_name": parameter_values}
-		model_cv = RandomizedSearchCV(model, params, cv = 5)  # pass model/pipeline after instantiating it
-		model_cv.fit(X_train, y_train)                        # grid search takes place here
-		model_cv.best_params_
+		params = {"parameter_name": [parameter_values]}
+		
+		model_cv = GridSearchCV(estimator   = model,       # pass model/pipeline after instantiating it
+								param_grid  = params,
+								scoring     = score,
+								cv          = folds,
+								verbose     = 1            # the higher, the more messages
+					)
+		
+		model_cv = RandomizedSearchCV(estimator             = model,
+									  param_distributions   = params,
+									  n_iter                = 100,
+									  scoring               = score,
+									  cv                    = folds,
+									  verbose               = 1,
+									  random_state          = 4
+					)
+		model_cv.fit(X_train, y_train)                     # search takes place here
+		model_cv.cv_results_
 		model_cv.best_score_
+		model_cv.best_params_
 
 	## models
 
@@ -845,7 +887,11 @@
 
 		# logistic regression
 		from sklearn.linear_model import LogisticRegression
+		from sklearn.feature_selection import RFE
 		model = LogisticRegression()
+		# rfe = RFE(model, n)                              # recursive feature elimination. select top n features
+		# fit = rfe.fit(X_train, y_train)
+		# print(fit.n_features_, fit.support_, fit.ranking_)
 		model.fit(X_train, y_train)
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
@@ -872,11 +918,22 @@
 		# decision tree
 		from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
 		import graphviz
-		model = DecisionTreeClassifier()
-		model = DecisionTreeRegressor()
+		model = DecisionTreeClassifier(criterion  = "gini/entropy",
+									   max_depth  = ,
+									   min_samples_split = ,
+									   min_samples_leaf = ,
+									   max_features = ,
+									   max_leaf_nodes = ,
+									   min_impurity_decrease = ,
+									   class_weight = "balanced",
+									   presort = "True"                   # faster training when daset is small
+				)
+		model = DecisionTreeRegressor()  # same parameters as DecisionTreeClassifier()
 		model.fit(X_train, y_train)
 		y_pred = model.predict(X_test)
 		model.score(X_test, y_test)
+		model.feature_importances_
+		model.tree_
 		graph_data = export_graphviz(model, out_file     = None,
 									 feature_names       = ,
 									 class_names         = ,
@@ -902,11 +959,26 @@
 		model.feature_importances_
 		model.oob_score_
 
+		# ada boost
+		from sklearn.ensemble import AdaBoostClassifier
+		model = AdaBoostClassifier(base_estimator    = ,                  # optional
+								   n_estimators      = 100,               # number of trees
+								   learning_rate     = 0.1,               # trade-off between learning_rate and n_estimators
+								   random_state      = 4,                 # random seed
+
+				)
+		model.fit(X_train, y_train)
+		y_pred = model.predict(X_test)
+		model.score(X_test, y_test)
+		model.feature_importances_
+		model.estimator_errors_
+		model.estimator_weights_
+
 		# gradient boosting
 		from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
 		model = GradientBoostingClassifier(loss                = "deviance",
 										   learning_rate       = 0.1,
-										   n_estimators        = 100,         # number fo trees
+										   n_estimators        = 100,         # number of trees
 										   max_depth           = 3,           # depth of tree
 										   min_samples_split   = 2,
 										   min_samples_leaf    = 1,
@@ -964,11 +1036,48 @@
         xgb.plot_tree(model, num_trees=2)               # import graphviz for this
         model.save_model("model_name")
 
-	## model performance
+        # voting ensemble
+        from sklearn.ensemble import VotingClassifier
+        estimators = []
+        estimators.append(("knn", KNeighborsClassifier()))
+        estimators.append(('cart', DecisionTreeClassifier()))
+        estimators.append(('svm', SVC()))
+        ensemble = VotingClassifier(estimators)
+        cv_results = cross_val_score(ensemble, X_train, y_train, cv = folds, scoring = score)
+
+    ## save/load model
+    	
+    	# the python version and library versions almost certainly need to be the same while loading a saved model
+
+        # save model to disk
+        from pickle import dump
+        dump(model, open("filename.sav", 'wb'))
+
+        from sklearn.externals.joblib import dump
+        dump(model, "filename.sav")
+
+        # load model from disk
+        from pickle import load
+        model = load(open("filename.sav", 'rb'))
+        
+        from sklearn.externals.joblib import load
+        model = load("filename.sav")
+
+	## evaluate model performance
 
 		# return default metric
 		model.score(X_test, y_test)                     # return accuracy/r-squared
 		
+		# regression
+
+		from sklearn.metrics import r2_score
+		r2_score(y_test, y_pred)
+
+		from sklearn.metrics import mean_squared_error
+		mean_squared_error(y_test, y_pred)
+
+		# classification
+
 		from sklearn.metrics import accuracy_score
 		accuracy_score(y_test, y_pred)
 
@@ -982,11 +1091,81 @@
 		y_pred_prob = model.predict_proba(X_test)[:, 0/1]  # return probabilites of class 0/1
 		fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
 
-		from sklearn.metrics import roc_auc_score          # google scikit learn metrics
+		from sklearn.metrics import roc_auc_score
 		y_pred_prob = model.predict_proba(X_test)[:, 0/1]
 		roc_auc_score(y_test, y_pred_prob)
 
-	## handling missing values
+		from sklearn.metrics import log_loss
+		log_loss(y_test, y_pred)                           # see scikit-learn documentation
+
+	## compare machine learning models
+
+		# prepare models
+		models = []
+		models.append(('LR', LogisticRegression()))
+		models.append(('CART', DecisionTreeClassifier()))
+
+		OR
+		
+		models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('LR', LogisticRegression())])))
+		models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('CART', DecisionTreeClassifier())])))
+
+		# evaluate each model in turn
+		results = []
+		names = []
+		score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
+		for name, model in models:
+			folds = KFold(n_splits = 5, random_state = 4)
+			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
+			results.append(cv_results)
+			names.append(name)
+			print("{0} - {1} ({2})".format(name, cv_results.mean(), cv_results.std()))
+		
+		# boxplot algorithm comparison
+		fig = plt.figure()
+		fig.suptitle('Algorithm Comparison')
+		ax = fig.add_subplot(111)
+		plt.boxplot(results)
+		ax.set_xticklabels(names)
+		plt.show()
+
+	## pre-processing
+
+		# scale
+		from sklearn.preprocessing import scale
+		X_scaled = scale(X)
+
+		# MinMaxScaler
+		from sklearn.preprocessing import MinMaxScaler
+		min_max_scaler = MinMaxScaler(feature_range=(0, 1)).fit(X_train)
+		X_train_scaled = min_max_scaler.transform(X_train)
+		X_test_scaled = min_max_scaler.transform(X_test)
+
+		# StandardScaler (0-mean, 1-standard deviation)
+		from sklearn.preprocessing import StandardScaler
+		standard_scaler = StandardScaler().fit(X_train)
+		X_train_scaled = standard_scaler.transform(X_train)
+		X_test_scaled = standard_scaler.transform(X_test)
+
+		# Normalizer - useful when data is sparse with lots of zeros
+		from sklearn.preprocessing import Normalizer
+		normalizer = Normalizer().fit(X_train)
+		X_train_scaled = normalizer.transform(X_train)
+		X_test_scaled = normalizer.transform(X_test)
+
+		# binarizer - convert all values above the threshold to 1 and all values below the threshold to 0
+		from sklearn.preprocessing import Binarizer
+		binarizer = Binarizer(threshold=0.5).fit_transform(X)
+
+		# pipeline - scale and model
+		from sklearn.preprocessing import StandardScaler   # google - preprocessing types in scikit-learn
+		steps = [("scaler", StandardScaler()),
+				 ("model_name", model)]
+		pipeline = Pipeline(steps)
+		pipeline.fit(X_train, y_train)                     # pipeline can be passed to GridSearchCV() instead of directly fitting
+		y_pred = pipeline.predict(X_test)
+
+		# handling missing values
 
 		from sklearn.preprocessing import Imputer
 		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
@@ -1000,20 +1179,6 @@
 				 ("model_name", model)]
 		pipeline = Pipeline(steps)
 		pipeline.fit(X_train, y_train)
-		y_pred = pipeline.predict(X_test)
-
-	## scaling
-
-		# standardization
-		from sklearn.preprocessing import scale
-		X_scaled = scale(X)
-
-		# pipeline - scale and model
-		from sklearn.preprocessing import StandardScaler   # google - preprocessing types in scikit-learn
-		steps = [("scaler", StandardScaler()),
-				 ("model_name", model)]
-		pipeline = Pipeline(steps)
-		pipeline.fit(X_train, y_train)                     # pipeline can be passed to GridSearchCV() instead of directly fitting
 		y_pred = pipeline.predict(X_test)
 
 	## NLP
@@ -1092,7 +1257,7 @@
 		# PCA
 		from sklearn.decomposition import PCA
 		model = PCA(n_components = )      # First do model = PCA(). n_components is known after plotting the bar plot shown below.
-		df_pca = model.fit_transform(df)  # Or use fit() and transform() separately. It is better to scale data before applying PCA.
+		df_pca = model.fit_transform(df)  # Or use fit() and transform() separately. Also, it is better to scale data before applying PCA.
 		model.components_
 		features = range(model.n_components_)
 		plt.bar(features, model.explained_variance_)
