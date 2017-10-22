@@ -23,7 +23,7 @@
 		np.linspace(start, stop, num, endpoint=True)  # generate "num" elements between [start, stop]
 		
 		array.reshape((3, 4))                         # return an array of changed size
-		arrray.resize((3, 4))                         # changes the array in-place
+		array.resize((3, 4))                          # changes the array in-place
 		array.transpose()                             # return transpose of matrix
 		array.sum(axis = 0/1)                         # 0 - column, 1 - row
 		array.cumsum(axis = 0/1)                      # cumulative sum across column/row
@@ -44,6 +44,7 @@
 		row_stack((a, b))                             # similar to rbind in R
 		vstack((a, b))                                # vertically stack array a and b.
 		hstack((a, b))         						  # horizontally stack array a and b
+		concatenate((a, b), axis = )                  # concatenate array a and b
 
 		a = array([1, 2, 3, 4])
 		b = a                 						  # not a copy. If "b" changes, "a" changes
@@ -76,11 +77,24 @@
 
 	import pandas as pd
 
-		# set print options
-		pd.set_option('display.max_columns', None)  # set display limit to all columns
-
-		df = pd.read_csv("", index_col = )          # read a csv
-		df = pd.DataFrame(python_dictionary)        # read python dictionary as dataframe
+		# print options
+		pd.set_option("display.max_columns", 20)  # set display limit to all columns
+		pd.get_options("display.max_rows")
+		pd.reset_options("display.max_columns")
+		
+		# read data
+		df = pd.read_csv(file_name,
+						 sep          =   ,         # character that seprates different values in the file
+						 names        = [],         # pass column names explicitly
+						 index_col    =   ,         # column index to use as index
+						 dtype        =   ,         # refer documentation
+						 na_values    =   ,         # list of values to be read as na
+						 parse_dates  =   ,         # refer documentation
+		)
+		
+		df = pd.DataFrame(data        =   ,         # numpy ndarray or python dictionary
+						  columns     = [],         # list of column names
+		)
 		
 		df.shape                                    # return shape as tuple
 		df.head(n)                                  # return first "n" rows of df
@@ -89,6 +103,20 @@
 		df.describe()                               # similar to summary() in R
 		df.info()
 
+		# check missing values
+		df.isnull().any()                           # return True if any of the values is missing
+		df.isnull().sum()                           # check number of missing values
+		df.notnull().all()                          # return True only if no missing values prsent
+
+		# sample rows or columns
+		df.sample(n             =   ,               # number of rows/columns to sample
+				  frac          =   ,               # either use n or frac
+				  replace       = False,            # sample with ro without replacement
+				  random_state  =  4,
+				  axis          =   ,               # sample either row or columns of dataframe
+		)
+
+		# statistics
 		df.corr(method="pearson")                   # return correlation matrix
 		df.skew()                                   # return skewness of numeric variables
 		df.categorical_column.nunique()             # return number of levels in a categorical variable
@@ -99,8 +127,9 @@
 		df.column_name.cumsum()                     # cumulative sum
 		df.column_name.cumprod()                    # cumulative product
 		
-		# visualise
+		# visualisations
 		df.hist()
+		df.plot(kind="bar", x = , y = )             # refer documentation
 		df.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
 		df.plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
 		
@@ -112,66 +141,61 @@
 		
 		df.index = index_variable                   # index variable must be equal to the number of rows in the dataframe
 		df.index.name = "index name"
-
-		# hierarchical indexing
-		df.set_index(["school", "rollno"])
-		df.sort_index()
-		df.loc["dgv":"dav"]                         # outer indexing (on "school")
-		df.loc[1:10]  		                        # inner indexing (on "rollno")
-		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
-
-		df.reindex()                                # conform data frame to new index. arrange rows or add new rows
-		
-		# set primary key column
-		df.set_index("column", inplace = True)
-
-		# print rows
-		df[:]                                       # print all rows
-		df[1:7]                                     # slicing
-		
-		# print columns
-		df.columns                                  # print all columns
-		df["column_name"]                           # print specific column. Return panda series object.
-		df.column_name                              # print specific column
-		df[["column_A","column_B"]]                 # print multiple columns. Pass a list of column names. Return pandas dataframe object.
-		
-		type(df["column_name"])                     # similar to class() in R
 		
 		# conditions
 		df[df.age > 10]
 		df[df.age == df.age.max()]
 
+		# filtering
+		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
+		df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
+		df[df.name == "Aman" | df.name = "Arjun"]      # return Aman and Arjun both
+		df.all()                                       # return True if all the elements are True
+		df.any()                                       # return True if any of the elements is True
+
+		# apply functions to dataframe
+		df.apply(function, axis = )                    # iterate over columns of dataframe
+		df.column_name.apply(lambda x: x**2)           # iterate over values of column
+		df.age.apply(np.argmax, axis = 1)              # max to get max value, np.argmax to get row name with max value
+
+		# rename columns
+		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
+		df.columns = ["column1", "column2"]            # rename all columns
+
 		# loc, iloc
 		df.loc[1:5,:]                               # print row [1,5]. need to specify the row and column header names
 		df.loc[[1, 4, 7], ["column1", "column2"]]
 		df.loc[1:10, "column1":"column2"]
-		df.loc[age == df.age.max(),:]
-
+		df.loc[age == df.age.max(), :]
 		df.iloc[1:10, 2:4]                          # print row [1, 10). need to specify the row and column indices
 
-		# dates
-		df = pd.read_csv("", parse_dates = True)    # use parse_dates = ["column_names"] to read only specific columns as date
-
-		# check missing values
-		df.isnull().any()                           # return True if any of the values is missing
-		df.isnull().sum()                           # check number of missing values
-		df.notnull().all()                          # return True only if no missing values prsent
-
+		# hierarchical indexing
+		df.set_index(["school", "rollno"], inplace = True)
+		df.sort_index()
+		df.loc["dgv":"dav"]                         # outer indexing (on "school")
+		df.loc[1:10]  		                        # inner indexing (on "rollno")
+		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
+		df.reindex()                                # conform data frame to new index. arrange rows or add new rows
+		
 		# fill NAs
 		df.column_name.fillna(df.column_name.mean(), axis = "index or columns", method = "ffil/bfil", limit = 1)
 		df.fillna(df.mean())
 		df.fillna({
 			"column_name": value,
 			"column_name": value
-			})
+		})
 
 		df.interpolate(method = "linear")
 
 		df.dropna(subset = ["list of columns"], how = "any/all", thresh = )
 
-		df.replace({"column_name": "value to be replaced", "column_name": "value to be replaced with"}, "value to replace with")
-		df.replace({"value to be replaced": "value to replace with", "value to be replaced": "value to replace with"})  # mapping
-		df.replace(["list of values to be replaced"], ["list of values to replace with"])  # mapping
+		# replace values
+		replace = {"gender":          {"male": 0, "female": 1},
+                   "marital_status":  {"married": 0, "divorced": 1, "single": 2}
+		}
+		df.replace(replace, inplace = True)
+		df.replace({"old_value": "new_value", "old_value": "new_value"})   # mapping
+		df.replace(["old_value_list"], ["new_value_list"])                 # mapping
 
 		# group by
 		group = df.groupby("categorical_column")    # returns GroupBy object
@@ -180,9 +204,9 @@
 		# group by and summarize
 		df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
 		df.groupby(["categorical_columns"]).agg({
-			"col2": [max, min], 
-			"col3": [size, "count"]
-			})  # "count" is a numpy function. see numpy functions
+			"column": [max, min], 
+			"column": [size, "count"]               # size and "count" are same. "count" is a numpy function. see numpy functions
+		})
 		
 		df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
 
@@ -212,8 +236,11 @@
 					   values =                     # numerical column name
 		)  						                    # in case of duplicate values, use aggfunc to aggregate
 
-		# concatinate dataframes - column + column or row + row
-		pd.concat([df1, df2], ignore_index = True, axis = )
+		# concatenate dataframes - column + column or row + row
+		pd.concat(objs         =  [df1, df2],
+				  axis         =  ,                 # 0-index+index, 1-column+column
+				  ignore_index = False              # keep index names
+		)
 
 		# merge/join dataframe
 		df.merge(df1, df2, on = "common_column", how = "inner")
@@ -223,35 +250,17 @@
 		df.stack.unstack()
 
 		# crosstabs
-		pd.crosstabs(df.categorical_column1, df.categorical_column2,    # could pass column lists as well
+		pd.crosstab(df.categorical_column1, df.categorical_column2,    # could pass column lists as well
 					 margins = True,
 					 normalize = {0, 1} or {"all", "index", "columns"}  # similar to prop.table() in R
 		)  # similar to table(category1, catedory2) in R
 
-		pd.crosstabs(df.categorical_column1, df.categorical_column2
+		pd.crosstab(df.categorical_column1, df.categorical_column2
 					 values = df.numerical_column,
 					 aggfunc = np.average
 		)  # similar to group by and summarize
 
-		# filtering
-		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
-		df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
-		df[df.name == "Aman" | df.name = "Arjun"]      # return Aman and Arjun both
-		df.all()                                       # return True if all the elements are True
-		df.any()                                       # return True if any of the elements is True
-
-		# apply functions to dataframe
-		df.apply(function, axis = )                    # apply to dataframe, function takes data frame as input
-		df.column_name.apply(function)                 # apply to series, function takes series as input
-		df.age.apply(np.argmax, axis = 1)              # max to get max value, np.argmax to get column name with max value
-		df.column_name.apply(lambda x: x**2)           # return x**2
-		df["gender"].map({"male": 0, "female": 1})     # similar to ifelse() in R
-
-		# rename columns
-		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
-		df.columns = ["column1", "column2"]            # rename all columns
-
-		# find and delete duplicate rows
+		# find duplicate rows
 		df.duplicated()                                # boolean ouput
 		df.duplicated().sum()                          # return number of duplicate entries
 
@@ -261,7 +270,16 @@
 		df.drop("column_name", axis = 1)
 
 		# one hot encoding
-		df_dummy = pd.get_dummies(df, columns = [column for column in categorical_columns if column not in ["target_column"]])
+		df_dummy = pd.get_dummies(df,
+								  columns = [column for column in categorical_columns if column not in ["target_column"]],
+								  prefix = 
+				   )
+
+		# select dataframe based on column names
+		pattern = r"column name pattern"
+		column_names_bool = list(df.columns.map(lambda x: bool(re.search(pattern, x))))
+		column_names = list(df.columns[column_names_bool])
+		new_df = df.loc[:, column_names]
 
 ==============================================================================================================================
 
@@ -272,12 +290,15 @@
 		# line plot
 		plt.plot(x, y, marker = "", linestyle = "")
 		
-		# scatter plot
-		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
-		
 		# histogram
 		plt.hist(x, bins = 30)                         # or pass a list of bin cutoff points
 		
+		# scatter plot
+		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
+		
+		# boxplot
+		plt.boxplot(x)
+
 		# 2-D histogram
 		plt.hist2d(x, y, bins = (30, 30), range=((xmin, xmax), (ymin, ymax)))  # range used for zooming
 		plt.colorbar()
@@ -722,19 +743,6 @@
 
 ### data cleaning
 
-		df.shape
-		df.columns
-		df.head()
-		df.info()                                     # to see information like null values
-		df.describe()
-		df.plot(kind="hist/bar/scatter/box", x = , y = )
-		
-		pd.melt()
-		df.pivot_table()
-		
-		df.reset.index()
-		df.index
-
 		df.column.str[0]                              # extract first letter from df.column
 		df.column.str.split("_")                      # split column on "_"
 		df.column.str.get(0)                          # get 0th item from each value of the column
@@ -760,9 +768,6 @@
 		# To remove $ sign from the column
 		df.amount.apply(lambda x: x.replace("$", ""))
 		df.amount.apply(lambda x: re.findall("\d+\.\d+", x)[0])  # if [0] is not used result will be [28.45] instead of 28.45
-
-		# drop duplicate
-		df.drop_duplicates()
 
 		# assert
 		assert condition                              # if condition is true, do nothing, if false, throw error
@@ -792,624 +797,3 @@
 		df.column.plot(style = "k.-")      # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
 		
 ==============================================================================================================================
-
-### scikit-learn
-
-	## supervised learning
-
-		# make artificial dataset
-		from sklearn.datasets import make_classification
-		X, y = make_classification(n_samples = , n_features = ,
-								   n_informative = , n_redundant = ,
-								   n_repeated = , random_state = ,
-								   weights = [0.5, 0.5]
-			   )
-
-		# divide data into X and y
-		X = df.drop("target_column", axis = 1).values
-		y = df.target_column.values
-
-		# split data into train and test
-		from sklearn.model_selection import train_test_split
-		X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 4, stratify = y)
-		
-		# cross validation
-		from sklearn.model_selection import KFold
-		from sklearn.model_selection import LeaveOneOut
-		from sklearn.model_selection import ShuffleSplit     # multiple train/test sets
-		from sklearn.model_selection import cross_val_score
-		
-		folds = KFold(n_splits = 5, random_state = 4)
-		folds = LeaveOneOut()
-		folds = ShuffleSplit(n_splits = 5, test_size = 0.3, random_state = 4)
-
-		score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
-		cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)  # pass model/pipeline after instantiating it
-		cv_results.mean()*100
-		cv_results.std()*100
-
-		# hyperparameter tuning
-		from sklearn.model_selection import GridSearchCV
-		from sklearn.model_selection import RandomizedSearchCV
-		params = {"parameter_name": [parameter_values]}
-		
-		model_cv = GridSearchCV(estimator   = model,       # pass model/pipeline after instantiating it
-								param_grid  = params,
-								scoring     = score,
-								cv          = folds,
-								verbose     = 1            # the higher, the more messages
-					)
-		
-		model_cv = RandomizedSearchCV(estimator             = model,
-									  param_distributions   = params,
-									  n_iter                = 100,
-									  scoring               = score,
-									  cv                    = folds,
-									  verbose               = 1,
-									  random_state          = 4
-					)
-		model_cv.fit(X_train, y_train)                     # search takes place here
-		model_cv.cv_results_
-		model_cv.best_score_
-		model_cv.best_params_
-
-	## models
-
-		# linear regression
-		from sklearn.linear_model import LinearRegression
-		model = LinearRegression()                         # instantiate model
-		model.fit(X_train, y_train)                        # fit model
-		y_pred = model.predict(X_test)                     # predict using model
-		model.score(X_test, y_test)                        # evaluate model
-
-		# regularization
-		from sklearn.linear_model import Lasso             # l1-regularization
-		model = Lasso(alpha = , normalize = )
-		model.fit(X_train, y_train)
-		coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
-		plt.plot(range(len(names)), coefficients)          # variable importance
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-
-		from sklearn.linear_model import Ridge             # l2-regularization
-		model = Ridge(alpha = , normalize = )
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-
-		from sklearn.linear_model import ElasticNet        # mix of l1 and l2 regularization
-		model = ElasticNet(alpha = , normalize = )
-		model.fit(X_train, y_train)
-		coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
-		plt.plot(range(len(names)), coefficients)          # variable importance
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-
-		# logistic regression
-		from sklearn.linear_model import LogisticRegression
-		from sklearn.feature_selection import RFE
-		model = LogisticRegression()
-		# rfe = RFE(model, n)                              # recursive feature elimination. select top n features
-		# fit = rfe.fit(X_train, y_train)
-		# print(fit.n_features_, fit.support_, fit.ranking_)
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-
-		# multiclass logistic regression
-		from sklearn.multiclass import OneVsRestClassifier
-		model = OneVsRestClassifier(LogisticRegression())  # also used when the target column is changed to dummy target columns
-
-		# knn
-		from sklearn.neighbors import KNeighborsClassifier
-		model = KNeighborsClassifier(n_neighbors = 6)
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-
-		# support vector machines
-		from sklearn.svm import SVC, SVR
-		model = SVC(C = , kernel = "")
-		model = SVR(C = , kernel = "")
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-
-		# decision tree
-		from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
-		import graphviz
-		model = DecisionTreeClassifier(criterion  = "gini/entropy",
-									   max_depth  = ,
-									   min_samples_split = ,
-									   min_samples_leaf = ,
-									   max_features = ,
-									   max_leaf_nodes = ,
-									   min_impurity_decrease = ,
-									   class_weight = "balanced",
-									   presort = "True"                   # faster training when daset is small
-				)
-		model = DecisionTreeRegressor()  # same parameters as DecisionTreeClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.tree_
-		graph_data = export_graphviz(model, out_file     = None,
-									 feature_names       = ,
-									 class_names         = ,
-									 filled              = True,
-									 rounded             = True,  
-									 special_characters  = True
-					 )
-		graph = graphviz.Source(graph_data) 
-		graph.render("tree")  # save tree as tree.pdf file
-
-		# random forest
-		from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-		model = RandomForestClassifier(n_estimators        = ,            # number of trees
-									   max_features        = ,            # number of features at each node split
-									   oob_score           = True,
-									   random_state        = 4,           # random seed
-
-				)
-		model = RandomForestRegressor()  # same parameters as RandomForestClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.oob_score_
-
-		# ada boost
-		from sklearn.ensemble import AdaBoostClassifier
-		model = AdaBoostClassifier(base_estimator    = ,                  # optional
-								   n_estimators      = 100,               # number of trees
-								   learning_rate     = 0.1,               # trade-off between learning_rate and n_estimators
-								   random_state      = 4,                 # random seed
-
-				)
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.estimator_errors_
-		model.estimator_weights_
-
-		# gradient boosting
-		from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
-		model = GradientBoostingClassifier(loss                = "deviance",
-										   learning_rate       = 0.1,
-										   n_estimators        = 100,         # number of trees
-										   max_depth           = 3,           # depth of tree
-										   min_samples_split   = 2,
-										   min_samples_leaf    = 1,
-										   subsample           = 1.0,
-										   max_features        = None,
-										   verbose             = 0,
-										   random_state        = 4,
-
-				)
-		model = GradientBoostingRegressor()             # same parameters as GradientBoostingClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.train_score_[i]                           # train score of i-th iteration
-
-		# xgboost
-		from xgboost import XGBClassifier
-		model = XGBClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		predictions = [round(value) for value in y_pred]
-		model.score(X_test, y_test)
-		
-		OR
-
-		import xgboost as xgb
-		dtrain = xgb.DMatrix(X_train, label = y_train)
-		dtest = xgb.DMatrix(X_test, label = y_test)
-		parameters = [
-      # General Parameters
-          booster            = "gbtree",          		# default = "gbtree"
-          silent             = 0,                 		# default = 0
-      # Booster Parameters
-          eta                = 0.3,               		# default = 0.3, range: [0,1]
-          gamma              = 0,                 		# default = 0,   range: [0,∞]
-          max_depth          = 6,                 		# default = 6,   range: [1,∞]
-          min_child_weight   = 1,                 		# default = 1,   range: [0,∞]
-          subsample          = 1,                 		# default = 1,   range: (0,1]
-          colsample_bytree   = 1,                 		# default = 1,   range: (0,1]
-          colsample_bylevel  = 1,                 		# default = 1,   range: (0,1]
-          lambda             = 1,                 		# default = 1
-          alpha              = 0,                 		# default = 0
-      # Task Parameters
-          objective          = "binary:logistic", 		# default = "reg:linear"
-          eval_metric        = ["error", "logloss"],
-          num_classes        = 2,                 		# number of classes in case of multi class classification
-          seed               = 4				  		# reproducability seed
-        ]
-
-        eval_list  = [(dtest,'eval'), (dtrain,'train')]
-        model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
-        y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
-        xgb.plot_importance(model)                      # import matplotlib for this
-        xgb.plot_tree(model, num_trees=2)               # import graphviz for this
-        model.save_model("model_name")
-
-        # voting ensemble
-        from sklearn.ensemble import VotingClassifier
-        estimators = []
-        estimators.append(("knn", KNeighborsClassifier()))
-        estimators.append(('cart', DecisionTreeClassifier()))
-        estimators.append(('svm', SVC()))
-        ensemble = VotingClassifier(estimators)
-        cv_results = cross_val_score(ensemble, X_train, y_train, cv = folds, scoring = score)
-
-    ## save/load model
-    	
-    	# the python version and library versions almost certainly need to be the same while loading a saved model
-
-        # save model to disk
-        from pickle import dump
-        dump(model, open("filename.sav", 'wb'))
-
-        from sklearn.externals.joblib import dump
-        dump(model, "filename.sav")
-
-        # load model from disk
-        from pickle import load
-        model = load(open("filename.sav", 'rb'))
-        
-        from sklearn.externals.joblib import load
-        model = load("filename.sav")
-
-	## evaluate model performance
-
-		# return default metric
-		model.score(X_test, y_test)                     # return accuracy/r-squared
-		
-		# regression
-
-		from sklearn.metrics import r2_score
-		r2_score(y_test, y_pred)
-
-		from sklearn.metrics import mean_squared_error
-		mean_squared_error(y_test, y_pred)
-
-		# classification
-
-		from sklearn.metrics import accuracy_score
-		accuracy_score(y_test, y_pred)
-
-		from sklearn import confusion_matrix
-		confusion_matrix(y_test, y_pred)
-
-		from sklearn import classification_report
-		classification_report(y_test, y_pred)
-
-		from sklearn import roc_curve
-		y_pred_prob = model.predict_proba(X_test)[:, 0/1]  # return probabilites of class 0/1
-		fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
-
-		from sklearn.metrics import roc_auc_score
-		y_pred_prob = model.predict_proba(X_test)[:, 0/1]
-		roc_auc_score(y_test, y_pred_prob)
-
-		from sklearn.metrics import log_loss
-		log_loss(y_test, y_pred)                           # see scikit-learn documentation
-
-	## compare machine learning models
-
-		# prepare models
-		models = []
-		models.append(('LR', LogisticRegression()))
-		models.append(('CART', DecisionTreeClassifier()))
-
-		OR
-		
-		models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('LR', LogisticRegression())])))
-		models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('CART', DecisionTreeClassifier())])))
-
-		# evaluate each model in turn
-		results = []
-		names = []
-		score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
-		for name, model in models:
-			folds = KFold(n_splits = 5, random_state = 4)
-			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
-			results.append(cv_results)
-			names.append(name)
-			print("{0} - {1} ({2})".format(name, cv_results.mean(), cv_results.std()))
-		
-		# boxplot algorithm comparison
-		fig = plt.figure()
-		fig.suptitle('Algorithm Comparison')
-		ax = fig.add_subplot(111)
-		plt.boxplot(results)
-		ax.set_xticklabels(names)
-		plt.show()
-
-	## pre-processing
-
-		# scale
-		from sklearn.preprocessing import scale
-		X_scaled = scale(X)
-
-		# MinMaxScaler
-		from sklearn.preprocessing import MinMaxScaler
-		min_max_scaler = MinMaxScaler(feature_range=(0, 1)).fit(X_train)
-		X_train_scaled = min_max_scaler.transform(X_train)
-		X_test_scaled = min_max_scaler.transform(X_test)
-
-		# StandardScaler (0-mean, 1-standard deviation)
-		from sklearn.preprocessing import StandardScaler
-		standard_scaler = StandardScaler().fit(X_train)
-		X_train_scaled = standard_scaler.transform(X_train)
-		X_test_scaled = standard_scaler.transform(X_test)
-
-		# Normalizer - useful when data is sparse with lots of zeros
-		from sklearn.preprocessing import Normalizer
-		normalizer = Normalizer().fit(X_train)
-		X_train_scaled = normalizer.transform(X_train)
-		X_test_scaled = normalizer.transform(X_test)
-
-		# binarizer - convert all values above the threshold to 1 and all values below the threshold to 0
-		from sklearn.preprocessing import Binarizer
-		binarizer = Binarizer(threshold=0.5).fit_transform(X)
-
-		# pipeline - scale and model
-		from sklearn.preprocessing import StandardScaler   # google - preprocessing types in scikit-learn
-		steps = [("scaler", StandardScaler()),
-				 ("model_name", model)]
-		pipeline = Pipeline(steps)
-		pipeline.fit(X_train, y_train)                     # pipeline can be passed to GridSearchCV() instead of directly fitting
-		y_pred = pipeline.predict(X_test)
-
-		# handling missing values
-
-		from sklearn.preprocessing import Imputer
-		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
-		imputer.fit(X)
-		X = imputer.transform(X)                           # return imputed dataframe
-
-		# pipeline - imputing and modelling in one go
-		from sklearn.pipeline import Pipeline              # alternative - import make_pipeline
-		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
-		steps = [("imputer", imputer),
-				 ("model_name", model)]
-		pipeline = Pipeline(steps)
-		pipeline.fit(X_train, y_train)
-		y_pred = pipeline.predict(X_test)
-
-	## NLP
-
-		# CountVectorizer() creates tokens, builds vocabulary and counts frequency of each word
-		from sklearn.feature_extraction.text import CountVectorizer           # for large text datasets, use HashingVectorizer
-		word_vector = CountVectorizer(token_pattern = "", ngram_range = (1))  # split tokens based on given pattern
-		word_vector.fit(df.text_column)                    # learn vocabulary from the given Series
-		word_vector.transform(df.text_column)              # create document term matrix
-		word_vector.fit_transform(df.text_column)          # fit and transform in one go
-
-		# combining text and numeric pipelines for them to be ready for final common pipeline
-		from sklearn.preprocessing import FunctionTransformer
-		from sklearn.feature_selection import chi2, SelectKBest
-		from sklearn.preprocessing import SparseInteractions
-
-		get_text_data = FunctionTransformer(lambda x: x.text_column, validate = False)  # validate checks for NaN values
-		get_numeric_data = FunctionTransformer(lambda x: x.numeric_column, validate = False)
-
-		numeric_pipeline = Pipeline([
-						       ("selector": get_numeric_data),
-						       ("imputer": Imputer())
-						   ])
-
-		text_pipeline = Pipeline([
-							("selector": get_text_data),
-							("vectorizer": CountVectorizer()),
-							("dim_red": SelectKBest(chi2, 100))  # select 100 best features using chi-squared test
-						])
-
-		from sklearn.pipeline import FeatureUnion
-		union = FeatureUnion([
-					("numeric": numeric_pipeline),
-					("text": text_pipeline)
-				])
-
-		final_pipeline = Pipeline([
-						 	("union": union),
-						 	('int', SparseInteractions(degree=2)),
-						 	("scale": MaxAbsScaler()),
-						 	("model": model)
-						 ])
-
-		final_pipeline.fit(X_train, y_train)
-
-	## unsupervised learning
-
-		# k-means clustering
-		from sklearn.cluster import KMeans
-		model = KMeans(n_clusters = )
-		model.fit(X)
-		model.inertia_
-		model.cluster_centers_
-		clusters = model.predict(X)
-		new_labels = model.predict(X_new)
-
-		# hierarchical clustering
-		# In complete linkage, the distance between clusters is the distance between the furthest points of the clusters.
-		# In single linkage, the distance between clusters is the distance between the closest points of the clusters.
-		
-		from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
-		mergings = linkage(X, method = "complete")
-		clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
-		pd.DataFrame({"labels": y, "cluster": clusters})           # cluster number starts from index 1
-
-		dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
-		plt.show()
-
-		# t-SNE - visualize n-dimensional data into 2-dimensional
-		from sklearn.manifold import TSNE
-		model = TSNE(learning_rate = 100)  # Optimal choice [50,200]. Points should appear in clusters i.e. not intermingled.
-		transformed = model.fit_transform(X)
-		plt.scatter(transformed.iloc[:, 0], transformed.iloc[:, 1], c = y)
-		plt.show()
-
-		# PCA
-		from sklearn.decomposition import PCA
-		model = PCA(n_components = )      # First do model = PCA(). n_components is known after plotting the bar plot shown below.
-		df_pca = model.fit_transform(df)  # Or use fit() and transform() separately. Also, it is better to scale data before applying PCA.
-		model.components_
-		features = range(model.n_components_)
-		plt.bar(features, model.explained_variance_)
-		plt.xticks(features)
-		plt.show()
-
-		# pca for sparse matrices like word frequencies. google - TfidfVectorizer
-		from sklearn.decomposition import TruncatedSVD
-		model = TruncatedSVD(n_components = )
-		df_pca = model.fit_transform(sparse_df)  # sparse_df is scipy.sparse.csr_matrix instead of numpy array.
-
-		# non negative matrix factorization - interpretable unlike pca
-		from sklearn.decomposition import NMF
-		model = NMF(n_components = n)  # always specify n_components unlike PCA()
-		nmf_features = model.fit_transform(df)   # data should have non-negative entries only
-		model.components_
-
-		# recommendor system using NMF
-		nmf_features = normalize(nmf_features)
-		df = pd.DataFrame(nmf_features, index = "article_names")
-		current_article = df.loc("article_name")
-		similarities = df.dot(current_article)  # cosine similarity. the more the similar
-		print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
-
-==============================================================================================================================
-
-### keras -- deep learning
-
-		X = df.drop(["target_column"], axis = 1).as_matrix()
-
-		# one hot encoding the outcome variable
-		from keras.utils import to_categorical
-		y = to_categorical(df.target_column)
-
-		# Steps in keras modelling
-		1. Create architecture
-		2. Compile model
-		3. Fit model
-		4. Predict using model
-
-	## 1. Create architecture
-
-		from keras.layers import Dense
-		from keras.models import Sequential
-
-		# Save the number of columns in predictors: n_cols
-		n_cols = X.shape[1]
-
-		# Set up the model
-		model = Sequential()
-
-		# Add the first layer
-		model.add(Dense(n_nodes, activation = "", input_shape = (n_cols,), kernel_initializer = , bias_initializer = ))
-
-		# Add the second layer
-		model.add(Dense(n_nodes, activation = ""))
-
-		# Add the output layer
-		model.add(Dense(1))                          # for regression
-		model.add(Dense(2, activation = "softmax"))  # for classification, one node for each class and a separate activation function
-
-		# visualize model
-		from keras.utils import plot_model
-		plot_model(model, to_file = "model.png", show_shapes = False, show_layer_names = True, rankdir = "TB/LR")
-
-	## 2. Compile the model
-
-		from keras.optimizers import SGD
-		optimizer = SGD(lr = 0.01)  # stochastic gradient descent
-		model.compile(optimizer = "adam"/optimizer,       # google - optimizers available in keras
-					  loss = "categorical_crossentropy",  # categorical_crossentropy is the log loss. google - loss functions in keras
-					  metrics = ["accuracy"]
-		)
-
-	## 3. Fit the model
-
-		# stop when there is no improvement in validation set score
-		from keras.callbacks import EarlyStopping
-		early_stopping_monitor = EarlyStopping(patience = 2)  # stop when there is no improvement for 3 consecutive epochs
-		
-		model.fit(X_train, y_train,
-				  validation_split = 0.25,
-				  epochs = 10,
-				  callbacks = [early_stopping_monitor]     # google keras callbacks techniques for advanced deep learning
-				  batch_size = 64
-		)
-		model.summary()
-		model.history
-		
-	## 4. Predict using the model
-
-		y_pred = model.predict(X_test)
-
-	## save and load model
-
-		# save model
-		model.save("my_model.h5")
-		
-		# load model
-		from keras.models import load_model
-		model = load_model("my_model.h5")
-
-==============================================================================================================================
-
-### NLP
-
-		import re
-		pattern = r""
-		re.match(pattern, string)                          # look for the pattern from the start of the string
-		match.start(); match.end()
-		re.search(pattern, string)                         # look for the pattern in the whole string and returns the first occurence
-		re.findall(pattern, string)                        # look for and returns all the occurences of patterns present in the string
-		re.split(pattern, string)                          # split the string at given pattern
-		re.sub(pattern, repl, string)                      # replace first occurence of pattern by repl in the string
-
-		from nltk.tokenize import word_tokenize
-		word_tokenize(string, pattern)                     # tokenize string into words
-
-		from nltk.tokenize import sent_tokenize
-		sent_tokenize(string, pattern)                     # tokenize string into sentences
-
-		from nltk.tokenize import regexp_tokenize
-		regexp_tokenize(string, pattern)                   # tokenize string based on pattern
-
-		from nltk.tokenize import TweetTokenizer
-		tokenizer = TweetTokenizer()
-		tokenizer.tokenize(string)
-
-		# plot word count
-		words = [word_tokenize(line) for line in book]     # return list of words of the entire book
-		word_lengths = [len(word) for word in words]       # return word length of each word
-		plt.hist(word_lengths)
-
-		# bag of words
-		from collections import Counter
-		word_frequencies = Counter(word_tokenize(string))  # return the word along with their count
-		print(word_frequencies.most_common(5))             # return the top 5 words occuring in the string
-
-		# text preprocessing
-		from nltk.corpus import stopwords
-		alpha_only = [t for t in word_tokenize(text.lower()) if t.isalpha()]    # return lowercase alphabetic token
-		no_stops = [t for t in tokens if t not in stopwords.words("english")]   # remove stop words
-
-		from nltk.stem import WordNetLemmatizer
-		wordnet_lemmatizer = WordNetLemmatizer()
-		lemmatized = [wordnet_lemmatizer.lemmatize(t) for t in no_stops]
-
-	## gensim - create bag of words
-
-		from gensim.corpora.dictionary import Dictionary
-		dictionary = Dictionary(articles)                  # articles is preprocessed and tokenized
-		dictionary.token2id                                # each token is given a unique id
-		corpus = [dictionary.doc2bow(article) for article in articles]
-		corpus[0][:10]                                     # print first 10 word ids from first document
-		
