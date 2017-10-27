@@ -123,7 +123,9 @@
 		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
 		df["column_name"].max()
 		df["column_name"].mean()
+		df["column_name"].mode()
 		df["column_name"].std()                     # standard deviation of column
+		df.column_name.quantile([0.1, 0.5])         # return quantile value
 		df.column_name.cumsum()                     # cumulative sum
 		df.column_name.cumprod()                    # cumulative product
 		
