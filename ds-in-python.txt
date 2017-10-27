@@ -293,7 +293,7 @@
 		plt.plot(x, y, marker = "", linestyle = "")
 		
 		# histogram
-		plt.hist(x, bins = 30)                         # or pass a list of bin cutoff points
+		plt.hist(x, bins = 30, rwidth = 0.9)           # or pass a list of bin cutoff points
 		
 		# scatter plot
 		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
@@ -442,6 +442,85 @@
 		y = np.arange(1, len(x) + 1) / len(x)
 		plt.plot(x, y, marker = ".", linestyle = "none")
 		plt.margins(0.02)  # keep data off plot edges
+
+	# version 2
+
+		# histogram
+		sns.distplot(a            =  df.numeric_column,
+					 bins         =  30,
+					 hist_kws     =  {"rwidth": 0.9},            # padding between bins
+					 color        =  ""
+		)
+
+		# count plot
+		sns.countplot(x/y         =  "categorical_column",       # x-vertical plot, y-horizontal plot
+					  hue         =  "categorical_column",
+					  data        =  df,
+					  order       =  ,                           # order of variable to plot - google
+					  hue_order   =  ,                           # order of hue variable     - google
+					  color       =  "",                         # single color for whole plot
+					  palette     =  mycolors,                   # multiple colors
+					  saturation  =  1.0,                        # saturation of the plot
+					  dodge       =  True                        # dodge or stack
+		)
+
+		# bar plot
+		sns.barplot(x             =  "categorical_column",
+					y             =  "numeric_column",           # switch x and y to change plot orientation
+					hue           =  "categorical_column",
+					data          =  df,
+					order         =  ,                           # order of variable to plot - google
+					hue_order     =  ,                           # order of hue variable     - google
+					color         =  "",                         # single color for whole plot
+					palette       =  mycolors,                   # or pass dic for x - {"value": "g", "value": "color"}
+					saturation    =  1.0,                        # saturation of the plot
+					errcolor      =  "",                         # color of error bar
+					errwidth      =  1.5,                        # width of error bar
+					capsize       =  0.1,                        # size of caps of error bar
+					dodge         =  True,                       # dodge or stack
+
+		)
+
+		# violin plot
+		sns.violinplot(x          = "categorical_column",        # optional
+					   y          = "numeric_column",            # switch x and y to change plot orientation
+					   hue        = "categorical_column",
+					   data       =  df,
+					   order      =  ,                           # order of variable to plot - google
+					   hue_order  =  ,                           # order of hue variable     - google
+					   inner      =  "quartile",
+					   dodge      =  True,                       # dodge or stack
+					   color      =  "",                         # single color for whole plot
+					   palette    =  mycolors,                   # or pass dic for x - {"value": "g", "value": "color"}
+					   saturation =  1.0,                        # saturation of the plot
+		)
+
+		# box plot
+		sns.boxplot(x             = "categorical_column",        # optional
+					y             = "numeric_column",            # switch x and y to change plot orientation
+					hue           = "categorical_column",
+					data          = df,
+					order         =  ,                           # order of variable to plot - google
+					hue_order     =  ,                           # order of hue variable     - google
+					color         =  "",                         # single color for whole plot
+					palette       = mycolors,                    # or pass dic for x - {"value": "g", "value": "color"}
+					saturation    = 1.0,                         # saturation of the plot
+					width         = 0.8,                         # width of each box - [0.0, 1.0]
+					dodge         = True,                        # dodge or stack
+					linewidth     = 2,                           # width of outer line of box plot
+					whis          = 1.5                          # points outside of 1.5*IQR from median are outliers
+		)
+
+		# scatter plot
+		sns.regplot(x             =  "numeric_column",
+					y             =  "numeric_column",
+					data          =  df,
+					fit_reg       =  True,                       # single color for whole plot
+					order         =  1,                          # order of fit
+					x_jitter      =  0,                          # add random noise to x variable
+					y_jitter      =  0,                          # add random noise to y variable
+					color         =  ""                          # color for points
+		)
 
 ==============================================================================================================================
 
