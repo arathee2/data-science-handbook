@@ -1,3 +1,25 @@
+
+### jupyter-notebook
+
+		# display variables without print()
+		from IPython.core.interactiveshell import InteractiveShell
+		InteractiveShell.ast_node_interactivity = "all"
+
+		# display matplotlib without plt.show()
+		%matplotlib inline
+
+		# keep track of time
+		%%time                                        # run cell code one time - use on top of the cell
+		%time                                         # run a single line of code - use before a line
+		%%timeit                                      # run cell code seven times and return mean time - use on top of the cell
+		%time                                         # run cell code seven times and return mean time - use before a line
+
+		# run different kernel
+		%R
+		rnorm(10)
+
+==============================================================================================================================
+
 ### numpy
 	
 	import numpy as np
@@ -109,6 +131,9 @@
 		df.isnull().sum()                           # check number of missing values
 		df.notnull().all()                          # return True only if no missing values prsent
 
+		df.categorical_column.nunique()             # return number of levels in a categorical variable
+		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
+		
 		# sample rows or columns
 		df.sample(n             =   ,               # number of rows/columns to sample
 				  frac          =   ,               # either use n or frac
@@ -120,8 +145,6 @@
 		# statistics
 		df.corr(method="pearson")                   # return correlation matrix
 		df.skew()                                   # return skewness of numeric variables
-		df.categorical_column.nunique()             # return number of levels in a categorical variable
-		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
 		df["column_name"].max()
 		df["column_name"].mean()
 		df["column_name"].mode()
@@ -144,6 +167,8 @@
 		
 		df.index = index_variable                   # index variable must be equal to the number of rows in the dataframe
 		df.index.name = "index name"
+		df.columns
+		df.columns.name
 		
 		# conditions
 		df[df.age > 10]
@@ -254,8 +279,8 @@
 
 		# crosstabs
 		pd.crosstab(df.categorical_column1, df.categorical_column2,    # could pass column lists as well
-					 margins = True,
-					 normalize = {0, 1} or {"all", "index", "columns"}  # similar to prop.table() in R
+					margins = True,
+					normalize = {0, 1} or {"all", "index", "columns"}  # similar to prop.table() in R
 		)  # similar to table(category1, catedory2) in R
 
 		pd.crosstab(df.categorical_column1, df.categorical_column2
@@ -276,9 +301,9 @@
 		df_dummy = pd.get_dummies(df,
 								  columns = [column for column in categorical_columns if column not in ["target_column"]],
 								  prefix = 
-				   )
+		)
 
-		# select dataframe based on column names
+		# subset dataframe based on column names
 		pattern = r"column name pattern"
 		column_names_bool = list(df.columns.map(lambda x: bool(re.search(pattern, x))))
 		column_names = list(df.columns[column_names_bool])
@@ -379,64 +404,9 @@
 
 		import seaborn as sns
 
-	## univariate plots
-
-		# regression line
-		sns.lmplot(x = "column_name", y = "column_name", hue = "categorical_column", data = df, palette = "Set1")
-		sns.lmplot(x = "column_name", y = "column_name", col/row = "categorical_column", data = df)  # two plots based on gender
-		plt.show()
-
-		# higher order regression line - polynomial regression
-		sns.regplot(x = , y = , data = auto, color = "color_name", order = 2, scatter_kws = {"alpha": 0.5, "s":2})  # s-size
-		sns.regplot(x = , y = , data = auto, color = "color_name", order = 3, scatter = None)  # scatter = None avoids plotting the points again
-		plt.show()
-
-		# residual plot
-		sns.residplot(x = , y = , data = , color = "color_name")
-
-		# strip plot
-		mycolors = sns.color_palette("seaborn palette names or matplotlib colormap or list of colors", n_colors = )  # return n_colors
-		sns.stripplot(x = "categorical_column",                 # optional
-					  y = "numeric variable",
-					  data = df,
-					  jitter = True,                            # same as in ggplot2
-					  hue = "categorical_column",
-					  orient = "v/h",                           # change orientation to vertical/horizontal
-					  size = ,                                  # point size
-					  palette = {"male": "g", "female": "r"},   # color correspoding to categorical value of variable
-					  palette = mycolors                        # color for each value of x or hue
-		)
-
-		# swarm plot
-		sns.swarmplot("same arguments as strip plot")  # visualize repeated value differently
-
-		# boxplot
-		sns.boxplot("same arguments as strip plot")
+		# colors - for categorical plots
+		mycolors = sns.color_palette(["list_of_colors"])         # colors are applied to hue else for category present on x/y axis
 		
-		# violin plot
-		sns.violinplot("same arguments as strip plot")
-		
-	## bivariate plots
-
-		# joint plot
-		sns.jointplot(x = "numeric_column", y = "numeric_column", data = df, kind = "kde")
-
-		# pair plot
-		sns.pairplot(df)  # pair plots between all numeric variables
-		sns.pairplot(df, hue = "categorical_column", kind = )
-
-		# covariance heat map
-		mycmap = sns.diverging_palette(h_neg=20, h_pos=220, s=75, l=50, sep=10, center='light', as_cmap=True)
-		sns.heatmap(df.corr(), cmap = mycmap, annot = True)
-
-		# ECDF plot - make custom function
-		x = np.sort(df.column_name)
-		y = np.arange(1, len(x) + 1) / len(x)
-		plt.plot(x, y, marker = ".", linestyle = "none")
-		plt.margins(0.02)  # keep data off plot edges
-
-	# version 2
-
 		# histogram
 		sns.distplot(a            =  df.numeric_column,
 					 bins         =  30,
@@ -527,12 +497,16 @@
 		)
 
 		# heatmap
+		mycmap = sns.light_palette(color, reverse=False, as_cmap=True)  # sequential palette from light to color
+		mycmap = sns.dark_palette(color, reverse=False, as_cmap=True)   # sequential palette from dark to color
+		mycmap = sns.diverging_palette(h_neg, h_pos, center="light/dark", as_cmap=True)  # h_neg to light/dark to h_pos
+		
 		sns.heatmap(data          =  df.corr(),                  # 2d array data such as a pivot table
-					cmap          =  None,                       # 
+					cmap          =  mycmap,                     # colors of the heatmap
 					center        =  None,                       # value at which to center diverging data
 					annot         =  None,                       # write values in each cell. bool or 2d array
 					fmt           =  ".2f",                      # string formatting for annotations
-					linewidths    =  1.0,                        # line width between cells
+					linewidths    =  0.0,                        # line width between cells
 					linecolor     =  "",                         # line color
 					cbar          =  True,                       # display color bar
 					square        =  False,                      # for square sized cells
