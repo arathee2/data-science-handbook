@@ -56,7 +56,7 @@
 		# boolean operations
 		logical_and(array1, array2)                   # returns an array with boolean values
 		logical_or(array1, array2)
-		logical_not(array1, array2)
+		logical_not(array)
 	
 		# distributions - google numpy distribution functions
 		np.random.normal(mean, std, size)
@@ -93,6 +93,7 @@
 		)
 		
 		df = pd.DataFrame(data        =   ,         # numpy ndarray or python dictionary
+						  index       = [],         # list of indices, defaults to arange(n)
 						  columns     = [],         # list of column names
 		)
 		
@@ -234,7 +235,7 @@
 		
 		# Unmelt: long to wide dataframe
 		df.pivot_table(index = ,                    # columns not to unmelt
-					   columns = ,                  # categorical column name
+					   columns = ,                  # columns to melt
 					   values =                     # numerical column name
 		)  						                    # in case of duplicate values, use aggfunc to aggregate
 
@@ -301,15 +302,6 @@
 		# boxplot
 		plt.boxplot(x)
 
-		# 2-D histogram
-		plt.hist2d(x, y, bins = (30, 30), range=((xmin, xmax), (ymin, ymax)))  # range used for zooming
-		plt.colorbar()
-		plt.show()
-
-		plt.hexbin(x, y, gridsize=(), extent=(xmin, xmax, ymin, ymax))         # extent similar to range in hist2d()
-		plt.colorbar()
-		plt.show()
-
 		# plotting images
 		image = plt.imread("image.jpg")
 		plt.imshow(image, extent = , aspect = )
@@ -326,8 +318,8 @@
 		plt.xlabel("x")                                # use of latex equations possible
 		plt.ylabel("y")
 		plt.title("title")
-		plt.xticks()                                   # customize x-axis ticks
-		plt.yticks()                                   # customize y-axis ticks
+		plt.xticks(arange(2), ("male", "female"))      # customize x-axis ticks
+		plt.yticks(rotation = "")                      # customize y-axis ticks
 		plt.tick_params()
 		
 		# transformation
@@ -354,7 +346,7 @@
 
 		# zooming and axis
 		plt.xlim([xmin, xmax])  	                   # zoom in
-		plt.ylim([ylim, ymax])
+		plt.ylim([ymin, ymax])
 		plt.axis([xmin, xmax, ymin, ymax])
 		plt.axis("off/equal/square/tight")
 		plt.figure(figsize=(10,10))
@@ -362,7 +354,7 @@
 		# legends
 		plt.scatter(x, y, color = "green", label = "male")
 		plt.scatter(x, y, color = "red", label = "female")
-		plt.legend(loc = "upper right")                # google legend locations
+		plt.legend(loc = "upper right")                # "upper/lower/center left/right"
 		plt.show()
 
 		# text and arrows
@@ -374,7 +366,7 @@
 
 		OR
 		
-		plt.text(x, y, s = "text to display on x,y coordinates")  # display text on x,y point
+		plt.text(x, y, s = "show this text at (x,y)")  # display text on x,y point
 		plt.grid(True)                                 # to enable the text
 
 		# themes and styles
@@ -459,7 +451,7 @@
 					  order       =  ,                           # order of variable to plot - google
 					  hue_order   =  ,                           # order of hue variable     - google
 					  color       =  "",                         # single color for whole plot
-					  palette     =  mycolors,                   # multiple colors
+					  palette     =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
 					  saturation  =  1.0,                        # saturation of the plot
 					  dodge       =  True                        # dodge or stack
 		)
@@ -471,8 +463,9 @@
 					data          =  df,
 					order         =  ,                           # order of variable to plot - google
 					hue_order     =  ,                           # order of hue variable     - google
+					ci            =  "sd",                       # confidence interval for error bar
 					color         =  "",                         # single color for whole plot
-					palette       =  mycolors,                   # or pass dic for x - {"value": "g", "value": "color"}
+					palette       =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
 					saturation    =  1.0,                        # saturation of the plot
 					errcolor      =  "",                         # color of error bar
 					errwidth      =  1.5,                        # width of error bar
@@ -491,7 +484,7 @@
 					   inner      =  "quartile",
 					   dodge      =  True,                       # dodge or stack
 					   color      =  "",                         # single color for whole plot
-					   palette    =  mycolors,                   # or pass dic for x - {"value": "g", "value": "color"}
+					   palette    =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
 					   saturation =  1.0,                        # saturation of the plot
 		)
 
@@ -521,6 +514,54 @@
 					y_jitter      =  0,                          # add random noise to y variable
 					color         =  ""                          # color for points
 		)
+
+		# density plot
+		sns.kdeplot(data          =  ,                           # 1d plot
+					data2         =  ,                           # 2d plot
+					shade         =  True,                       # add color to show varying density
+					vertical      =  False,                      # 1d - change orientation, 2d - no effect
+					gridsize      =  20,                         # number of discrete points in the evaluation grid 
+					legend        =  True,                       # 1d - show legend because label not shown on axis, 2d - no effect
+					cumulative    =  False,                      # 1d - cumulative plot, 2d - can't pass this argument
+					cbar          =  False                       # 2d - add color bar
+		)
+
+		# heatmap
+		sns.heatmap(data          =  df.corr(),                  # 2d array data such as a pivot table
+					cmap          =  None,                       # 
+					center        =  None,                       # value at which to center diverging data
+					annot         =  None,                       # write values in each cell. bool or 2d array
+					fmt           =  ".2f",                      # string formatting for annotations
+					linewidths    =  1.0,                        # line width between cells
+					linecolor     =  "",                         # line color
+					cbar          =  True,                       # display color bar
+					square        =  False,                      # for square sized cells
+					xticklabels   =  "auto",                     # "auto", bool, list-like, or int. See documentation.
+					yticklabels   =  "auto"                      # "auto", bool, list-like, or int. See documentation.
+		)
+
+		# pair plot
+		g = sns.PairGrid(data, hue = "categorical_column", palette = , vars = [], dropna = True)
+		g.map_diag(sns.kdeplot)
+		g.map_offdiag(plt.scatter)
+		g.add_legend()
+
+		# facet plot - bar, count, box and violin plot
+		sns.factorplot(x          =  "categorical_column",
+					   y          =  "numeric_column",
+					   hue        =  "categorical_column",
+					   data       =  df,
+					   row        =  "categorical_column",
+					   col        =  "categorical_column",
+					   kind       =  "bar/count/box/violin",
+					   color      =  "",
+					   palette    =  mycolors
+		)
+
+		# facet plot - histogram and scatter plot
+		g = sns.FacetGrid(data, row = "categorical_column", col = "categorical_column", hue = "categorical_column", palette = )
+		g.map(plt.hist, "numeric_column")
+		g.map(plt.scatter, "numeric_column", "numeric_column")
 
 ==============================================================================================================================
 
