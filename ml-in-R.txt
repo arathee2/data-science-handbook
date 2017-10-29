@@ -540,22 +540,22 @@
 		library(ROSE)
 
 		# oversampling
-		oversampled_train_data <- ovun.sample(Class ~ ., data = train, method = "over",
+		oversampled_train_data <- ovun.sample(target ~ ., data = train, method = "over",
                                     	N = 2*length(train$target[train$target == "class_with_more_observations"]),
                                       	seed = 1)$data
 		
 		# undersampling
-		undersampled_train_data <- ovun.sample(Class ~ ., data = train, method = "under",
+		undersampled_train_data <- ovun.sample(target ~ ., data = train, method = "under",
                                     	N = 2*length(train$target[train$target == "class_with_less_observations"]),
                                       	seed = 1)$data
 
 		# mixed sampling
-		mix_sampled_train_data <- ovun.sample(Class ~ ., data = train, method = "both", p=0.5, 
+		mix_sampled_train_data <- ovun.sample(target ~ ., data = train, method = "both", p=0.5, 
                                   		N=nrow(train),
                                   		seed = 1)$data
 
 		# ROSE (type of mixed sampling)
-		rose_train_data <- ROSE(Class ~ ., data = train, seed = 1)$data
+		rose_train_data <- ROSE(target ~ ., data = train, seed = 1)$data
 
 		# SMOTE
 		library(DMwR)
@@ -566,7 +566,7 @@
 		library(caret)
 
 		set.seed(4)
-		down_train <- downSample(x = train[, -ncol(train)], y = train$target)
+		down_train <- downSample(x = train[, -ncol(train)], y = train$target)  # ncol(train) - column number of target variable
 		up_train <- upSample(x = train[, -ncol(train)], y = train$target)
 
 ==============================================================================================================================
