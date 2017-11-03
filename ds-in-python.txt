@@ -47,7 +47,7 @@
 		array.reshape((3, 4))                         # return an array of changed size
 		array.resize((3, 4))                          # changes the array in-place
 		array.transpose()                             # return transpose of matrix
-		array.sum(axis = 0/1)                         # 0 - column, 1 - row
+		array.sum(axis = 0/1)                         # 0 - column-wise, 1 - row-wise
 		array.cumsum(axis = 0/1)                      # cumulative sum across column/row
 		
 		np.exp(array)                                 # array or pandas Series
