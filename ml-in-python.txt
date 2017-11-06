@@ -786,6 +786,8 @@
 
 	## gensim - create bag of words
 
+		documents = ["doc1", "doc2", "doc3"]
+		articles = [word_tokenize(doc.lower() for doc in documents)]
 		from gensim.corpora.dictionary import Dictionary
 		dictionary = Dictionary(articles)                  # articles is preprocessed and tokenized
 		dictionary.token2id                                # each token is given a unique id
