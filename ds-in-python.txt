@@ -418,20 +418,24 @@
 		sns.countplot(x/y         =  "categorical_column",       # x-vertical plot, y-horizontal plot
 					  hue         =  "categorical_column",
 					  data        =  df,
-					  order       =  ,                           # order of variable to plot - google
-					  hue_order   =  ,                           # order of hue variable     - google
+					  order       =  [],                         # order of variable to plot or list(df.categorical_column.value_counts().index)
+					  hue_order   =  [],                         # order of hue variable - google
 					  color       =  "",                         # single color for whole plot
 					  palette     =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
 					  saturation  =  1.0,                        # saturation of the plot
 					  dodge       =  True                        # dodge or stack
 		)
+		for patch in ax.patches:
+		    x=patch.get_bbox().get_points()[:,0]
+    		y=patch.get_bbox().get_points()[1,1]
+    		ax.annotate("{}%".format(round(100*y/len(df), 1)), xy = (x.mean(), y), ha = "center", va = "bottom")
 
 		# bar plot
 		sns.barplot(x             =  "categorical_column",
 					y             =  "numeric_column",           # switch x and y to change plot orientation
 					hue           =  "categorical_column",
 					data          =  df,
-					order         =  ,                           # order of variable to plot - google
+					order         =  ,                           # order of variable to plot - google or plot using pd.DataFrame(groupby("categorical_column").numeric_column.function()) for ascending/descending ordered plot
 					hue_order     =  ,                           # order of hue variable     - google
 					ci            =  "sd",                       # confidence interval for error bar
 					color         =  "",                         # single color for whole plot
@@ -441,7 +445,6 @@
 					errwidth      =  1.5,                        # width of error bar
 					capsize       =  0.1,                        # size of caps of error bar
 					dodge         =  True,                       # dodge or stack
-
 		)
 
 		# violin plot
