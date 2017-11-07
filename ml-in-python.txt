@@ -743,6 +743,7 @@
 
 ### NLP
 
+		# preprocessing - lowercase -> stem -> tokenize -> remove stop words -> remove punctuation -> remove special characters
 		import re
 		pattern = r""
 		re.match(pattern, string)                          # look for the pattern from the start of the string
@@ -788,10 +789,38 @@
 
 		documents = ["doc1", "doc2", "doc3"]
 		articles = [word_tokenize(doc.lower() for doc in documents)]
+		
 		from gensim.corpora.dictionary import Dictionary
 		dictionary = Dictionary(articles)                  # articles is preprocessed and tokenized
-		dictionary.token2id                                # each token is given a unique id
-		corpus = [dictionary.doc2bow(article) for article in articles]
-		corpus[0][:10]                                     # print first 10 word ids from first document
 		
+		# get token id
+		dictionary.token2id                                # return all tokens with their respective ids
+		token_id = dictionary.token2id,get("cars")         # return token id for "cars"
+
+		# get token using token id
+		dictionary.get(token_id)
+		
+		# create corpus
+		corpus = [dictionary.doc2bow(article) for article in articles]
+		corpus[0][:10]                                     # print first 10 word ids with their frequency from first document
+		doc = corpus[0]                                    # doc has word ids with their frequency for first document
+
+		# tf-idf
+		from gensim.models.tfidfmodel import TfidfModel
+		tfidf = TfidfModel(corpus)                         # train tfidf model on corpus
+		tfidf_weights = tfidf[doc]                         # get work_ids and their tfidf weight of a specific document
+		sorted_tfidf_weights = sorted(tfidf_weights, key=lambda w: w[1], reverse=True)  # sort according to tfidf weights
+
+		for term_id, weight in sorted_tfidf_weights[:5]:
+		    print(dictionary.get(term_id), weight)         # top five words with their tf-idf value
+
+		# named entity recognotition (NER) using spacy
+		import spacy
+		nlp = spacy.load("en")                             # load english corpus
+		npl.entity                                         # 
+		doc = nlp("sample text")                           # NER
+		doc.ents                                           # look at entities
+		for ent in doc.ents:
+    		print(ent.text, ent.label_)                    # look at entities and their labels
+
 ==============================================================================================================================
