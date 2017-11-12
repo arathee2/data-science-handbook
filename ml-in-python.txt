@@ -766,7 +766,7 @@
 		Then compare y_train with y_pred_train and y_test with y_pred_test.
 		"""
 
-		# reshape data - [n_rows, time steps, n_cols] or [n_rows, n_cols, time steps] for time series data
+		# reshape data - [n_samples, time_steps, input_dim] for time series data - input_dim can be n_cols
 		X_train = X_train.reshape((n_rows, time_steps, n_cols))
 		X_test = X_test.reshape((n_rows, time_steps, n_cols))
 
