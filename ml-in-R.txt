@@ -588,14 +588,26 @@
 		colSums(is.na(data_frame))*100/nrow(data_frame)
 		sapply(data_frame, function(x) sum(is.na(x))*100/length(x))
 
-		library("mice")
+		library("Hmisc")
+		df_imputed <- aregImpute(~ x1 + x2 + x3, data = data_frame, n.impute = 5)
+		df_imputed
+		df_imputed$imputed$x1
+
+		library("missForest")
+		df_imputed <- missForest(data_frame)
+		df_imputed$ximp
 		
+		library("mice")
+		md.pattern(data_frame)
+
 		set.seed(10)
 		imputed <- complete(mice(data_frame))
 		data_frame$var <- imputed$var
 
 		library(DMwR)
 		inputData <- knnImputation(inputData)
+
+		knn.impute(data, k = 10, cat.var = 1:ncol(data), to.impute = 1:nrow(data), using = 1:nrow(data))
 
 ==============================================================================================================================
 

@@ -767,6 +767,7 @@
 		"""
 
 		# reshape data - [n_samples, time_steps, input_dim] for time series data - input_dim can be n_cols
+		# play with time_steps and input_dim values but time_stepsxinput_dim must be constant in every case
 		X_train = X_train.reshape((n_rows, time_steps, n_cols))
 		X_test = X_test.reshape((n_rows, time_steps, n_cols))
 
@@ -776,12 +777,12 @@
 		from keras.layers import LSTM
 
 		model = Sequential()
-		model.add(LSTM(units                   =   n_cells,            # number of LSTM cells aka neurons
-					   activation              =   "",
-					   recurrent_activation    =   "",                 # activation to use for the recurrent step
-					   input_shape             =   time_steps,         # not sure if this is required if LSTM is first layer
-					   dropout                 =   0.2,                # dropout at input for each cell of LSTM
-					   recurrent_dropout       =   0.1                 # dropout at output for each cell of LSTM
+		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
+					   activation            =   "",
+					   recurrent_activation  =   "",                   # activation to use for the recurrent step
+					   input_shape           =   (time_steps, n_cols), # specify input shape if LSTM is the first layer
+					   dropout               =   0.2,                  # dropout at input for each cell of LSTM
+					   recurrent_dropout     =   0.1                   # dropout at output for each cell of LSTM
 		))
 		model.add(Dense(1))
 
@@ -792,12 +793,12 @@
 		model.add(LSTM(units = n_cells, activation = ""))
 		model.add(Dense(1))
 
-		# stateful LSTM
+		# stateful LSTM - mention batch shape, reset state after each epoch, don't shuffle data and evaluate/predict in same batches
 		batch_input_shape = (batch_size, time_steps, n_cols)
-		model.add(LSTM(units                   =   n_cells,            # number of LSTM cells aka neurons
-					   activation              =   ,
-					   batch_input_shape       =   batch_input_shape,  # add this to each LSTM layer in case of stateful LSTM
-					   stateful                =   True                # statefulness set to True
+		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
+					   activation            =   ,
+					   batch_input_shape     =   batch_input_shape,    # add this to each LSTM layer in case of stateful LSTM
+					   stateful              =   True                  # statefulness set to True
 		))
 		model.add(Dense(1))
 
@@ -836,7 +837,7 @@
 
 		model = Sequential()
 		model.add(Embedding(input_dim = vocab_size, output_dim = 32, input_length = max_review_length))
-		model.add(Convolution1D(filters = 32, kernel_size = 3))  # same parameters as Convolution2D
+		model.add(Convolution1D(filters = 32, kernel_size = 3))        # same parameters as Convolution2D
 		model.add(MaxPooling1D(pool_size = 2)
 		model.add(LSTM(100))
 		model.add(Dense(1))
