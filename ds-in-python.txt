@@ -755,7 +755,7 @@
 		lambda variables: operations                  # return result of operation
 		square = lambda x: x**2                       # return square of x
 
-		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract reults by list(map())
+		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
 		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
 		from functools import reduce
 		reduce(function, sequence)                    # returns a single value unlike map() and filter()
@@ -850,10 +850,6 @@
 
 ### data cleaning
 
-		df.column.str[0]                              # extract first letter from df.column
-		df.column.str.split("_")                      # split column on "_"
-		df.column.str.get(0)                          # get 0th item from each value of the column
-
 		# importing files from current directory
 		import glob
 		files = glob.glob("*.csv")                    # return list of all csv file names from current working directory
@@ -871,6 +867,34 @@
 		re.findall("pattern", "string")               # return all matched patterns
 		df.column.replace(",", ";")                   # replace "," with ";" 
 		df.column.str.contains("pattern")             # return True if pattern found in column
+
+		# pandas string methods
+		s = pd.Series(['a_b_c', 'B', 'C', 'Aaba', ' Baca ', np.nan, 'CABA', 'dog', 'cat'])
+		
+		s.str.get(0)                                  # get first element from each string
+		s.str[0]                                      # get first element from each string
+		
+		s.str.lower()
+		s.str.upper()
+		
+		s.str.len()
+		
+		s.str.strip()
+		s.str.lstrip()
+		s.str.rstrip()
+		
+		s.str.split("_", expand=False)                # split "a_b_c" to [a, b, c]. Refer documentation for more functionality.
+		s.str.rsplit("_")                             # same as split but works in reverse direction i.e. from end to start of a string
+		
+		s.str.replace(pattern, "custom_string")       # replace pattern with "custom_string"
+
+		pattern = r'[0-9][a-z]'
+		s.str.contains(pattern, na=False)             # return True if string is "12N4" because "2N" is inside "12N4"
+		s.str.match(pattern, na=False)                # return True if the string is "2N" i.e. exact match
+
+		s.str.find(pattern, start=0, end=None)        # return lowest index where the substring is fully contained between [start:end]
+
+		s.str.join("_")                               # join on whitespaces using "_"
 
 		# To remove $ sign from the column
 		df.amount.apply(lambda x: x.replace("$", ""))
