@@ -368,7 +368,7 @@
 		trellis.par.set(caretTheme())
 		plot(algo.model, metric = "Accuracy")  # look at ?plot.train
 
-		algo.predict <- predict.train(algo.model, cv, type = "class or prob")
+		algo.predict <- predict.train(algo.model, cv, type = "raw/prob")
 		confusionMatrix(algo.predict, cv$target, mode = "prec_recall", positive = "class_name")
 
 		imp <- varImp(algo.model)
