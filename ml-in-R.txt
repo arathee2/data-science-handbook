@@ -568,7 +568,9 @@
 		set.seed(4)
 		down_train <- downSample(x = train[, -ncol(train)], y = train$target)  # ncol(train) - column number of target variable
 		up_train <- upSample(x = train[, -ncol(train)], y = train$target)
+		
 		OR
+		
 		algo.control = trainControl(method = "cv", 
 									number = 5,
 									classProbs = T,
@@ -577,7 +579,6 @@
 									allowParallel = T,
 									sampling = "up/down/smote/rose"
 									)
-
 
 ==============================================================================================================================
 

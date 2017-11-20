@@ -307,7 +307,16 @@
 		accuracy_score(y_test, y_pred)
 
 		from sklearn.metrics import confusion_matrix
-		confusion_matrix(y_test, y_pred)
+		cm = confusion_matrix(y_test, y_pred)
+		def print_accuracy(cm):
+			tn = cm[0][0]
+			fp = cm[0][1]
+			fn = cm[1][0]
+			tp = cm[1][1]
+			sensitivity = tp/(tp+fn)
+			specificity = tn/(tn+fp)
+			accuracy = (tp+fn)/(tn+fp+fn+tp)
+			print(pd.DataFrame({"Accuracy": [accuracy], "Sensitivity": [sensitivity], "Specificity": [specificity]}))
 
 		from sklearn.metrics import classification_report
 		classification_report(y_test, y_pred)
