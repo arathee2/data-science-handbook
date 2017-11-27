@@ -110,7 +110,10 @@
 		# logistic regression
 		from sklearn.linear_model import LogisticRegression
 		from sklearn.feature_selection import RFE
-		model = LogisticRegression()
+		model = LogisticRegression(penalty  =  "l2",
+								   C        =  1.0,
+								   verbose  =  1
+		)
 		# rfe = RFE(model, n)                              # recursive feature elimination. select top n features
 		# fit = rfe.fit(X_train, y_train)
 		# print(fit.n_features_, fit.support_, fit.ranking_)
@@ -141,15 +144,15 @@
 		# decision tree
 		from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
 		import graphviz
-		model = DecisionTreeClassifier(criterion  = "gini/entropy",
-									   max_depth  = ,
-									   min_samples_split = ,
-									   min_samples_leaf = ,
-									   max_features = ,
-									   max_leaf_nodes = ,
+		model = DecisionTreeClassifier(criterion         =  "gini/entropy",
+									   max_depth         =  ,
+									   min_samples_split =  ,
+									   min_samples_leaf  =  ,
+									   max_features      =  ,
+									   max_leaf_nodes    =  ,
 									   min_impurity_decrease = ,
-									   class_weight = "balanced",
-									   presort = "True"                   # faster training when daset is small
+									   class_weight      =  "balanced",
+									   presort           =  "True"        # faster training when dataset is small
 				)
 		model = DecisionTreeRegressor()  # same parameters as DecisionTreeClassifier()
 		model.fit(X_train, y_train)
