@@ -891,6 +891,13 @@
 		word_frequencies = Counter(word_tokenize(string))  # return the word along with their count
 		print(word_frequencies.most_common(5))             # return the top 5 words occuring in the string
 
+		from sklearn.feature_extraction.text import CountVectorizer
+		vectorizer = CountVectorizer()
+		documents = ["doc1", "doc2", "doc3"]
+		X = vectorizer.fit_transform(documents) 
+		print(X.toarray())
+		print(vectorizer.get_feature_names())
+
 		# text preprocessing
 		from nltk.corpus import stopwords
 		alpha_only = [t for t in word_tokenize(text.lower()) if t.isalpha()]    # return lowercase alphabetic token
