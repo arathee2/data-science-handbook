@@ -859,15 +859,6 @@
 ### NLP
 
 		# preprocessing - lowercase -> stem -> tokenize -> remove stop words -> remove punctuation -> remove special characters
-		import re
-		pattern = r""
-		re.match(pattern, string)                          # look for the pattern from the start of the string
-		match.start(); match.end()
-		re.search(pattern, string)                         # look for the pattern in the whole string and returns the first occurence
-		re.findall(pattern, string)                        # look for and returns all the occurences of patterns present in the string
-		re.split(pattern, string)                          # split the string at given pattern
-		re.sub(pattern, repl, string)                      # replace first occurence of pattern by repl in the string
-
 		from nltk.tokenize import word_tokenize
 		word_tokenize(string, pattern)                     # tokenize string into words
 

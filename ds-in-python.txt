@@ -104,6 +104,10 @@
 		pd.get_options("display.max_rows")
 		pd.reset_options("display.max_columns")
 		
+		# importing files from current directory
+		import glob
+		files = glob.glob("*.csv")                    # return list of all csv file names from current working directory
+
 		# read data
 		df = pd.read_csv(file_name,
 						 sep          =   ,         # character that seprates different values in the file
@@ -162,7 +166,8 @@
 		from pandas.tools.plotting import scatter_matrix
 		scatter_matrix(df)
 		
-
+		df.column.astype(str/"category")              # change column to string/categorical variable
+		pd.to_numeric(df.column, errors = "coerce")   # change column to numeric
 		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
 		
 		df.index = index_variable                   # index variable must be equal to the number of rows in the dataframe
@@ -308,6 +313,9 @@
 		column_names_bool = list(df.columns.map(lambda x: bool(re.search(pattern, x))))
 		column_names = list(df.columns[column_names_bool])
 		new_df = df.loc[:, column_names]
+
+		# write csv
+		df.to_csv("filename.csv", sep = )
 
 ==============================================================================================================================
 
@@ -745,7 +753,7 @@
 				print(param)
 		function_name(1, 2, "hi")
 
-		def functions_name(**kwargs):                 # keyword args
+		def function_name(**kwargs):                 # keyword args
 		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
 			for key, value in kwargs.items():
 				print(str(key) + ":" + str(value))
@@ -782,7 +790,7 @@
 		for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
 
 		# list comprehension
-		squares = [num**2 for num in range(5)]        # produce a list of squares of 1 through 5
+		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
 		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
 		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
 		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
@@ -839,35 +847,50 @@
 
 ==============================================================================================================================
 
-### web scraping
+### regular expressions
 
-		from urllib.request import urlretrieve
-		urlretrieve("url", "filename.csv")            # save url file to csv
-
-		pd.read_csv("url", sep = )
-		pd.read_excel("url", sheetname = None)        # read all sheets of excel file from url as a dictionary with sheet names as keys
+		# strings
+		string = ""
+		string.lower(); string.upper()
+		string.strip(); string.lstrip(); string.rstrip()   # strip whitespace
+		split_result = string.split(".")                   # return list of substrings separated by "."
+		".".join(split_result)                             # join list items using "."
 		
-==============================================================================================================================
+		"amandeep" + " rathee" == "amandeep rathee"        # concatenate strings
+		"yo"*3                                             # return "yoyoyo"
 
-### data cleaning
+		# quote preference - ' ' < " " < ''' ''' < """ """
+		print('What\'s up?') # escaping ' using \'
+		print("What's up?")  # ' ' < " "
+		print('''What's up "Jim"?''')  # " " < ''' '''
+		print("""What'''s''' up?""")  # ''' ''' < """ """
 
-		# importing files from current directory
-		import glob
-		files = glob.glob("*.csv")                    # return list of all csv file names from current working directory
-
-		df.dtypes                                     # get types of each column of dataframe
-		df.column.astype(str/"category")              # change column to string/categorical variable
-		pd.to_numeric(df.column, errors = "coerce")   # change column to numeric
-
-		# string matching
-		## to extract "I have $1767.89 and that"s a lot of money", use - "^\$[0-9]*\.[0-9]{2}$"
+		# regular expressions
 		import re
-		pattern = re.compile("^\$[0-9]*\.[0-9]{2}$")
-		result = pattern.match("I have $1767.89 and that is a lot of money!")
-		re.split(pattern, string)                     # split string at given pattern
-		re.findall("pattern", "string")               # return all matched patterns
-		df.column.replace(",", ";")                   # replace "," with ";" 
-		df.column.str.contains("pattern")             # return True if pattern found in column
+		pattern = r""
+		result = re.match(pattern, string)                 # return None is pattern not found at the very start of string
+		result.group()                                     # return match result
+		result.start(); result.end()                       # return start and end index of the string where pattern was found
+		
+		result = re.search(pattern, string)                # look for the pattern in the whole string and returns the first occurence
+		result.group()
+
+		result = re.findall(pattern, string)               # return list all the occurences of patterns present in the string
+		result[0]
+
+		# group matching
+		# write a pattern for the thing you are looking for, adding parenthesis groups to extract the parts you want.
+		# group matching can be used with re.match(), re.search() and re.findall()
+		result = re.search("([a-zA-Z.0-9]+)(@)([a-zA-Z.]+)", "user.name123@gmail.com")
+		result.group()                                     # return user.name123@gmail.com
+		result.group(1)                                    # return "user.name123"
+		result.group(2)                                    # return "@"
+		result.group(3)                                    # return "gmail.com"
+
+		re.split(pattern, string)                          # split the string at given pattern
+		
+		re.sub(pattern, replacement, string)               # replace first occurence of pattern by repl in the string
+
 
 		# pandas string methods
 		s = pd.Series(['a_b_c', 'B', 'C', 'Aaba', ' Baca ', np.nan, 'CABA', 'dog', 'cat'])
@@ -887,26 +910,29 @@
 		s.str.split("_", expand=False)                # split "a_b_c" to [a, b, c]. Refer documentation for more functionality.
 		s.str.rsplit("_")                             # same as split but works in reverse direction i.e. from end to start of a string
 		
+		s.str.join("_")                               # join on whitespaces using "_"
+
 		s.str.replace(pattern, "custom_string")       # replace pattern with "custom_string"
 
 		pattern = r'[0-9][a-z]'
-		s.str.contains(pattern, na=False)             # return True if string is "12N4" because "2N" is inside "12N4"
 		s.str.match(pattern, na=False)                # return True if the string is "2N" i.e. exact match
-
+		s.str.contains(pattern, na=False)             # return True if string is "12N4" because "2N" is inside "12N4"
 		s.str.find(pattern, start=0, end=None)        # return lowest index where the substring is fully contained between [start:end]
 
-		s.str.join("_")                               # join on whitespaces using "_"
+		# recommended: use re inside lambda functions while doing complicated regex tasks
+		df.amount.apply(lambda x: x.find(patter))
+		df.amount.apply(lambda x: re.findall(pattern, x)[0])  # if [0] is not used result will be [result] instead of `result`
 
-		# To remove $ sign from the column
-		df.amount.apply(lambda x: x.replace("$", ""))
-		df.amount.apply(lambda x: re.findall("\d+\.\d+", x)[0])  # if [0] is not used result will be [28.45] instead of 28.45
+==============================================================================================================================
 
-		# assert
-		assert condition                              # if condition is true, do nothing, if false, throw error
+### web scraping
 
-		# write csv
-		df.to_csv("filename.csv", sep = )
+		from urllib.request import urlretrieve
+		urlretrieve("url", "filename.csv")            # save url file to csv
 
+		pd.read_csv("url", sep = )
+		pd.read_excel("url", sheetname = None)        # read all sheets of excel file from url as a dictionary with sheet names as keys
+		
 ==============================================================================================================================
 
 ### time series with pandas
