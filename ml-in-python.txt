@@ -872,7 +872,7 @@
 		tokenizer = TweetTokenizer()
 		tokenizer.tokenize(string)
 
-		# plot word count
+		# plot word lengths
 		words = [word_tokenize(line) for line in book]     # return list of words of the entire book
 		word_lengths = [len(word) for word in words]       # return word length of each word
 		plt.hist(word_lengths)

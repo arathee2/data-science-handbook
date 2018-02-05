@@ -100,13 +100,13 @@
 	import pandas as pd
 
 		# print options
-		pd.set_option("display.max_columns", 20)  # set display limit to all columns
+		pd.set_option("display.max_columns", 20)    # set display limit to all columns
 		pd.get_options("display.max_rows")
 		pd.reset_options("display.max_columns")
 		
 		# importing files from current directory
 		import glob
-		files = glob.glob("*.csv")                    # return list of all csv file names from current working directory
+		files = glob.glob("*.csv")                  # return list of all csv file names from current working directory
 
 		# read data
 		df = pd.read_csv(file_name,
@@ -175,11 +175,9 @@
 		df.columns
 		df.columns.name
 		
-		# conditions
+		# filtering
 		df[df.age > 10]
 		df[df.age == df.age.max()]
-
-		# filtering
 		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
 		df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
 		df[df.name == "Aman" | df.name = "Arjun"]      # return Aman and Arjun both
