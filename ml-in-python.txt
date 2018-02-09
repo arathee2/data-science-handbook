@@ -896,7 +896,12 @@
 
 		from nltk.stem import WordNetLemmatizer
 		wordnet_lemmatizer = WordNetLemmatizer()
-		lemmatized = [wordnet_lemmatizer.lemmatize(t) for t in no_stops]
+		lemmatized = [wordnet_lemmatizer.lemmatize(word) for word in no_stops]
+
+		from nltk.stem.porter import PorterStemmer
+		stemmer = PorterStemmer()
+		stemmed = [stemmer.stem(word) for word in lemmatized]
+
 
 	## gensim - create bag of words
 
