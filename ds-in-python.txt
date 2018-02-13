@@ -705,7 +705,7 @@
 	        ('jane', 'B', 12),
     	    ('dave', 'B', 10),
         ]
-        sorted(student_tuples, key=lambda student: student[2], reverse=False)  # sort by age
+        sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age
 
 		# if-else condition
 		if condition:
