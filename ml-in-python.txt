@@ -890,17 +890,18 @@
 		print(vectorizer.get_feature_names())
 
 		# text preprocessing
+		alpha_only = [word for word in words if word.isalpha()]    # return lowercase alphabetic token
+		
 		from nltk.corpus import stopwords
-		alpha_only = [t for t in word_tokenize(text.lower()) if t.isalpha()]    # return lowercase alphabetic token
-		no_stops = [t for t in tokens if t not in stopwords.words("english")]   # remove stop words
-
+		no_stops = [word for word in words if word not in stopwords.words("english")]   # remove stop words
+		
 		from nltk.stem import WordNetLemmatizer
-		wordnet_lemmatizer = WordNetLemmatizer()
+		lemmatizer = WordNetLemmatizer()
 		lemmatized = [wordnet_lemmatizer.lemmatize(word) for word in no_stops]
 
 		from nltk.stem.porter import PorterStemmer
 		stemmer = PorterStemmer()
-		stemmed = [stemmer.stem(word) for word in lemmatized]
+		stemmed = [stemmer.stem(word) for word in no_stops]
 
 
 	## gensim - create bag of words
