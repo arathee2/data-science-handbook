@@ -104,6 +104,8 @@
 		pd.get_options("display.max_rows")
 		pd.reset_options("display.max_columns")
 		
+		pd.set_option("max_colwidth", 20)
+
 		# importing files from current directory
 		import glob
 		files = glob.glob("*.csv")                  # return list of all csv file names from current working directory
