@@ -1,81 +1,135 @@
 
-### scikit-learn
+#### scikit-learn
 
-	## supervised learning
+	### supervised learning
 
-		# make artificial dataset
-		from sklearn.datasets import make_classification
-		X, y = make_classification(n_samples = , n_features = ,
-								   n_informative = , n_redundant = ,
-								   n_repeated = , random_state = ,
-								   weights = [0.5, 0.5]
-			   )
+		## get X and y
 
-		# divide data into X and y
-		X = df.drop("target_column", axis = 1).values
-		y = df.target_column.values
-		
-		# encode class values as integers
-		from sklearn.preprocessing import LabelEncoder
-		encoder = LabelEncoder()
-		encoder.fit(y)
-		encoder.classes_
-		encoded_y = encoder.transform(y)
-		y = encoder.inverse_transform(encoded_y)
+			# make artificial dataset
+			from sklearn.datasets import make_classification
+			X, y = make_classification(n_samples = , n_features = ,
+									   n_informative = , n_redundant = ,
+									   n_repeated = , random_state = ,
+									   weights = [0.5, 0.5]
+				   )
 
-		# split data into train and test
-		from sklearn.model_selection import train_test_split
-		X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 4, stratify = y)
-		
-		# cross validation
-		from sklearn.model_selection import KFold
-		from sklearn.model_selection import StratifiedKFold  # useful in case of imbalanced class
-		from sklearn.model_selection import LeaveOneOut
-		from sklearn.model_selection import ShuffleSplit     # multiple train/test sets
-		from sklearn.model_selection import cross_val_score
-		
-		folds = KFold(n_splits = 5, shuffle = True, random_state = 4)
-		folds = StratifiedKFold(n_splits = 5, shuffle = True, random_state = 4)
-		folds = LeaveOneOut()
-		folds = ShuffleSplit(n_splits = 5, test_size = 0.3, random_state = 4)
+			# divide data into X and y
+			X = df.drop("target_column", axis = 1).values
+			y = df.target_column.values
+			
+			# encode class values as integers
+			from sklearn.preprocessing import LabelEncoder
+			encoder = LabelEncoder()
+			encoder.fit(y)
+			encoder.classes_
+			encoded_y = encoder.transform(y)
+			y = encoder.inverse_transform(encoded_y)
 
-		score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
-		cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)  # pass model/pipeline after instantiating it
-		cv_results.mean()*100
-		cv_results.std()*100
+		## preprocess: sklearn-pandas pipeline
 
-		# manual cross validation
-		for train_index, test_index in folds.split(X_train, y_train):
-			model.fit(X_train[train_index], y_train[train_index])
-			y_pred = model.predict(X_train[test_index])
-			model.score(X_train[test_index], y_train[test_index])
+			# divide dataframe into predictors and target
+			X = df.drop("target_column", axis = 1)
+			y = df.target_column
 
-		# hyperparameter tuning
-		from sklearn.model_selection import GridSearchCV
-		from sklearn.model_selection import RandomizedSearchCV
-		params = {"parameter_name": [parameter_values]}
-		
-		model_cv = GridSearchCV(estimator   = model,       # pass model/pipeline after instantiating it
-								param_grid  = params,
-								scoring     = score,
-								cv          = folds,
-								verbose     = 1            # the higher, the more messages
-					)
-		
-		model_cv = RandomizedSearchCV(estimator             = model,
-									  param_distributions   = params,
-									  n_iter                = 100,
-									  scoring               = score,
-									  cv                    = folds,
-									  verbose               = 1,
-									  random_state          = 4
-					)
-		model_cv.fit(X_train, y_train)                     # search takes place here
-		model_cv.cv_results_
-		model_cv.best_score_
-		model_cv.best_params_
+			# drop na observations if possible
 
-	## models
+			# 1. basic preprocessing - impute and scale numeric features, impute and encode categorical features
+			from sklearn_pandas import DataFrameMapper
+			from sklearn_pandas import CategoricalImputer
+			preprocess = DataFrameMapper([
+	        	(['num_var_1'], [Imputer(), StandardScaler()]),
+	        	(['num_var_2'], [Imputer(), StandardScaler()]),
+	        	(['cat_var_1'], [CategoricalImputer(), LabelEncoder()]),
+	        	(['cat_var_2'], [CategoricalImputer(), LabelEncoder()])],
+	        df_out=True)
+			
+			preprocess.fit(X)
+			X = preprocess.transform(X)
+			X = X.apply(lambda column: column.astype(np.float64))
+			
+			# 2. advance preprocessing - one hot encode some of the categorical variables
+			one_hot_encode = DataFrameMapper([
+	        	(['num_var_1'], None),
+	        	(['num_var_2'], None),
+	        	(['cat_var_1'], OneHotEncoder()),                # one hot encode variables with less categories
+	        	(['cat_var_2'], None)],                          # don't one hot encode variables with a lot of categories
+	    	df_out=True)
+
+			one_hot_encode.fit(X)
+			X = one_hot_encode.transform(X)
+
+			# preprocess y
+			from sklearn.preprocessing import LabelEncoder
+			encoder = LabelEncoder()
+			encoder.fit(y)
+			y = encoder.transform(y)
+
+			# when you get the test data in the future, just transform it using the basic and advance processing steps
+			test_predictors = preprocess.transform(test_predictors)
+			test_predictors = test_predictors.apply(lambda column: column.astype(np.float64))
+			test_predictors = one_hot_encode.transform(test_predictors)
+			test_target = encoder.fit(test_target)
+
+		## preprocess: sklearn pipeline
+
+			from sklearn.pipeline import Pipeline
+			from sklearn.pipeline import FeatureUnion
+			from sklearn.base import BaseEstimator, TransformerMixin
+			from sklearn.preprocessing import OneHotEncoder
+			from category_encoders import OrdinalEncoder
+
+			class DataFrameSelector(BaseEstimator, TransformerMixin):
+				def __init__(self, attribute_names):
+					self.attribute_names = attribute_names
+				def fit(self, X, y=None):
+					return self
+				def transform(self, X):
+					return X[self.attribute_names]
+
+			# divide dataframe into predictors and target
+			X = df.drop("target_column", axis = 1)
+			y = df.target_column
+
+			# preprocess X
+			num_attributes = []
+			cat_attributes = []
+
+			num_pipeline = Pipeline([
+							('selector', DataFrameSelector(num_attributes)),
+							('imputer', Imputer()),
+							('scaler', StandardScaler())
+						])
+ 
+			cat_pipeline = Pipeline([
+							('selector', DataFrameSelector(cat_attributes)),
+							('imputer', CustomImputer(strategy='mode')),
+							('label_encoder', OrdinalEncoder()),
+							('one_hot_encoder', OneHotEncoder())  # avoid this step if too much categories in a column
+						])
+
+			full_pipeline = FeatureUnion(transformer_list=[
+								("num_pipeline", num_pipeline),
+								("cat_pipeline", cat_pipeline)
+						])
+
+			full_pipeline.fit(X)
+			X = full_pipeline.transform(X)
+			
+			# preprocess y
+			from sklearn.preprocessing import LabelEncoder
+			encoder = LabelEncoder()
+			encoder.fit(y)
+			y = encoder.transform(y)
+
+			# when you get the test data in the future, just transform it using the pipeline
+			test_predictors = full_pipeline.transform(test)
+			test_target = encoder.fit(test_target)
+
+			# split data into train and test
+			from sklearn.model_selection import train_test_split
+			X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 4, stratify = y)
+			
+	### models
 
 		# linear regression
 		from sklearn.linear_model import LinearRegression
@@ -266,258 +320,343 @@
 
         # voting ensemble
         from sklearn.ensemble import VotingClassifier
-        estimators = []
-        estimators.append(("knn", KNeighborsClassifier()))
-        estimators.append(('cart', DecisionTreeClassifier()))
-        estimators.append(('svm', SVC()))
-        ensemble = VotingClassifier(estimators)
-        cv_results = cross_val_score(ensemble, X_train, y_train, cv = folds, scoring = score)
+        estimators = [
+        			("knn", KNeighborsClassifier()),
+        			('cart', DecisionTreeClassifier()),
+        			('svm', SVC())
+        ]
+        model = VotingClassifier(estimators)
+        cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
 
-    ## save/load model
-    	
-    	# the python version and library versions almost certainly need to be the same while loading a saved model
+	    ## save/load model
+	    	
+	    	# the python version and library versions almost certainly need to be the same while loading a saved model
 
-        # save model to disk
-        from pickle import dump
-        dump(model, open("filename.sav", 'wb'))
+	        # save model to disk
+	        from pickle import dump
+	        dump(model, open("filename.sav", 'wb'))
 
-        from sklearn.externals.joblib import dump
-        dump(model, "filename.sav")
+	        from sklearn.externals.joblib import dump
+	        dump(model, "filename.sav")
 
-        # load model from disk
-        from pickle import load
-        model = load(open("filename.sav", 'rb'))
-        
-        from sklearn.externals.joblib import load
-        model = load("filename.sav")
+	        # load model from disk
+	        from pickle import load
+	        model = load(open("filename.sav", 'rb'))
+	        
+	        from sklearn.externals.joblib import load
+	        model = load("filename.sav")
 
-	## evaluate model performance
+	### model evaluation
 
-		# return default metric
-		model.score(X_test, y_test)                     # return accuracy/r-squared
-		
-		# regression
+			# return default metric
+			model.score(X_test, y_test)                     # return accuracy/r-squared
+			
+		## regression
 
-		from sklearn.metrics import r2_score
-		r2_score(y_test, y_pred)
+			from sklearn.metrics import r2_score
+			r2_score(y_test, y_pred)
 
-		from sklearn.metrics import mean_squared_error
-		mean_squared_error(y_test, y_pred)
+			from sklearn.metrics import mean_squared_error
+			mean_squared_error(y_test, y_pred)
 
-		# classification
+		## classification
 
-		from sklearn.metrics import accuracy_score
-		accuracy_score(y_test, y_pred)
+			from sklearn.metrics import accuracy_score
+			accuracy_score(y_test, y_pred)
 
-		from sklearn.metrics import confusion_matrix
-		cm = confusion_matrix(y_test, y_pred)
-		def print_accuracy(cm):
-			tn = cm[0][0]
-			fp = cm[0][1]
-			fn = cm[1][0]
-			tp = cm[1][1]
-			sensitivity = tp/(tp+fn)
-			specificity = tn/(tn+fp)
-			accuracy = (tp+fn)/(tn+fp+fn+tp)
-			print(pd.DataFrame({"Accuracy": [accuracy], "Sensitivity": [sensitivity], "Specificity": [specificity]}))
+			from sklearn.metrics import confusion_matrix
+			cm = confusion_matrix(y_test, y_pred)
+			def print_accuracy(cm):
+				tn = cm[0][0]
+				fp = cm[0][1]
+				fn = cm[1][0]
+				tp = cm[1][1]
+				sensitivity = tp/(tp+fn)
+				specificity = tn/(tn+fp)
+				accuracy = (tp+fn)/(tn+fp+fn+tp)
+				print(pd.DataFrame({"Accuracy": [accuracy], "Sensitivity": [sensitivity], "Specificity": [specificity]}))
 
-		from sklearn.metrics import classification_report
-		classification_report(y_test, y_pred)
+			from sklearn.metrics import classification_report
+			classification_report(y_test, y_pred)
 
-		from sklearn.metrics import roc_curve
-		y_pred_prob = model.predict_proba(X_test)[:, 0/1]  # return probabilites of class 0/1
-		fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
+			from sklearn.metrics import roc_curve
+			y_pred_prob = model.predict_proba(X_test)[:, 0/1]  # return probabilites of class 0/1
+			fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
 
-		from sklearn.metrics import roc_auc_score
-		y_pred_prob = model.predict_proba(X_test)[:, 0/1]
-		roc_auc_score(y_test, y_pred_prob)
+			from sklearn.metrics import roc_auc_score
+			y_pred_prob = model.predict_proba(X_test)[:, 0/1]
+			roc_auc_score(y_test, y_pred_prob)
 
-		from sklearn.metrics import log_loss
-		log_loss(y_test, y_pred)                           # see scikit-learn documentation
+			from sklearn.metrics import log_loss
+			log_loss(y_test, y_pred)                           # see scikit-learn documentation
 
-	## compare machine learning models
+		## cross validation
 
-		# prepare models
-		models = []
-		models.append(('LR', LogisticRegression()))
-		models.append(('CART', DecisionTreeClassifier()))
+			# create folds
+			from sklearn.model_selection import KFold
+			from sklearn.model_selection import StratifiedKFold  # useful in case of imbalanced class
+			from sklearn.model_selection import LeaveOneOut
+			from sklearn.model_selection import ShuffleSplit     # multiple train/test sets
+			from sklearn.model_selection import cross_val_score
+			
+			folds = KFold(n_splits = 5, shuffle = True, random_state = 4)
+			folds = StratifiedKFold(n_splits = 5, shuffle = True, random_state = 4)
+			folds = LeaveOneOut()
+			folds = ShuffleSplit(n_splits = 5, test_size = 0.3, random_state = 4)
 
-		OR
-		
-		models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('LR', LogisticRegression())])))
-		models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('CART', DecisionTreeClassifier())])))
+			# cross validation without hyperparameter tuning - select best model among different models
+			score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
+			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)  # pass model/pipeline after instantiating it
+			cv_results.mean()*100
+			cv_results.std()*100
 
-		# evaluate each model in turn
-		results = []
-		names = []
-		score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
-		for name, model in models:
-			folds = KFold(n_splits = 5, random_state = 4)
-			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
-			results.append(cv_results)
-			names.append(name)
-			print("{0} - {1} ({2})".format(name, cv_results.mean(), cv_results.std()))
-		
-		# boxplot algorithm comparison
-		fig = plt.figure()
-		fig.suptitle('Algorithm Comparison')
-		ax = fig.add_subplot(111)
-		plt.boxplot(results)
-		ax.set_xticklabels(names)
-		plt.show()
+			# manual cross validation
+			for train_index, test_index in folds.split(X_train, y_train):
+				model.fit(X_train[train_index], y_train[train_index])
+				y_pred = model.predict(X_train[test_index])
+				model.score(X_train[test_index], y_train[test_index])
 
-	## pre-processing
+			# hyperparameter tuning - select best hyperparameters of a model among different hyperparameters
+			from sklearn.model_selection import GridSearchCV
+			from sklearn.model_selection import RandomizedSearchCV
+			
+			params = {"parameter_name": [parameter_values]}
+			params = [
+					{'param_1': [1, 2], 'param_2':, [4, 5]},   # try all combinations - (1, 4), (1, 5), (2, 4) and (2, 5)
+					{'param_1': [1], 'param_2': [6, 7]}        # also try (1, 6) and (1, 7)  but not (2, 6) and (2, 7)
+			]
+			
+			# tuning hyperparameters while using pipeline
+			params = {'stepname__paramname': [parameter_values]}
+			
+			model_cv = GridSearchCV(estimator   = model,       # pass model/pipeline after instantiating it
+									param_grid  = params,
+									scoring     = score,
+									cv          = folds,
+									verbose     = 1            # the higher, the more messages
+						)
+			
+			model_cv = RandomizedSearchCV(estimator             = model,
+										  param_distributions   = params,
+										  n_iter                = 100,
+										  scoring               = score,
+										  cv                    = folds,
+										  verbose               = 1,
+										  random_state          = 4
+						)
+			model_cv.fit(X_train, y_train)                     # search takes place here
+			model_cv.cv_results_
+			model_cv.best_score_
+			model_cv.best_params_
 
-		# scale
-		from sklearn.preprocessing import scale
-		X_scaled = scale(X)
+		## compare machine learning models
 
-		# MinMaxScaler
-		from sklearn.preprocessing import MinMaxScaler
-		min_max_scaler = MinMaxScaler(feature_range=(0, 1)).fit(X_train)
-		X_train_scaled = min_max_scaler.transform(X_train)
-		X_test_scaled = min_max_scaler.transform(X_test)
+			# prepare models
+			models = []
+			models.append(('LR', LogisticRegression()))
+			models.append(('CART', DecisionTreeClassifier()))
 
-		# StandardScaler (0-mean, 1-standard deviation)
-		from sklearn.preprocessing import StandardScaler
-		standard_scaler = StandardScaler().fit(X_train)
-		X_train_scaled = standard_scaler.transform(X_train)
-		X_test_scaled = standard_scaler.transform(X_test)
+			OR
+			
+			models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('LR', LogisticRegression())])))
+			models.append(('LR', Pipeline([('Scaler', StandardScaler()), ('CART', DecisionTreeClassifier())])))
 
-		# Normalizer - useful when data is sparse with lots of zeros
-		from sklearn.preprocessing import Normalizer
-		normalizer = Normalizer().fit(X_train)
-		X_train_scaled = normalizer.transform(X_train)
-		X_test_scaled = normalizer.transform(X_test)
+			# evaluate each model in turn
+			results = []
+			names = []
+			score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
+			for name, model in models:
+				folds = KFold(n_splits = 5, random_state = 4)
+				cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
+				results.append(cv_results)
+				names.append(name)
+				print("{0} - {1} ({2})".format(name, cv_results.mean(), cv_results.std()))
+			
+			# boxplot algorithm comparison
+			fig = plt.figure()
+			fig.suptitle('Algorithm Comparison')
+			ax = fig.add_subplot(111)
+			plt.boxplot(results)
+			ax.set_xticklabels(names)
+			plt.show()
 
-		# binarizer - convert all values above the threshold to 1 and all values below the threshold to 0
-		from sklearn.preprocessing import Binarizer
-		binarizer = Binarizer(threshold=0.5).fit_transform(X)
+	### preprocessing techniques
 
-		# pipeline - scale and model
-		from sklearn.preprocessing import StandardScaler   # google - preprocessing types in scikit-learn
-		steps = [("scaler", StandardScaler()),
-				 ("model_name", model)]
-		pipeline = Pipeline(steps)
-		pipeline.fit(X_train, y_train)                     # pipeline can be passed to GridSearchCV() instead of directly fitting
-		y_pred = pipeline.predict(X_test)
+		## impute missing values
 
-		# handling missing values
+			# Imputer - for numeric columns
+			from sklearn.preprocessing import Imputer
+			imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
+			imputer.fit(X_train)
+			X_train = imputer.transform(X_train)
+			X_test = imputer.transform(X_test)
 
-		from sklearn.preprocessing import Imputer
-		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
-		imputer.fit(X)
-		X = imputer.transform(X)                           # return imputed dataframe
+			# CustomImputer - for numeric as well as categorical columns
+			from sklearn.base import BaseEstimator, TransformerMixin
+			class CustomImputer(BaseEstimator, TransformerMixin):
+				def __init__(self, strategy='mode', filler='NA'):
+			    	self.strategy = strategy
+			    	self.fill = filler
 
-		# pipeline - imputing and modelling in one go
-		from sklearn.pipeline import Pipeline              # alternative - import make_pipeline
-		imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
-		steps = [("imputer", imputer),
-				 ("model_name", model)]
-		pipeline = Pipeline(steps)
-		pipeline.fit(X_train, y_train)
-		y_pred = pipeline.predict(X_test)
+				def fit(self, X, y=None):
+					if self.strategy in ['mean','median']:
+						if not all(X.dtypes == np.number):
+							raise ValueError('dtypes mismatch np.number dtype is \
+			                                 required for '+ self.strategy)
+					if self.strategy == 'mean':
+						self.fill = X.mean()
+					elif self.strategy == 'median':
+						self.fill = X.median()
+					elif self.strategy == 'mode':
+						self.fill = X.mode().iloc[0]
+					elif self.strategy == 'fill':
+						if type(self.fill) is list and type(X) is pd.DataFrame:
+							self.fill = dict([(cname, v) for cname,v in zip(X.columns, self.fill)])
+					return self
 
-	## NLP
+				def transform(self, X, y=None):
+					return X.fillna(self.fill)
 
-		# CountVectorizer() creates tokens, builds vocabulary and counts frequency of each word
-		from sklearn.feature_extraction.text import CountVectorizer           # for large text datasets, use HashingVectorizer
-		word_vector = CountVectorizer(token_pattern = "", ngram_range = (1))  # split tokens based on given pattern
-		word_vector.fit(df.text_column)                    # learn vocabulary from the given Series
-		word_vector.transform(df.text_column)              # create document term matrix
-		word_vector.fit_transform(df.text_column)          # fit and transform in one go
+			imputer = CustomImputer(strategy = "mean/median/mode")
+			imputer.fit(X_train)                           # use this imputer on numeric and categorical columns separately
+			X_train = imputer.transform(X_train)
+			X_test = imputer.transform(X_test)
 
-		# combining text and numeric pipelines for them to be ready for final common pipeline
-		from sklearn.preprocessing import FunctionTransformer
-		from sklearn.feature_selection import chi2, SelectKBest
-		from sklearn.preprocessing import SparseInteractions
+		## scale
 
-		get_text_data = FunctionTransformer(lambda x: x.text_column, validate = False)  # validate checks for NaN values
-		get_numeric_data = FunctionTransformer(lambda x: x.numeric_column, validate = False)
+			# stanadard scaler - not to be used in machine learning pipelines
+			from sklearn.preprocessing import scale
+			X_scaled = scale(X)
 
-		numeric_pipeline = Pipeline([
-						       ("selector": get_numeric_data),
-						       ("imputer": Imputer())
-						   ])
+			# MinMaxScaler
+			from sklearn.preprocessing import MinMaxScaler
+			min_max_scaler = MinMaxScaler(feature_range=(0, 1))
+			min_max_scaler.fit(X_train)
+			X_train_scaled = min_max_scaler.transform(X_train)
+			X_test_scaled = min_max_scaler.transform(X_test)
 
-		text_pipeline = Pipeline([
-							("selector": get_text_data),
-							("vectorizer": CountVectorizer()),
-							("dim_red": SelectKBest(chi2, 100))  # select 100 best features using chi-squared test
-						])
+			# StandardScaler (0-mean, 1-standard deviation)
+			from sklearn.preprocessing import StandardScaler
+			standard_scaler = StandardScaler()
+			standard_scaler.fit(X_train)
+			X_train_scaled = standard_scaler.transform(X_train)
+			X_test_scaled = standard_scaler.transform(X_test)
 
-		from sklearn.pipeline import FeatureUnion
-		union = FeatureUnion([
-					("numeric": numeric_pipeline),
-					("text": text_pipeline)
-				])
+			# Normalizer - useful when data is sparse with lots of zeros
+			from sklearn.preprocessing import Normalizer
+			normalizer = Normalizer()
+			normalizer.fit(X_train)
+			X_train_scaled = normalizer.transform(X_train)
+			X_test_scaled = normalizer.transform(X_test)
 
-		final_pipeline = Pipeline([
-						 	("union": union),
-						 	('int', SparseInteractions(degree=2)),
-						 	("scale": MaxAbsScaler()),
-						 	("model": model)
-						 ])
+		## encode categorical values
 
-		final_pipeline.fit(X_train, y_train)
+			# LabelEncoder
+			from sklearn.preprocessing import LabelEncoder
+			label_encoder = LabelEncoder()
+			label_encoder.fit(X_train_subset)
+			X_train_subset = label_encoder.transform(X_train_subset)
+			X_test_subset = label_encoder.transform(X_test_subset)
 
-	## unsupervised learning
+			# OneHotEncoder - only works with numeric data
+			from sklearn.preprocessing import OneHotEncoder
+			one_hot_encoder = OneHotEncoder()
+			one_hot_encoder.fit(X_train_subset)
+			X_train_subset = one_hot_encoder.transform(X_train_subset)
+			X_test_subset = one_hot_encoder.transform(X_test_subset)
 
-		# k-means clustering
-		from sklearn.cluster import KMeans
-		model = KMeans(n_clusters = )
-		model.fit(X)
-		model.inertia_
-		model.cluster_centers_
-		clusters = model.predict(X)
-		new_labels = model.predict(X_new)
+			# CategoricalEncoder
+			from sklearn.preprocessing import CategoricalEncoder
+			categorical_encoder = CategoricalEncoder(encoding='ordinal/onehot/onehot-dense')
+			categorical_encoder.fit(X_train_subset)
+			X_train_subset = categorical_encoder.transform(X_train_subset)
+			X_test_subset = categorical_encoder.transform(X_test_subset)
 
-		# hierarchical clustering
-		# In complete linkage, the distance between clusters is the distance between the furthest points of the clusters.
-		# In single linkage, the distance between clusters is the distance between the closest points of the clusters.
-		
-		from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
-		mergings = linkage(X, method = "complete")
-		clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
-		pd.DataFrame({"labels": y, "cluster": clusters})           # cluster number starts from index 1
+			# binarizer - convert all values above the threshold to 1 and all values below the threshold to 0
+			from sklearn.preprocessing import Binarizer
+			binarizer = Binarizer(threshold=0.5).fit_transform(X)
 
-		dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
-		plt.show()
+		## pipeline
 
-		# t-SNE - visualize n-dimensional data into 2-dimensional
-		from sklearn.manifold import TSNE
-		model = TSNE(learning_rate = 100)  # Optimal choice [50,200]. Points should appear in clusters i.e. not intermingled.
-		transformed = model.fit_transform(X)
-		plt.scatter(transformed.iloc[:, 0], transformed.iloc[:, 1], c = y)
-		plt.show()
+			from sklearn.pipeline import Pipeline              # alternative - import make_pipeline
 
-		# PCA
-		from sklearn.decomposition import PCA
-		model = PCA(n_components = )       # First do model = PCA(). n_components is known after plotting the bar plot shown below.
-		df_pca = model.fit_transform(df)   # Or use fit() and transform() separately. Also, it is better to scale data before applying PCA.
-		model.components_
-		features = range(model.n_components_)
-		plt.bar(features, model.explained_variance_)
-		plt.xticks(features)
-		plt.show()
+			# all but last step need to have transform function. Last step may or may not have transform function.
+			steps = [('impute', Imputer())
+					 ("scaler", StandardScaler()),
+					 ("model_name", model)]
+			pipeline = Pipeline(steps)
+			pipeline.fit(X_train, y_train)
+			y_pred = pipeline.predict(X_test)
 
-		# pca for sparse matrices like word frequencies. google - TfidfVectorizer
-		from sklearn.decomposition import TruncatedSVD
-		model = TruncatedSVD(n_components = )
-		df_pca = model.fit_transform(sparse_df)  # sparse_df is scipy.sparse.csr_matrix instead of numpy array.
+			# multiple pipelines
+			from sklearn.pipeline import FeatureUnion
+			pipeline_1 = Pipeline([(),()])
+			pipeline_2 = Pipeline([(),()])
 
-		# non negative matrix factorization - interpretable unlike pca
-		from sklearn.decomposition import NMF
-		model = NMF(n_components = n)  # always specify n_components unlike PCA()
-		nmf_features = model.fit_transform(df)   # data should have non-negative entries only
-		model.components_
+			union = FeatureUnion([
+						("p1": pipeline_1),
+						("p2": pipeline_2)
+					])
+			final_pipeline = Pipeline([('union', union), (), (), ("model_name", model)])
+			final_pipeline.fit(X_train, y_train)
 
-		# recommendor system using NMF
-		nmf_features = normalize(nmf_features)
-		df = pd.DataFrame(nmf_features, index = "article_names")
-		current_article = df.loc("article_name")
-		similarities = df.dot(current_article)  # cosine similarity. the more the similar
-		print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
+	### unsupervised learning
+
+			# k-means clustering
+			from sklearn.cluster import KMeans
+			model = KMeans(n_clusters = )
+			model.fit(X)
+			model.inertia_
+			model.cluster_centers_
+			clusters = model.predict(X)
+			new_labels = model.predict(X_new)
+
+			# hierarchical clustering
+			# In complete linkage, the distance between clusters is the distance between the furthest points of the clusters.
+			# In single linkage, the distance between clusters is the distance between the closest points of the clusters.
+			
+			from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+			mergings = linkage(X, method = "complete")
+			clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
+			pd.DataFrame({"labels": y, "cluster": clusters})           # cluster number starts from index 1
+
+			dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
+			plt.show()
+
+			# t-SNE - visualize n-dimensional data into 2-dimensional
+			from sklearn.manifold import TSNE
+			model = TSNE(learning_rate = 100)  # Optimal choice [50,200]. Points should appear in clusters i.e. not intermingled.
+			transformed = model.fit_transform(X)
+			plt.scatter(transformed.iloc[:, 0], transformed.iloc[:, 1], c = y)
+			plt.show()
+
+			# PCA
+			from sklearn.decomposition import PCA
+			model = PCA(n_components = )       # First do model = PCA(). n_components is known after plotting the bar plot shown below.
+			df_pca = model.fit_transform(df)   # Or use fit() and transform() separately. Also, it is better to scale data before applying PCA.
+			model.components_
+			features = range(model.n_components_)
+			plt.bar(features, model.explained_variance_)
+			plt.xticks(features)
+			plt.show()
+
+			# pca for sparse matrices like word frequencies. google - TfidfVectorizer
+			from sklearn.decomposition import TruncatedSVD
+			model = TruncatedSVD(n_components = )
+			df_pca = model.fit_transform(sparse_df)  # sparse_df is scipy.sparse.csr_matrix instead of numpy array.
+
+			# non negative matrix factorization - interpretable unlike pca
+			from sklearn.decomposition import NMF
+			model = NMF(n_components = n)  # always specify n_components unlike PCA()
+			nmf_features = model.fit_transform(df)   # data should have non-negative entries only
+			model.components_
+
+			# recommendor system using NMF
+			nmf_features = normalize(nmf_features)
+			df = pd.DataFrame(nmf_features, index = "article_names")
+			current_article = df.loc("article_name")
+			similarities = df.dot(current_article)  # cosine similarity. the more the similar
+			print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
 
 ==============================================================================================================================
 

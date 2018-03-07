@@ -106,6 +106,13 @@
 		
 		pd.set_option("max_colwidth", 20)
 
+		# os module
+		import os
+		os.getcwd()
+		os.chdir(r"")
+		os.listdir(path)
+		os.mkdir(path)
+
 		# importing files from current directory
 		import glob
 		files = glob.glob("*.csv")                  # return list of all csv file names from current working directory
@@ -135,19 +142,20 @@
 		# check missing values
 		df.isnull().any()                           # return True if any of the values is missing
 		df.isnull().sum()                           # check number of missing values
-		df.notnull().all()                          # return True only if no missing values prsent
+		df.notnull().all()                          # return True only if no missing values present
+		df.dropna(subset = ["list of columns"], how = "any/all", thresh = )
+
+		# duplicate rows
+		df.duplicated()                             # boolean ouput
+		df.duplicated().sum()                       # return number of duplicate entries
+		df.drop_duplicates(keep = "first", inplace = True)  # keep first entry and delete rest of the duplicate entries
+
+		# drop column
+		df.drop("column_name", axis = 1)
 
 		df.categorical_column.nunique()             # return number of levels in a categorical variable
 		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
 		
-		# sample rows or columns
-		df.sample(n             =   ,               # number of rows/columns to sample
-				  frac          =   ,               # either use n or frac
-				  replace       = False,            # sample with ro without replacement
-				  random_state  =  4,
-				  axis          =   ,               # sample either row or columns of dataframe
-		)
-
 		# statistics
 		df.corr(method="pearson")                   # return correlation matrix
 		df.skew()                                   # return skewness of numeric variables
@@ -159,6 +167,14 @@
 		df.column_name.cumsum()                     # cumulative sum
 		df.column_name.cumprod()                    # cumulative product
 		
+		# sample rows or columns
+		df.sample(n             =   ,               # number of rows/columns to sample
+				  frac          =   ,               # either use n or frac
+				  replace       = False,            # sample with ro without replacement
+				  random_state  =  4,
+				  axis          =   ,               # sample either row or columns of dataframe
+		)
+
 		# visualisations
 		df.hist()
 		df.plot(kind="bar", x = , y = )             # refer documentation
@@ -168,14 +184,24 @@
 		from pandas.tools.plotting import scatter_matrix
 		scatter_matrix(df)
 		
+		# change columns types
 		df.column.astype(str/"category")              # change column to string/categorical variable
 		pd.to_numeric(df.column, errors = "coerce")   # change column to numeric
 		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
 		
-		df.index = index_variable                   # index variable must be equal to the number of rows in the dataframe
+		# index and column names
+		df.index = index_variable                     # index variable must be equal to the number of rows in the dataframe
 		df.index.name = "index name"
 		df.columns
 		df.columns.name
+		
+		# hierarchical indexing
+		df.set_index(["school", "rollno"], inplace = True)
+		df.sort_index()
+		df.loc["dgv":"dav"]                         # outer indexing (on "school")
+		df.loc[1:10]  		                        # inner indexing (on "rollno")
+		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
+		df.reindex()                                # conform data frame to new index. arrange rows or add new rows
 		
 		# filtering
 		df[df.age > 10]
@@ -186,15 +212,17 @@
 		df.all()                                       # return True if all the elements are True
 		df.any()                                       # return True if any of the elements is True
 
-		# apply functions to dataframe
-		df.apply(function, axis = )                    # iterate over columns of dataframe
-		df.column_name.apply(lambda x: x**2)           # iterate over values of column
-		df.age.apply(np.argmax, axis = 1)              # max to get max value, np.argmax to get row name with max value
+		# sort dataframe
+		df.sort_values(by = ["column_name", "column_name"], ascending = False)
 
 		# rename columns
 		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
 		df.columns = ["column1", "column2"]            # rename all columns
 
+		# change columns order
+		ordered = ['col_3', 'col_1', 'col_2']
+		df = df[ordered]
+		
 		# loc, iloc
 		df.loc[1:5,:]                               # print row [1,5]. need to specify the row and column header names
 		df.loc[[1, 4, 7], ["column1", "column2"]]
@@ -202,14 +230,6 @@
 		df.loc[age == df.age.max(), :]
 		df.iloc[1:10, 2:4]                          # print row [1, 10). need to specify the row and column indices
 
-		# hierarchical indexing
-		df.set_index(["school", "rollno"], inplace = True)
-		df.sort_index()
-		df.loc["dgv":"dav"]                         # outer indexing (on "school")
-		df.loc[1:10]  		                        # inner indexing (on "rollno")
-		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
-		df.reindex()                                # conform data frame to new index. arrange rows or add new rows
-		
 		# fill NAs
 		df.column_name.fillna(df.column_name.mean(), axis = "index or columns", method = "ffil/bfil", limit = 1)
 		df.fillna(df.mean())
@@ -220,8 +240,6 @@
 
 		df.interpolate(method = "linear")
 
-		df.dropna(subset = ["list of columns"], how = "any/all", thresh = )
-
 		# replace values
 		replace = {"gender":          {"male": 0, "female": 1},
                    "marital_status":  {"married": 0, "divorced": 1, "single": 2}
@@ -229,6 +247,11 @@
 		df.replace(replace, inplace = True)
 		df.replace({"old_value": "new_value", "old_value": "new_value"})   # mapping
 		df.replace(["old_value_list"], ["new_value_list"])                 # mapping
+
+		# apply functions to dataframe
+		df.apply(function, axis = )                    # iterate over columns of dataframe
+		df.column_name.apply(lambda x: x**2)           # iterate over values of column
+		df.age.apply(np.argmax, axis = 1)              # max to get max value, np.argmax to get row name with max value
 
 		# group by
 		group = df.groupby("categorical_column")    # returns GroupBy object
@@ -252,9 +275,6 @@
 		# set column names after groupby
 		df.columns = ["_".join(colname) for colname in df.columns]
 		
-		# sort dataframe
-		df.sort_values(by = ["column_name", "column_name"], ascending = False)
-
 		# Melt: wide to long dataframe
 		pd.melt(df,
 				id_vars = ["columns_to_keep"],
@@ -292,15 +312,6 @@
 					 values = df.numerical_column,
 					 aggfunc = np.average
 		)  # similar to group by and summarize
-
-		# find duplicate rows
-		df.duplicated()                                # boolean ouput
-		df.duplicated().sum()                          # return number of duplicate entries
-
-		df.drop_duplicates(keep = "first", inplace = True)  # keep first entry and delete rest of the duplicate entries
-
-		# drop column
-		df.drop("column_name", axis = 1)
 
 		# one hot encoding
 		df_dummy = pd.get_dummies(df,
