@@ -453,7 +453,7 @@
 		sns.barplot(x             =  "categorical_column",
 					y             =  "numeric_column",           # switch x and y to change plot orientation
 					hue           =  "categorical_column",
-					data          =  df,
+					data          =  df,                         # to sort barplot, use df.sort_values['categorical_column']
 					order         =  ,                           # order of variable to plot - google or plot using pd.DataFrame(groupby("categorical_column").numeric_column.function()) for ascending/descending ordered plot
 					hue_order     =  ,                           # order of hue variable     - google
 					ci            =  "sd",                       # confidence interval for error bar
@@ -719,6 +719,7 @@
 		# dictionary
 		dictionary = {'key': 'value', 'key': 'value'}       # key and value can be string, integer or float
 		dict([('key', 'value'), ('key', 'value')])
+		dict(zip([key_list], [value_list]))
 		dict(key='value', key='value')
 		dictionary.keys()
 		dictionary.values()
@@ -730,7 +731,7 @@
 	        ('jane', 'B', 12),
     	    ('dave', 'B', 10),
         ]
-        sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age
+        sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age in ascending order
 
 		# if-else condition
 		if condition:
