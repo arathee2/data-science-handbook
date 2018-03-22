@@ -716,6 +716,14 @@
 		print("Value of x is: {1} and value of y is: {0}".format(y, x))
 		print("Value of x is:", x, "and value of y is:", y)
 
+		# dictionary
+		dictionary = {'key': 'value', 'key': 'value'}       # key and value can be string, integer or float
+		dict([('key', 'value'), ('key', 'value')])
+		dict(key='value', key='value')
+		dictionary.keys()
+		dictionary.values()
+		dictionary.items()
+
 		# sort sequence
 		student_tuples = [
         	('john', 'A', 15),
@@ -758,8 +766,8 @@
 		nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
 
 		# default arguments
-		def function_name(x = 0):
-			print(x)
+		def function_name(x = 2):
+			print(x**2)
 
 		# multiple arguments
 		def function_name(*args):
@@ -768,7 +776,8 @@
 				print(param)
 		function_name(1, 2, "hi")
 
-		def function_name(**kwargs):                 # keyword args
+		# keyword arguments
+		def function_name(**kwargs):
 		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
 			for key, value in kwargs.items():
 				print(str(key) + ":" + str(value))
@@ -777,12 +786,21 @@
 		# lambda functions
 		lambda variables: operations                  # return result of operation
 		square = lambda x: x**2                       # return square of x
-		maximum = lambda x,y: x if x>y else y
+		maximum = lambda x, y: x if (x > y) else y
 
 		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
 		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
 		from functools import reduce
 		reduce(function, sequence)                    # returns a single value unlike map() and filter()
+
+		# list comprehension
+		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
+		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
+		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
+		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
+
+		# dictionary comprehension
+		result = {number: number**2 for number in range(5)}
 
 		# error handling
 		def root(number):
@@ -803,15 +821,6 @@
 
 		# load dataframe in chunks
 		for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
-
-		# list comprehension
-		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
-		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
-		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
-		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
-
-		# dictionary comprehension
-		result = {number: number**2 for number in range(5)}
 
 		# generators
 		generator = (num for num in range(10))        # generator can be iterated over. instead of returning a list at once it returns number as and when required.

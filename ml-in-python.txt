@@ -722,6 +722,7 @@
 					  loss       =   "categorical_crossentropy",
 					  metrics    =   ["accuracy"]
 		)
+		model.summary()
 
 	## 3. Fit the model
 
@@ -753,7 +754,7 @@
 		# load weights
 		model.load_weights("weights.best.hdf5")                 # load weights only after model is fitted
 		
-	## 4. Evaluate/Predict using the model
+	## 4. Evaluate model/make predictions
 
 		# evaluate model performance on test set
 		scores = model.evaluate(X_test, y_test)
@@ -770,6 +771,7 @@
 		plt.xlabel('epoch')
 		plt.legend(['train', 'test'], loc="upper left")
 		plt.show()
+
 		# visualise training history for loss
 		plt.plot(training.history['loss'])
 		plt.plot(training.history['val_loss'])
