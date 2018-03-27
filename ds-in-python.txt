@@ -198,6 +198,7 @@
 		# hierarchical indexing
 		df.set_index(["school", "rollno"], inplace = True)
 		df.sort_index()
+		df.reset_index()
 		df.loc["dgv":"dav"]                         # outer indexing (on "school")
 		df.loc[1:10]  		                        # inner indexing (on "rollno")
 		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
@@ -270,7 +271,7 @@
 		
 		# change GroupBy to DataFrame
 		df = pd.DataFrame(df.groupby())
-		df = df.add_suffix('_Count').reset_index()
+		df = df.add_suffix('_Count').reset_index()  # or df.add_prefix()
 
 		# set column names after groupby
 		df.columns = ["_".join(colname) for colname in df.columns]
@@ -290,7 +291,7 @@
 		)  						                    # in case of duplicate values, use aggfunc to aggregate
 
 		# concatenate dataframes - column + column or row + row
-		pd.concat(objs         =  [df1, df2],
+		pd.concat(objs         =  [df1, df2],       # make sure the columns names/index is same - reset indexx if needed
 				  axis         =  ,                 # 0-index+index, 1-column+column
 				  ignore_index = False              # keep index names
 		)
