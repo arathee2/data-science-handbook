@@ -1,0 +1,518 @@
+
+#### keras -- deep learning
+
+	### Steps in keras modelling
+			# 0. Preprocess data
+			# 1. Create architecture
+			# 2. Compile model
+			# 3. Fit model
+			# 4. Evaluate and predict using model
+
+	### multilayer perceptron
+
+		## 0. preprocess
+
+			# get X_train, y_train, X_test, y_test using sklearn preprocessing pipeline
+
+			# one-hot encode the outcome variable - in case of multiclass classification problem
+			from keras.utils import to_categorical
+			y_train   = to_categorical(y_train)
+
+			# preprocess test data in the exact same way as train data
+
+			n_cols    = X_train.shape[1]
+			n_classes = y_train.shape[1]                              # multiclass classification
+
+		## 1. create architecture
+
+			from keras.models import Sequential
+			from keras.layers import Dense
+
+			# instantiate model
+			model = Sequential()
+
+			# add first hidden layer
+			from keras import backend as K
+			activation = "tanh" or K.tanh or K.relu(x, alpha = 0.0, max_value = None)  # refer keras activations 
+			
+			from keras.initializers import glorot_normal
+			initializer = "glorot_normal" or glorot_normal(seed = 4)  # refer keras initializers for creating new regularizer
+			
+			from keras.regularizers import l1
+			regularizer = l1(0.01)                                    # refer keras regularizers for creating new regularizer
+
+			model.add(Dense(units                 =   n_neurons,      # number of neurons in the layer     
+							activation            =   activation,     # activation function. None means 'linear' activation
+							input_shape           =   (n_cols,),      # mention this for the first hidden layer only
+							use_bias              =   True,           # whether the layer uses bias vector or not
+							kernel_initializer    =   initializer,    # weights initializer
+							bias_initializer      =   initializer,    # bias initializer
+							kernel_regularizer    =   regularizer,    # use regularization on weight matrix
+							bias_regularizer      =   regularizer,    # use regularization on bias vector
+							activity_regularizer  =   regularizer,    # use regularization on output of activation
+							kernel_constraint     =   ,               # restrict the weight matrix values 
+							bias_constraint       =                   # restrict the bias vector values
+			))
+			
+			# add activation - if not added as an argument to Dense()
+			from keras.layers import Activation                       # for simple activations
+			from keras.layers.advanced_activations import LeakyReLU   # for advanced activations
+			
+			# simple activation
+			model.add(Activation(activation))
+			
+			OR
+			
+			# advanced activation			
+			model.add(LeakyReLU(alpha=0.3))                           # figure which is the right way
+
+			# normalize the layer
+			from keras.layers import BatchNormalization
+			model.add(BatchNormalization())                           # apply it before activation layer
+
+			# regularization techniques - the following are applied to previous layer
+			model.add(GaussianNoise(stddev = 1))                      # add zero-centered gaussian noise to neuron values with std
+			model.add(Dropout(rate = 0.2, seed = 4))                  # drop 20% neurons
+			model.add(GaussianDropout(rate = 0.2))                    # drop 20% neurons and multiply neurons with one-centered gaussian noise 
+
+			# add second hidden layer
+			model.add(Dense(n_neurons, activation = ""))
+
+			# add last layer
+			model.add(Dense(1))                                       # for regression
+			model.add(Dense(1, activation = "sigmoid"))               # for binary classification - use binary crossentropy loss
+			model.add(Dense(n_classes, activation = "softmax"))       # for multiclass classification - use categorical crossentropy loss
+
+		## 2. compile model
+
+			from keras.optimizers import SGD
+			optimizer = 'sgd' or SGD(lr = 0.01, decay = 1e-6, momentum = 0.9, nesterov = True)  # refer keras optimizers
+
+			from keras import losses
+			loss = losses.mean_squared_error/losses.binary_crossentropy/losses.categorical_crossentropy  # refer keras losses
+
+			from keras import metrics
+			metrics = [metrics.mean_squared_error, metrics.binary_accuracy, metrics.categorical_accuracy, metrics.top_k_categorical_accuracy(k = 5)]  # refer keras metrics
+
+			model.compile(optimizer  =   optimizer,
+						  loss       =   loss,
+						  metrics    =   metrics
+			)
+
+			# model summary
+			from keras.utils import print_summary
+			print_summary(model, line_length = None, positions = None, print_fn = None)
+
+			from keras.utils import plot_model
+			plot_model(model, to_file = "model.png", show_shapes = False, show_layer_names = True, rankdir = "TB/LR")
+
+			from IPython.display import SVG
+			from keras.utils.vis_utils import model_to_dot
+			SVG(model_to_dot(model).create(prog='dot', format='svg')) # google - how to visualise pydot.Graph object
+
+		## 3. fit model
+
+			training = model.fit(x                =   X_train,
+							 	 y                =   y_train,
+				  			 	 batch_size       =   128,
+				  				 epochs           =   10,
+				  			 	 verbose          =   1,                     # 0, 1 or 2
+							 	 callbacks        =   callbacks,             # refer miscellaneous
+				  			 	 validation_split =   0.20,
+				  			 	 validation_data  =   (X_test, y_test),      # pass validation_split or validation_data
+				  			 	 shuffle          =   True,                  # shuffle data before each epoch
+				  			 	 class_weight     =   None                   # assign weight in case of unbalanced class
+			)
+			
+			model.summary()
+			training.history.keys()
+
+			# look at all the layers of the model
+			print(model.layers)
+
+		## 4. evaluate model
+
+			# evaluate model performance on test set
+			model.evaluate(X_test, y_test, verbose = 1)
+			print(model.metrics_names)                                       # no idea what this function does
+			
+			# predict values on test set
+			y_pred = model.predict(X_test)
+
+			# visualise training history
+			plt.plot(training.history['acc/loss'])
+			plt.plot(training.history['val_acc/val_loss'])
+			plt.title('model accuracy/loss')
+			plt.ylabel('accuracy/loss')
+			plt.xlabel('epoch')
+			plt.legend(['train', 'test'], loc="upper left")
+			plt.show()
+
+
+	### cnn
+
+		## 0. preprocess
+
+			# get preprocessed X_train, y_train, X_test, y_test
+			X_train, y_train, X_test, y_test = mnist.load_data()
+
+			# reshape X - (samples, height, width, channels)
+			samples  = X_train.shape[0]
+			height   = 28
+			width    = 28
+			channels = 3
+
+			X_train  = X_train.reshape((samples, height, width, channels))
+			X_train  = X_train.astype('float32')
+			X_train  = X_train/255
+
+			# one-hot encode y
+			from keras.utils import to_categorical
+			y_train   = to_categorical(y_train)
+			n_classes = y_train.shape[1]
+
+			# preprocess test data in the exact same way as train data
+
+		## 1. create architecture
+
+			from keras.layers import Conv2D
+			from keras.layers import MaxPooling2D
+
+			model = Sequential()
+			model.add(Conv2D(filters               =   32,                 # number of filters
+							 kernel_size           =   (5, 5),             # size of each filter
+							 strides               =   (1, 1),             # stride size
+							 padding               =   "valid/same",       # valid - no padding, same - keeps same dimensions
+							 data_format           =   'channels_last',
+							 input_shape           =   (height, width, channels),
+							 activation            =   ,
+							 use_bias              =   ,
+							 kernel_initializer    =   ,
+							 bias_initializer      =   ,
+							 kernel_regularizer    =   ,
+							 bias_regularizer      =   ,
+							 activity_regularizer  =   ,
+							 kernel_constraint     =   ,
+							 bias_constraint       =
+			))
+			model.add(Conv2D())
+			model.add(MaxPooling2D(pool_size = (2, 2)))
+			model.add(Dropout(0.2))
+			# followed by [m*(n*(CONV) ==> POOL ==> (REGULARISE)?) ==> flatten ==> k*dense] layers
+			
+			model.add(Conv2D())
+			model.add(Conv2D())
+			model.add(MaxPooling2D())
+			model.add(Dropout(0.2))
+
+			model.add(Flatten())                                           # change convolution layers to fully connected layer
+			
+			model.add(Dense(128))
+			model.add(Dense(n_classes, activation='softmax'))
+
+
+		## 2. compile model
+
+		## 3. fit model
+
+		## 4. evaluate model
+
+
+	### rnn
+
+		## 0. preprocess
+
+		## 1. create architecture
+
+		## 2. compile model
+
+		## 3. fit model
+
+		## 4. evaluate model
+
+	### miscellaneous
+
+		## keras + sklearn
+
+			# 1. Build function that defines, compiles and returns a keras model
+			def create_model(activation = "sigmoid"):
+				
+				# create architecture
+				model = Sequential()
+				model.add(Dense(8))
+				model.add(Dense(8))
+				model.add(Dense(2, activation = activation))
+				
+				# compile model
+				model.compile(loss = , optimizer = , metrics = )
+				
+				return model
+
+			# 2. Create scikit-learn compatible model using keras wrapper
+			from keras.wrappers.scikit_learn import KerasClassifier
+			from keras.wrappers.scikit_learn import KerasRegressor
+			model = KerasClassifier(build_fn = create_model, epochs = , batch_size = 10, verbose = 1)
+			model = KerasRegressor(build_fn = create_model, epochs = , batch_size = 10, verbose = 1)
+
+			# 3. Use model as a native scikit-learn model
+			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
+
+			OR
+
+			optimizers = ['rmsprop', 'adam']
+			weight_initializers = ['glorot_uniform', 'normal', 'uniform']
+			epochs = [50, 100, 150]
+			batches = [32, 64, 128]
+			params = {"optimizer"           : optimizers,
+					  "epochs"              : epochs,
+					  "batch_size"          : batches,
+					  "weight_initializer"  : weight_initializers
+			}
+			model_cv = GridSearchCV(estimator = model, param_grid = params)
+			model_cv.fit(X_train, y_train)
+			model_cv.cv_results_
+			model_cv.best_score_
+			model_cv.best_params_
+
+
+		## callbacks
+			
+			# early stopping
+			from keras.callbacks import EarlyStopping
+			early_stopping = EarlyStopping(monitor     =  'val_loss',        # or 'val_acc'
+										   min_delta   =  0,                 # improvement in score less than min_delta will not be considered as an improvement 
+										   patience    =  3,                 # number of epochs to monitor before stopping training
+										   verbose     =  0/1,               # verbosity
+										   mode        =  'auto'             # maximise or minimise monitoring quantity before stopping training
+			)
+
+			# model checkpoint
+			from keras.callbacks import ModelCheckpoint
+			filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"  # multiple checkpoints as a result of different file names
+			filepath = "weights-improvement.hdf5"                            # checkpoints will be overwritten to this file
+			checkpoint = ModelCheckpoint(filepath,
+										 monitor            =  'val_loss',   # or 'val_acc'
+										 verbose            =  0/1,          # verbosity
+										 save_best_only     =  True,         # don't overwrite the best model
+										 save_weights_only  =  False,        # save weightsonly or entire model
+										 mode               =  'auto',       # maximise or minimise the monitoring quantity before saving
+										 period             =  1             # number of epochs between checkpoints
+			)
+
+			# learning rate scheduler
+			from keras.callbacks import LearningRateScheduler
+			lr_schedular = LearningRateScheduler(lambda x: 1. / (1. + x),    # pass a function which takes current epoch index and lr and outputs updated lr
+												 verbose = 0/1)
+			
+			# reduce learning rate when loss becomes stagnant
+			from keras.callbacks import ReduceLROnPlateau
+			reduce_lr = ReduceLROnPlateau(monitor     =  'val_loss',
+										  factor      =  0.1,                # reduce lr by this factor
+										  patience    =  10,                 # lr is reduced if htere is no improvement in monitor metric for 10 epochs
+										  verbose     =  0/1,                # verbosity
+										  mode        =  'auto',             # maximise or minimise the monitoring quantity before saving
+										  min_delta   =  0.0001,             # improvement in score less than min_delta will not be considered as an improvement 
+										  cooldown    =  0,                  # no idea about this
+										  min_lr      =  0                   # minimum value of lr after which it's not reduced
+			)
+
+			# tensorboard
+			from keras.callbacks import TensorBoard
+			tensorboard = TensorBoard(log_dir                 =  './logs',   # log directory
+									  histogram_freq          =  1,          # frequency (in epochs) at which to compute activation and weight histograms for the layers of the model
+									  batch_size              =  128,        # size of batch of inputs to feed to the network for histograms computation
+									  write_graph             =  True,       # whether to visualize the graph 
+									  write_grads             =  True,       # whether to visualize gradient histograms
+									  write_images            =  False,      # whether to write model weights to visualize as image
+									  embeddings_freq         =  0,          # frequency (in epochs) at which selected embedding layers will be saved
+									  embeddings_layer_names  =  None        # a list of names of layers to keep eye on. If None then watch all embedding layers
+			)
+			
+			# combine all callbacks and pass to fit method
+			callbacks = [early_stopping, checkpoint, lr_schedular, reduce_lr, tensorboard]
+
+		## model attributes
+
+			# save model
+			model.save("my_model.h5")
+			
+			# load model
+			from keras.models import load_model
+			model = load_model("my_model.h5")
+
+
+
+
+
+
+
+
+
+
+	## learning rate schedules
+
+		# time-based decay - drop learning rate after each epoch
+		epochs = 10
+		learning_rate = 0.1
+		decay_rate = learning_rate / epochs
+		momentum = 0.9
+		sgd = SGD(lr = learning_rate, momentum = momentum, decay = decay_rate, nesterov = False)
+
+		# drop-based decay - drop learning rate after each specified number of epochs
+		from keras.callbacks import LearningRateScheduler
+		def step_decay(epoch):
+			"""
+			half the learning rate every 10 epochs
+			input: epoch
+			output: learning rate
+			"""
+			initial_lr = 0.1                     # initial learning rate
+			drop = 0.5                           # drop learning rate by half
+			epochs_drop = 10.0                   # number of epochs after which to drop learning rate
+			lr = initial_lr * math.pow(drop, math.floor((1+epoch)/epochs_drop))
+			return lr
+
+		lr_scheduler = LearningRateScheduler(step_decay)
+		callbacks_list = [lr_scheduler]
+
+	# CNN
+
+		from keras.models import Sequential
+		from keras.layers import Dense
+		from keras.layers import Dropout
+		from keras.layers import Flatten
+		from keras.layers import Conv2D
+		from keras.layers import MaxPooling2D
+		from keras.utils import np_utils
+
+		# reshape data to work with CNN - [n_rows, height, width, channels]
+		X_train = X_train.reshape(n_rows, height, width, channels).astype('float32')
+		X_test = X_test.reshape(n_rows, height, width, channels).astype('float32')
+		
+		# model architecture
+		model = Sequential()
+		model.add(Conv2D(filters               =   32,
+						 kernel_size           =   (5, 5),
+						 input_shape           =   (height, width, channels),
+						 strides               =   1,
+						 padding               =   "valid/same",       # valid - no padding, same - keeps same dimensions
+						 activation            =   "relu",
+						 use_bias              =   True,               # whether the layer uses bias vector or not
+						 kernel_initializer    =   ,                   # weights initializer
+						 bias_initializer      =   ,                   # bias initializer
+						 kernel_regularizer    =   ,                   # use regularization on weight matrix
+						 bias_regularizer      =   ,                   # use regularization on bias vector
+						 activity_regularizer  =   ,                   # use regularization on output of activation
+						 kernel_constraint     =   ,                   # contraint function, generally used when dropout is used
+						 bias_constraint       =                       # contraint function, generally used when dropout is used
+		))
+		model.add(MaxPooling2D(pool_size=(2, 2)))
+		model.add(Dropout(0.2))                                        # drop 20% neurons
+		model.add(Flatten())
+		model.add(Dense(128, activation='relu'))
+		model.add(Dense(num_classes, activation='softmax'))
+
+	# RNN
+
+		# embeddings - for text data
+		vocab_size        = 5000
+		max_review_length = 400
+		from keras.preprocessing import sequence
+		X_train = sequence.pad_sequences(X_train, maxlen=max_review_length, padding='pre', truncating='pre', value=0)
+		X_test = sequence.pad_sequences(X_test, maxlen=max_review_length, padding='pre', truncating='pre', value=0)
+		model = Sequential()
+		model.add(Embedding(input_dim          =   vocab_size,         # vocabulary size
+							output_dim         =   32,                 # dimension of embedding
+							input_length       =   max_review_length   # length of review
+		))
+		# add subsequent layers here like (Flatten() and Dense()) or LSTM()
+		""" 
+		The model will take as input an integer matrix of size (batch, input_length).
+		The largest integer (i.e. word index) in the input should be no larger than 4999 (vocabulary size-1).
+		Now model.output_shape == (None, max_review_length, 32), where None is the batch dimension.
+		Refer documentation for a small comprehensive code - very nice!
+		"""
+
+		"""
+		In time series prediction, scale full dataset(X and y), divide into train and test, fit the model and predict.
+		After prediction, undo the scaling by using min_max_scaler.inverse_transform(y_pred) for y_train, y_pred_train, y_test and y_ pred_test.
+		Then compare y_train with y_pred_train and y_test with y_pred_test.
+		"""
+
+		# reshape data - [n_samples, time_steps, input_dim] for time series data - input_dim can be n_cols
+		# play with time_steps and input_dim values but time_stepsxinput_dim must be constant in every case
+		X_train = X_train.reshape((n_rows, time_steps, n_cols))
+		X_test = X_test.reshape((n_rows, time_steps, n_cols))
+
+		# simple LSTM
+		from keras.models import Sequential
+		from keras.layers import Dense
+		from keras.layers import LSTM
+
+		model = Sequential()
+		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
+					   activation            =   "",
+					   recurrent_activation  =   "",                   # activation to use for the recurrent step
+					   input_shape           =   (time_steps, n_cols), # specify input shape if LSTM is the first layer
+					   dropout               =   0.2,                  # dropout at input for each cell of LSTM
+					   recurrent_dropout     =   0.1                   # dropout at output for each cell of LSTM
+		))
+		model.add(Dense(1))
+
+		OR
+		
+		model = Sequential()
+		model.add(Embedding(input_dim = , output_dim = , input_length = ))
+		model.add(LSTM(units = n_cells, activation = ""))
+		model.add(Dense(1))
+
+		# stateful LSTM - mention batch shape, reset state after each epoch, don't shuffle data and evaluate/predict in same batches
+		batch_input_shape = (batch_size, time_steps, n_cols)
+		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
+					   activation            =   ,
+					   batch_input_shape     =   batch_input_shape,    # add this to each LSTM layer in case of stateful LSTM
+					   stateful              =   True                  # statefulness set to True
+		))
+		model.add(Dense(1))
+
+		for i in range(n_epochs):                                      # create manual epochs. Can't set epochs because can't pass states to next epoch.
+			model.fit(x             =   X_train,
+					  y             =   y_train,
+					  batch_size    =   64,
+					  epochs        =   1,                             # epochs should be 1 since manual epochs in process
+					  verbose       =   1,
+					  shuffle       =   False                          # don't shuffle data before each epoch
+			)
+			model.reset_states()                                       # reset state after each epoch
+
+		y_pred = model.predict(X_train, batch_size = 64)               # prediction should be in batches
+		model.reset_states()                                           # reset state after predicting on a specific dataset
+		y_pred = model.predict(X_test, batch_size = 64)                # prediction should be in batches
+		
+		model.evaluate(X_test, y_test, batch_size = 64)
+		model.reset_states()
+
+		# stacked LSTMs
+		"""
+		LSTMs can be stacked. The last LSTM layer has to have return_sequences = True
+		"""
+		model.add(LSTM(units = n_cells, batch_input_shape = batch_input_shape, stateful = True, return_sequences = True))
+		model.add(LSTM(units = n_cells, batch_input_shape = batch_input_shape, stateful = True))
+		model.add(Dense(1))
+
+		# LSTM and CNN
+		from keras.models import Sequential
+		from keras.layers import Dense
+		from keras.layers import LSTM
+		from keras.layers.convolutional import Convolution1D
+		from keras.layers.convolutional import MaxPooling1D
+		from keras.layers.embeddings import Embedding
+
+		model = Sequential()
+		model.add(Embedding(input_dim = vocab_size, output_dim = 32, input_length = max_review_length))
+		model.add(Convolution1D(filters = 32, kernel_size = 3))        # same parameters as Convolution2D
+		model.add(MaxPooling1D(pool_size = 2)
+		model.add(LSTM(100))
+		model.add(Dense(1))
+
+==============================================================================================================================

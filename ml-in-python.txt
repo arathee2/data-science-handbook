@@ -290,32 +290,35 @@
 		import xgboost as xgb
 		dtrain = xgb.DMatrix(X_train, label = y_train)
 		dtest = xgb.DMatrix(X_test, label = y_test)
-		parameters = [
-      # General Parameters
-          booster            = "gbtree",          		# default = "gbtree"
-          silent             = 0,                 		# default = 0
-      # Booster Parameters
-          eta                = 0.3,               		# default = 0.3, range: [0,1]
-          gamma              = 0,                 		# default = 0,   range: [0,∞]
-          max_depth          = 6,                 		# default = 6,   range: [1,∞]
-          min_child_weight   = 1,                 		# default = 1,   range: [0,∞]
-          subsample          = 1,                 		# default = 1,   range: (0,1]
-          colsample_bytree   = 1,                 		# default = 1,   range: (0,1]
-          colsample_bylevel  = 1,                 		# default = 1,   range: (0,1]
-          lambda             = 1,                 		# default = 1
-          alpha              = 0,                 		# default = 0
-      # Task Parameters
-          objective          = "binary:logistic", 		# default = "reg:linear"
-          eval_metric        = ["error", "logloss"],
-          num_classes        = 2,                 		# number of classes in case of multi class classification
-          seed               = 4				  		# reproducability seed
-        ]
+		parameters = dict(
+			
+			# general Parameters
+			booster            = "gbtree",          		# default = "gbtree"
+			silent             = 0,                 		# default = 0
+
+			# booster Parameters
+			eta                = 0.3,               		# default = 0.3, range: [0,1
+			gamma              = 0,                 		# default = 0,   range: [0,∞]
+			max_depth          = 6,                 		# default = 6,   range: [1,∞]
+			min_child_weight   = 1,                 		# default = 1,   range: [0,∞]
+			subsample          = 1,                 		# default = 1,   range: (0,1]
+			colsample_bytree   = 1,                 		# default = 1,   range: (0,1]
+			colsample_bylevel  = 1,                 		# default = 1,   range: (0,1]
+			lambda             = 1,                 		# default = 1
+			alpha              = 0,                 		# default = 
+
+			# task Parameters
+			objective          = "binary:logistic", 		# default = "reg:linear"
+			eval_metric        = ["error", "logloss"],
+			num_classes        = 2,                 		# number of classes in case of multi class classification
+			seed               = 4				  		    # reproducability seed
+        )
 
         eval_list  = [(dtest,'eval'), (dtrain,'train')]
         model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
         y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
-        xgb.plot_importance(model)                      # import matplotlib for this
-        xgb.plot_tree(model, num_trees=2)               # import graphviz for this
+        xgb.plot_importance(model)                          # import matplotlib for this
+        xgb.plot_tree(model, num_trees=2)                   # import graphviz for this
         model.save_model("model_name")
 
         # voting ensemble
@@ -657,343 +660,6 @@
 			current_article = df.loc("article_name")
 			similarities = df.dot(current_article)  # cosine similarity. the more the similar
 			print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
-
-==============================================================================================================================
-
-### keras -- deep learning
-
-		X_train = df.drop(["target_column"], axis = 1).as_matrix()   # size - [n_rows, n_cols]
-
-		# one hot encoding the outcome variable
-		from keras.utils import to_categorical
-		y_train = to_categorical(df.target_column)
-
-		n_cols = X_train.shape[1]
-		num_classes = y_train.shape[1]
-
-		# Steps in keras modelling
-		1. Create architecture
-		2. Compile model
-		3. Fit model
-		4. Predict using model
-
-	## 1. Create architecture
-
-		from keras.models import Sequential
-		from keras.layers import Dense
-		from keras.layers import Dropout
-
-		# Set up the model
-		model = Sequential()
-
-		# Add first hidden layer
-		model.add(Dense(units                 =   n_neurons,      # number of neurons in the layer     
-						activation            =   "",             # activation function. None means no activation
-						input_shape           =   (n_cols,),      # mention this for the first hidden layer only
-						use_bias              =   True,           # whether the layer uses bias vector or not
-						kernel_initializer    =   ,               # weights initializer
-						bias_initializer      =   ,               # bias initializer
-						kernel_regularizer    =   ,               # use regularization on weight matrix
-						bias_regularizer      =   ,               # use regularization on bias vector
-						activity_regularizer  =   ,               # use regularization on output of activation
-						kernel_constraint     =   ,               # contraint function, generally used when dropout is used
-						bias_constraint       =                   # contraint function, generally used when dropout is used
-		))
-
-		# add drouput to the previous layer
-		model.add(Dropout(rate = 0.2, seed = 4))
-
-		# Add second hidden layer
-		model.add(Dense(n_neurons, activation = ""))
-
-		# Add the output layer
-		model.add(Dense(1))                                       # for regression
-		model.add(Dense(num_classes, activation = "softmax"))     # for classification, one neuron for each class and a separate activation function
-
-		# visualize model
-		from keras.utils import plot_model
-		plot_model(model, to_file = "model.png", show_shapes = False, show_layer_names = True, rankdir = "TB/LR")
-
-	## 2. Compile the model
-
-		from keras.optimizers import SGD
-		sgd = SGD(lr = 0.01, momentum = 0.0, decay = 0.0, nesterov = False)
-		model.compile(optimizer  =   "adam"/sgd,
-					  loss       =   "categorical_crossentropy",
-					  metrics    =   ["accuracy"]
-		)
-		model.summary()
-
-	## 3. Fit the model
-
-		# stop when there is no improvement in validation set score
-		from keras.callbacks import EarlyStopping
-		early_stopping_monitor = EarlyStopping(patience = 2)    # stop when there is no improvement for 3 consecutive epochs
-		
-		# checkpoint model - save weights
-		from keras.callbacks import ModelCheckpoint
-		filepath = "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"  # multiple checkpoints as a result of different file names
-		filepath = "weights-improvement.hdf5"                            # checkpoints will be overwritten to this file
-		checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose = 1, save_best_only = True, mode = 'max')
-		callbacks_list = [early_stopping_monitor, checkpoint]
-		
-		training = model.fit(x                =   X_train,
-							 y                =   y_train,
-				  			 batch_size       =   64,
-				  			 epochs           =   10,
-				  			 verbose          =   1,                     # 0, 1 or 2
-							 callbacks        =   callbacks_list,        # google keras callbacks techniques for advanced deep learning
-				  			 validation_split =   0.25,
-				  			 validation_data  =   (X_test, y_test),      # pass validation_split or validation_data
-				  			 shuffle          =   True,                  # shuffle data before each epoch
-				  			 class_weight     =   None                   # assign weight in case of unbalanced class
-		)
-		model.summary()
-		training.history.keys()
-
-		# load weights
-		model.load_weights("weights.best.hdf5")                 # load weights only after model is fitted
-		
-	## 4. Evaluate model/make predictions
-
-		# evaluate model performance on test set
-		scores = model.evaluate(X_test, y_test)
-		print(model.metrics_names)
-		
-		# predict values on test set
-		y_pred = model.predict(X_test)
-
-		# visualise training history for accuracy
-		plt.plot(training.history['acc'])
-		plt.plot(training.history['val_acc'])
-		plt.title('model accuracy')
-		plt.ylabel('accuracy')
-		plt.xlabel('epoch')
-		plt.legend(['train', 'test'], loc="upper left")
-		plt.show()
-
-		# visualise training history for loss
-		plt.plot(training.history['loss'])
-		plt.plot(training.history['val_loss'])
-		plt.title('model loss')
-		plt.ylabel('loss')
-		plt.xlabel('epoch')
-		plt.legend(['train', 'test'], loc="upper right")
-		plt.show()
-
-	## save and load model
-
-		# save model
-		model.save("my_model.h5")
-		
-		# load model
-		from keras.models import load_model
-		model = load_model("my_model.h5")
-
-	## keras and scikit-learn
-
-		# 1. Build function that defines, compiles and returns a keras model
-		def create_model(optimizer = "", loss = "", weight_initializer = ):
-			# create model
-			model = Sequential()
-			model.add(Dense(n_nodes, activation = "", input_shape = (n_cols,), kernel_initializer = weight_initializer))
-			model.add(Dense(n_nodes, activation = ""))
-			model.add(Dense(2, activation = "softmax"))
-			# Compile model
-			model.compile(loss = loss, optimizer = optimizer, metrics = [""])
-			return model
-
-		# 2. Create scikit-learn compatible model using keras wrapper
-		from keras.wrappers.scikit_learn import KerasClassifier
-		from keras.wrappers.scikit_learn import KerasRegressor
-		model = KerasClassifier(build_fn = create_model, epochs = , batch_size = 10, verbose = 1)
-		model = KerasRegressor(build_fn = create_model, epochs = , batch_size = 10, verbose = 1)
-
-		# 3. Use model as a native scikit-learn model
-		cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
-
-		OR
-
-		optimizers = ['rmsprop', 'adam']
-		weight_initializers = ['glorot_uniform', 'normal', 'uniform']
-		epochs = [50, 100, 150]
-		batches = [32, 64, 128]
-		params = {"optimizer"           : optimizers,
-				  "epochs"              : epochs,
-				  "batch_size"          : batches,
-				  "weight_initializer"  : weight_initializers
-		}
-		model_cv = GridSearchCV(estimator = model, param_grid = params)
-		model_cv.fit(X_train, y_train)
-		model_cv.cv_results_
-		model_cv.best_score_
-		model_cv.best_params_
-
-	## learning rate schedules
-
-		# time-based decay - drop learning rate after each epoch
-		epochs = 10
-		learning_rate = 0.1
-		decay_rate = learning_rate / epochs
-		momentum = 0.9
-		sgd = SGD(lr = learning_rate, momentum = momentum, decay = decay_rate, nesterov = False)
-
-		# drop-based decay - drop learning rate after each specified number of epochs
-		from keras.callbacks import LearningRateScheduler
-		def step_decay(epoch):
-			"""
-			half the learning rate every 10 epochs
-			input: epoch
-			output: learning rate
-			"""
-			initial_lr = 0.1                     # initial learning rate
-			drop = 0.5                           # drop learning rate by half
-			epochs_drop = 10.0                   # number of epochs after which to drop learning rate
-			lr = initial_lr * math.pow(drop, math.floor((1+epoch)/epochs_drop))
-			return lr
-
-		lr_scheduler = LearningRateScheduler(step_decay)
-		callbacks_list = [lr_scheduler]
-
-	# CNN
-
-		from keras.models import Sequential
-		from keras.layers import Dense
-		from keras.layers import Dropout
-		from keras.layers import Flatten
-		from keras.layers import Conv2D
-		from keras.layers import MaxPooling2D
-		from keras.utils import np_utils
-
-		# reshape data to work with CNN - [n_rows, height, width, channels]
-		X_train = X_train.reshape(n_rows, height, width, channels).astype('float32')
-		X_test = X_test.reshape(n_rows, height, width, channels).astype('float32')
-		
-		# model architecture
-		model = Sequential()
-		model.add(Conv2D(filters               =   32,
-						 kernel_size           =   (5, 5),
-						 input_shape           =   (height, width, channels),
-						 strides               =   1,
-						 padding               =   "valid/same",       # valid - no padding, same - keeps same dimensions
-						 activation            =   "relu",
-						 use_bias              =   True,               # whether the layer uses bias vector or not
-						 kernel_initializer    =   ,                   # weights initializer
-						 bias_initializer      =   ,                   # bias initializer
-						 kernel_regularizer    =   ,                   # use regularization on weight matrix
-						 bias_regularizer      =   ,                   # use regularization on bias vector
-						 activity_regularizer  =   ,                   # use regularization on output of activation
-						 kernel_constraint     =   ,                   # contraint function, generally used when dropout is used
-						 bias_constraint       =                       # contraint function, generally used when dropout is used
-		))
-		model.add(MaxPooling2D(pool_size=(2, 2)))
-		model.add(Dropout(0.2))                                        # drop 20% neurons
-		model.add(Flatten())
-		model.add(Dense(128, activation='relu'))
-		model.add(Dense(num_classes, activation='softmax'))
-
-	# RNN
-
-		# embeddings - for text data
-		vocab_size        = 5000
-		max_review_length = 400
-		from keras.preprocessing import sequence
-		X_train = sequence.pad_sequences(X_train, maxlen=max_review_length, padding='pre', truncating='pre', value=0)
-		X_test = sequence.pad_sequences(X_test, maxlen=max_review_length, padding='pre', truncating='pre', value=0)
-		model = Sequential()
-		model.add(Embedding(input_dim          =   vocab_size,         # vocabulary size
-							output_dim         =   32,                 # dimension of embedding
-							input_length       =   max_review_length   # length of review
-		))
-		# add subsequent layers here like (Flatten() and Dense()) or LSTM()
-		""" 
-		The model will take as input an integer matrix of size (batch, input_length).
-		The largest integer (i.e. word index) in the input should be no larger than 4999 (vocabulary size-1).
-		Now model.output_shape == (None, max_review_length, 32), where None is the batch dimension.
-		Refer documentation for a small comprehensive code - very nice!
-		"""
-
-		"""
-		In time series prediction, scale full dataset(X and y), divide into train and test, fit the model and predict.
-		After prediction, undo the scaling by using min_max_scaler.inverse_transform(y_pred) for y_train, y_pred_train, y_test and y_ pred_test.
-		Then compare y_train with y_pred_train and y_test with y_pred_test.
-		"""
-
-		# reshape data - [n_samples, time_steps, input_dim] for time series data - input_dim can be n_cols
-		# play with time_steps and input_dim values but time_stepsxinput_dim must be constant in every case
-		X_train = X_train.reshape((n_rows, time_steps, n_cols))
-		X_test = X_test.reshape((n_rows, time_steps, n_cols))
-
-		# simple LSTM
-		from keras.models import Sequential
-		from keras.layers import Dense
-		from keras.layers import LSTM
-
-		model = Sequential()
-		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
-					   activation            =   "",
-					   recurrent_activation  =   "",                   # activation to use for the recurrent step
-					   input_shape           =   (time_steps, n_cols), # specify input shape if LSTM is the first layer
-					   dropout               =   0.2,                  # dropout at input for each cell of LSTM
-					   recurrent_dropout     =   0.1                   # dropout at output for each cell of LSTM
-		))
-		model.add(Dense(1))
-
-		OR
-		
-		model = Sequential()
-		model.add(Embedding(input_dim = , output_dim = , input_length = ))
-		model.add(LSTM(units = n_cells, activation = ""))
-		model.add(Dense(1))
-
-		# stateful LSTM - mention batch shape, reset state after each epoch, don't shuffle data and evaluate/predict in same batches
-		batch_input_shape = (batch_size, time_steps, n_cols)
-		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
-					   activation            =   ,
-					   batch_input_shape     =   batch_input_shape,    # add this to each LSTM layer in case of stateful LSTM
-					   stateful              =   True                  # statefulness set to True
-		))
-		model.add(Dense(1))
-
-		for i in range(n_epochs):                                      # create manual epochs. Can't set epochs because can't pass states to next epoch.
-			model.fit(x             =   X_train,
-					  y             =   y_train,
-					  batch_size    =   64,
-					  epochs        =   1,                             # epochs should be 1 since manual epochs in process
-					  verbose       =   1,
-					  shuffle       =   False                          # don't shuffle data before each epoch
-			)
-			model.reset_states()                                       # reset state after each epoch
-
-		y_pred = model.predict(X_train, batch_size = 64)               # prediction should be in batches
-		model.reset_states()                                           # reset state after predicting on a specific dataset
-		y_pred = model.predict(X_test, batch_size = 64)                # prediction should be in batches
-		
-		model.evaluate(X_test, y_test, batch_size = 64)
-		model.reset_states()
-
-		# stacked LSTMs
-		"""
-		LSTMs can be stacked. The last LSTM layer has to have return_sequences = True
-		"""
-		model.add(LSTM(units = n_cells, batch_input_shape = batch_input_shape, stateful = True, return_sequences = True))
-		model.add(LSTM(units = n_cells, batch_input_shape = batch_input_shape, stateful = True))
-		model.add(Dense(1))
-
-		# LSTM and CNN
-		from keras.models import Sequential
-		from keras.layers import Dense
-		from keras.layers import LSTM
-		from keras.layers.convolutional import Convolution1D
-		from keras.layers.convolutional import MaxPooling1D
-		from keras.layers.embeddings import Embedding
-
-		model = Sequential()
-		model.add(Embedding(input_dim = vocab_size, output_dim = 32, input_length = max_review_length))
-		model.add(Convolution1D(filters = 32, kernel_size = 3))        # same parameters as Convolution2D
-		model.add(MaxPooling1D(pool_size = 2)
-		model.add(LSTM(100))
-		model.add(Dense(1))
 
 ==============================================================================================================================
 

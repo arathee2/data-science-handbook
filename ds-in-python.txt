@@ -36,7 +36,7 @@
 		
 		random.seed(4)                                # set seed for random number
 		random.rand()                                 # create random number in [0.0,1.0)
-		random.randint(low, high, size)               # create random integer between in [low, high)
+		random.randint(low, high, (size))             # create array of given size with random numbers in [low, high)
 		random.random((3, 4))                         # create 3x4 array with random numbers in [0.0,1.0)
 		random.choice([0,1,2], size, replace, p)      # generate random numbers of size from array with probability p
 		random.shuffle(array)                         # modify a sequence in-place by shuffling its contents
@@ -50,6 +50,7 @@
 		array.sum(axis = 0/1)                         # 0 - column-wise, 1 - row-wise
 		array.cumsum(axis = 0/1)                      # cumulative sum across column/row
 		
+		np.unique(array)
 		np.exp(array)                                 # array or pandas Series
 		np.sqrt(array)
 		np.max(array, axis)
@@ -185,7 +186,8 @@
 		scatter_matrix(df)
 		
 		# change columns types
-		df.column.astype(str/"category")              # change column to string/categorical variable
+		df.column.astype(str)
+		df.column.astype("category", categories = ['good', 'excellent'], ordered=True)  # change column to string/categorical variable
 		pd.to_numeric(df.column, errors = "coerce")   # change column to numeric
 		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
 		
@@ -326,8 +328,12 @@
 		column_names = list(df.columns[column_names_bool])
 		new_df = df.loc[:, column_names]
 
+		OR
+
+		df.filter(regex='^id.*', axis=1)            # subset dataframe on column or index names according to given pattern 
+
 		# write csv
-		df.to_csv("filename.csv", sep = )
+		df.to_csv("filename.csv", sep = , index = False)
 
 ==============================================================================================================================
 
