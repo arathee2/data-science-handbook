@@ -1,0 +1,141 @@
+
+### word embeddings
+	
+	## create word embeddings from scratch in gensim
+
+		from gensim.models import Word2Vec
+
+		# training data
+		sentences = [['this', 'is', 'sentence', 'one'], ['this', 'is', 'sentence', 'two']]
+
+		# train model
+		model = Word2Vec(sentences      = sentences,           # training data
+						 size           = 100,                 # embedding dimensions
+						 window         = 5,                   # window size: for cbow choose 5, for skipgram choose 10
+						 sg             = 0,                   # 0 - cbow, 1 - skipgram
+						 min_count      = 5,                   # words occurring less than this count are discarded
+						 max_vocab_size = None,                # maximum vocabulary size
+						 sample         = 0.001,               # words with frequency higher than this are downsampled
+						 hs             = 0,                   # 0 - negative sampling, 1 - hierarchical softmax
+						 negative       = 5,                   # number of noise words to choose randomly, hs should be set to 0
+						 cbow_mean      = 1,                   # 0 - add vectors, 1 - take mean of vectors
+						 alpha          = 0.025,               # initial learning rate
+						 min_alpha      = 0.0001,              # learning rate will drop to min_alpha as training progresses
+						 seed           = 1,                   # for reproducability
+						 workers        = 3,                   # number of cores for parallel processing		 
+						 compute_loss   = True,                # compute and store loss value - model.get_latest_training_loss()
+						 sorted_vocab   = 0                    # whether vocabulary be sorted based on word frequencies
+
+		)
+		
+		# print model loss
+		model.get_latest_training_loss()
+
+		# summarize the loaded model
+		print(model)
+		
+		# summarize vocabulary
+		words = list(model.wv.vocab)
+		print(words)
+		
+		# access vector for one word
+		print(model['sentence'])
+		
+		# save model
+		model.save('model.bin')
+		
+		# load model
+		new_model = Word2Vec.load('model.bin')
+		print(new_model)
+
+		# to load these embeddings - refer this section on line #93 - ### use pre-trained embeddings in Keras
+
+	## access pre-trained word embeddings in gensim
+
+		### load word2vec embeddings
+
+			from gensim.models import KeyedVectors
+			
+			# download google word2vec model
+			link = "https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit?usp=sharing"
+
+			# load the google word2vec model
+			filename = 'GoogleNews-vectors-negative300.bin'
+			model = KeyedVectors.load_word2vec_format(filename, binary=True)
+
+			# calculate: (king - man) + woman = ?
+			result = model.most_similar(positive=['woman', 'king'], negative=['man'], topn=1)
+			print(result)
+
+		### load glove embeddings
+
+			# download standford glove model
+			link = "http://nlp.stanford.edu/data/glove.6B.zip"
+
+			# convert glove to word2vec format
+			from gensim.scripts.glove2word2vec import glove2word2vec
+			glove_input_file = 'glove.6B.100d.txt'
+			word2vec_output_file = 'glove.6B.100d.txt.word2vec'
+			glove2word2vec(glove_input_file, word2vec_output_file)
+
+			from gensim.models import KeyedVectors
+			
+			# load the stanford glove model (which is present in word2vec format created above)
+			filename = 'glove.6B.100d.txt.word2vec'
+			model = KeyedVectors.load_word2vec_format(filename, binary=False)
+			
+			# calculate: (king - man) + woman = ?
+			result = model.most_similar(positive=['woman', 'king'], negative=['man'], topn=1)
+			print(result)
+
+	## use gensim word embeddings in Keras
+
+		# load gensim word embedding model (contains all english words) - either created from scratch or access pre-trained embeddings
+		model = 
+
+		# create weight matrix - holds only the word vectors of the words that are present in training data
+		embedding_weights = np.zeros((VOCAB_SIZE, EMBEDDING_SIZE))
+		
+		# create a word2id dictionary using training data
+		word2id =  
+		
+		# copy word vectors from model to weight matrix
+		for word, index in word2id.items():
+			try:
+				embedding_weights[index, :] = model[word]
+			except KeyError:
+				pass
+
+		# use weight matrix in Embedding layer
+		model.add(Embedding(input_dim     = VOCAB_SIZE,              # vocabulary size
+							output_dim    = EMBEDDING_SIZE,          # length of vector with which each word is represented
+							input_length  = MAX_SEQ_LENGTH,          # length of input sequence
+							weights       = embedding_weights,       # word embedding matrix
+							trainable     = True                     # True - update embeddings_weight matrix
+		))
+
+		# to learn word embeddings while training the neural network, don't pass the 'weights' and 'trianable' argument
+		model.add(Embedding(input_dim     = VOCAB_SIZE,              # vocabulary size
+							output_dim    = EMBEDDING_SIZE,          # length of vector with which each word is represented
+							input_length  = MAX_SEQ_LENGTH           # length of input sequence
+		))
+
+	## visualise gensim word embeddings
+
+		from sklearn.decomposition import PCA
+		from matplotlib import pyplot
+		
+		# load gensim word embeddings model
+		model = 
+
+		# reduce number of dimensions of the embeddings to two to visualise in a scatter plot
+		X = model[model.wv.vocab]
+		pca = PCA(n_components=2)
+		result = pca.fit_transform(X)
+
+		# create scatter plot
+		pyplot.scatter(result[:, 0], result[:, 1])
+		words = list(model.wv.vocab)
+		for i, word in enumerate(words):
+			pyplot.annotate(word, xy=(result[i, 0], result[i, 1]))
+		pyplot.show()

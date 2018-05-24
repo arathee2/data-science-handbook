@@ -900,28 +900,46 @@
 		# regular expressions
 		import re
 		pattern = r""
+
+		# split
+		re.split(pattern, string)                          # split the string at given pattern
+		
+		# substitute
+		re.sub(pattern, replacement, string)               # replace first occurence of pattern by repl in the string
+
+		# match
 		result = re.match(pattern, string)                 # return None is pattern not found at the very start of string
 		result.group()                                     # return match result
-		result.start(); result.end()                       # return start and end index of the string where pattern was found
-		
+		result.start()                                     # return start index of the string where pattern was found
+		result.end()                                       # return end index of the string where pattern was found
+
+		# search
 		result = re.search(pattern, string)                # look for the pattern in the whole string and returns the first occurence
 		result.group()
 
+		# findall
 		result = re.findall(pattern, string)               # return list all the occurences of patterns present in the string
-		result[0]
+		result[0:3]
 
-		# group matching
-		# write a pattern for the thing you are looking for, adding parenthesis groups to extract the parts you want.
-		# group matching can be used with re.match(), re.search() and re.findall()
+		# finditer
+		for match in re.finditer(pattern, string):         # similar to findall but gives freedom to tinker with each match unlike findall
+			# do something with the match object found
+			print(match.group(0))
+			result.append(match.group())
+
+		# extract groups
+		# to extract groups, put parenthesis around the part of the pattern that you want to extract
+		# group matching can be used with re.match(), re.search() and re.finditer() but not with re.findall()
 		result = re.search("([a-zA-Z.0-9]+)(@)([a-zA-Z.]+)", "user.name123@gmail.com")
-		result.group()                                     # return user.name123@gmail.com
-		result.group(1)                                    # return "user.name123"
-		result.group(2)                                    # return "@"
-		result.group(3)                                    # return "gmail.com"
+		result.group(0)                                    # return full match   - equivalent to result.group()
+		result.group(1)                                    # return first group  - "user.name123"
+		result.group(2)                                    # return second group - "@"
+		result.group(3)                                    # return third group  - "gmail.com"
 
-		re.split(pattern, string)                          # split the string at given pattern
-		
-		re.sub(pattern, replacement, string)               # replace first occurence of pattern by repl in the string
+		# working with compile object
+		pattern = re.compile(r"")                          # create compile object
+		result = pattern.search(string)                    # no need to pass the pattern parameter
+		result = pattern.sub(replacement, string)
 
 
 		# pandas string methods

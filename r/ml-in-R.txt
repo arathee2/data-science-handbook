@@ -514,7 +514,7 @@
 		library("caTools")
 		set.seed(10)
 		split <- sample.split(data_frame$target, SplitRatio = 0.8)
-		train <- subset(data_frame,split == TRUE)
+		train <- subset(data_frame, split == TRUE)
 		cv <- subset(data_frame, split == FALSE)
 
 	# using sample
