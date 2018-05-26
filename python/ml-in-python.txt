@@ -605,148 +605,72 @@
 
 	### unsupervised learning
 
+		## clustering
+
 			# k-means clustering
-			from sklearn.cluster import KMeans
-			model = KMeans(n_clusters = )
-			model.fit(X)
-			model.inertia_
-			model.cluster_centers_
-			clusters = model.predict(X)
-			new_labels = model.predict(X_new)
+
+				from sklearn.cluster import KMeans
+				model = KMeans(n_clusters = )
+				model.fit(X)
+				model.inertia_
+				model.cluster_centers_
+				clusters = model.predict(X)
+				new_labels = model.predict(X_new)
 
 			# hierarchical clustering
-			# In complete linkage, the distance between clusters is the distance between the furthest points of the clusters.
-			# In single linkage, the distance between clusters is the distance between the closest points of the clusters.
-			
-			from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
-			mergings = linkage(X, method = "complete")
-			clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
-			pd.DataFrame({"labels": y, "cluster": clusters})           # cluster number starts from index 1
 
-			dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
-			plt.show()
+				from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+				
+				# complete linkage : distance between clusters is the distance between the farthest points of the clusters.
+				# single linkage   : distance between clusters is the distance between the closest points of the clusters.
+				mergings = linkage(X, method = "complete")
+				clusters = fcluster(mergings, 15, criterion = "distance")  # dendrogram height = 15
+				pd.DataFrame({"labels": y, "cluster": clusters})           # cluster number starts from index 1
+				dendrogram(mergings, labels = y, leaf_rotation = , leaf_font_size = )  # visualize dendrogram
+				plt.show()
 
-			# t-SNE - visualize n-dimensional data into 2-dimensional
-			from sklearn.manifold import TSNE
-			model = TSNE(learning_rate = 100)  # Optimal choice [50,200]. Points should appear in clusters i.e. not intermingled.
-			transformed = model.fit_transform(X)
-			plt.scatter(transformed.iloc[:, 0], transformed.iloc[:, 1], c = y)
-			plt.show()
+		## dimensionality-reduction
 
-			# PCA
-			from sklearn.decomposition import PCA
-			model = PCA(n_components = )       # First do model = PCA(). n_components is known after plotting the bar plot shown below.
-			df_pca = model.fit_transform(df)   # Or use fit() and transform() separately. Also, it is better to scale data before applying PCA.
-			model.components_
-			features = range(model.n_components_)
-			plt.bar(features, model.explained_variance_)
-			plt.xticks(features)
-			plt.show()
+			# t-SNE - visualize n-dimensional data in 2-dimensions
 
-			# pca for sparse matrices like word frequencies. google - TfidfVectorizer
-			from sklearn.decomposition import TruncatedSVD
-			model = TruncatedSVD(n_components = )
-			df_pca = model.fit_transform(sparse_df)  # sparse_df is scipy.sparse.csr_matrix instead of numpy array.
+				from sklearn.manifold import TSNE
+				model = TSNE(learning_rate = 100)  # optimum lr = [50,200]. Results should be such that points should appear in clusters i.e. not intermingled.
+				transformed = model.fit_transform(X)
+				plt.scatter(transformed.iloc[:, 0], transformed.iloc[:, 1], c = y)
+				plt.show()
 
-			# non negative matrix factorization - interpretable unlike pca
-			from sklearn.decomposition import NMF
-			model = NMF(n_components = n)  # always specify n_components unlike PCA()
-			nmf_features = model.fit_transform(df)   # data should have non-negative entries only
-			model.components_
+			# principle component analysis
 
-			# recommendor system using NMF
-			nmf_features = normalize(nmf_features)
-			df = pd.DataFrame(nmf_features, index = "article_names")
-			current_article = df.loc("article_name")
-			similarities = df.dot(current_article)  # cosine similarity. the more the similar
-			print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
+				from sklearn.decomposition import PCA
+				model = PCA(n_components = )       # first do model = PCA(). optimum n_components_ is known after plotting the bar plot - using elbow method
+				model.fit(df)                      # scale data before applying pca
+				df_pca = model.transform(df)
+				model.components_
+				features = range(model.n_components_)
+				plt.bar(features, model.explained_variance_)
+				plt.xticks(features)
+				plt.show()
 
-==============================================================================================================================
+				# pca for sparse matrices such as bag-of-words model or tf-idf model
+				from sklearn.decomposition import TruncatedSVD
+				model = TruncatedSVD(n_components = )
+				model.fit_transform(sparse_df)     # sparse_df is scipy.sparse.csr_matrix, not a numpy array
+				df_pca = model.transform(sparse_df)
+				model.components_
 
-### NLP
+				# non-negative matrix factorization (NMF) - interpretable, unlike pca
+				from sklearn.decomposition import NMF
+				model = NMF(n_components = n)      # always specify n_components, unlike PCA()
+				model.fit(df)                      # data should have non-negative entries only
+				nmf_features = model.transform(df)
+				model.components_
 
-		# preprocessing - lowercase -> stem -> tokenize -> remove stop words -> remove punctuation -> remove special characters
-		from nltk.tokenize import word_tokenize
-		word_tokenize(string, pattern)                     # tokenize string into words
-
-		from nltk.tokenize import sent_tokenize
-		sent_tokenize(string, pattern)                     # tokenize string into sentences
-
-		from nltk.tokenize import regexp_tokenize
-		regexp_tokenize(string, pattern)                   # tokenize string based on pattern
-
-		from nltk.tokenize import TweetTokenizer
-		tokenizer = TweetTokenizer()
-		tokenizer.tokenize(string)
-
-		# plot word lengths
-		words = [word_tokenize(line) for line in book]     # return list of words of the entire book
-		word_lengths = [len(word) for word in words]       # return word length of each word
-		plt.hist(word_lengths)
-
-		# bag of words
-		from collections import Counter
-		word_frequencies = Counter(word_tokenize(string))  # return the word along with their count
-		print(word_frequencies.most_common(5))             # return the top 5 words occuring in the string
-
-		from sklearn.feature_extraction.text import CountVectorizer
-		vectorizer = CountVectorizer()
-		documents = ["doc1", "doc2", "doc3"]
-		X = vectorizer.fit_transform(documents) 
-		print(X.toarray())
-		print(vectorizer.get_feature_names())
-
-		# text preprocessing
-		alpha_only = [word for word in words if word.isalpha()]    # return lowercase alphabetic token
-		
-		from nltk.corpus import stopwords
-		no_stops = [word for word in words if word not in stopwords.words("english")]   # remove stop words
-		
-		from nltk.stem import WordNetLemmatizer
-		lemmatizer = WordNetLemmatizer()
-		lemmatized = [wordnet_lemmatizer.lemmatize(word) for word in no_stops]
-
-		from nltk.stem.porter import PorterStemmer
-		stemmer = PorterStemmer()
-		stemmed = [stemmer.stem(word) for word in no_stops]
-
-
-	## gensim - create bag of words
-
-		documents = ["doc1", "doc2", "doc3"]
-		articles = [word_tokenize(doc.lower() for doc in documents)]
-		
-		from gensim.corpora.dictionary import Dictionary
-		dictionary = Dictionary(articles)                  # articles is preprocessed and tokenized
-		
-		# get token id
-		dictionary.token2id                                # return all tokens with their respective ids
-		token_id = dictionary.token2id,get("cars")         # return token id for "cars"
-
-		# get token using token id
-		dictionary.get(token_id)
-		
-		# create corpus
-		corpus = [dictionary.doc2bow(article) for article in articles]
-		corpus[0][:10]                                     # print first 10 word ids with their frequency from first document
-		doc = corpus[0]                                    # doc has word ids with their frequency for first document
-
-		# tf-idf
-		from gensim.models.tfidfmodel import TfidfModel
-		tfidf = TfidfModel(corpus)                         # train tfidf model on corpus
-		tfidf_weights = tfidf[doc]                         # get work_ids and their tfidf weight of a specific document
-		sorted_tfidf_weights = sorted(tfidf_weights, key=lambda w: w[1], reverse=True)  # sort according to tfidf weights
-
-		for term_id, weight in sorted_tfidf_weights[:5]:
-		    print(dictionary.get(term_id), weight)         # top five words with their tf-idf value
-
-		# named entity recognotition (NER) using spacy
-		import spacy
-		nlp = spacy.load("en")                             # load english corpus
-		npl.entity                                         # 
-		doc = nlp("sample text")                           # NER
-		doc.ents                                           # look at entities
-		for ent in doc.ents:
-    		print(ent.text, ent.label_)                    # look at entities and their labels
+				# recommendor system using NMF
+				nmf_features = normalize(nmf_features)
+				df = pd.DataFrame(nmf_features, index = "article_names")
+				current_article = df.loc("article_name")
+				similarities = df.dot(current_article)  # cosine similarity. the more the similar
+				print(similarities.nlargest())          # see similarities between current article and other articles. Recommend the most similar article.
 
 ==============================================================================================================================
+

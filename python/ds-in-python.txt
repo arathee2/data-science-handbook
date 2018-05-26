@@ -116,69 +116,72 @@
 
 		# importing files from current directory
 		import glob
-		files = glob.glob("*.csv")                  # return list of all csv file names from current working directory
+		files = glob.glob("*.csv")                         # return list of all csv file names from current working directory
 
 		# read data
 		df = pd.read_csv(file_name,
-						 sep          =   ,         # character that seprates different values in the file
-						 names        = [],         # pass column names explicitly
-						 index_col    =   ,         # column index to use as index
-						 dtype        =   ,         # refer documentation
-						 na_values    =   ,         # list of values to be read as na
-						 parse_dates  =   ,         # refer documentation
+						 sep          =   ,                # character that seprates different values in the file
+						 names        = [],                # pass column names explicitly
+						 index_col    =   ,                # column index to use as index
+						 dtype        =   ,                # refer documentation
+						 na_values    =   ,                # list of values to be read as na
+						 parse_dates  =   ,                # refer documentation
 		)
 		
-		df = pd.DataFrame(data        =   ,         # numpy ndarray or python dictionary
-						  index       = [],         # list of indices, defaults to arange(n)
-						  columns     = [],         # list of column names
+		df = pd.DataFrame(data        =   ,                # numpy ndarray or python dictionary
+						  index       = [],                # list of indices, defaults to arange(n)
+						  columns     = [],                # list of column names
 		)
 		
-		df.shape                                    # return shape as tuple
-		df.head(n)                                  # return first "n" rows of df
-		df.tail(n)                                  # return last "n" rows of df
-		df.dtypes                                   # return data type of each column
-		df.describe()                               # similar to summary() in R
+		df.shape                                           # return shape as tuple
+		df.head(n)                                         # return first "n" rows of df
+		df.tail(n)                                         # return last "n" rows of df
+		df.dtypes                                          # return data type of each column
+		df.describe()                                      # similar to summary() in R
 		df.info()
 
 		# check missing values
-		df.isnull().any()                           # return True if any of the values is missing
-		df.isnull().sum()                           # check number of missing values
-		df.notnull().all()                          # return True only if no missing values present
-		df.dropna(subset = ["list of columns"], how = "any/all", thresh = )
+		df.isnull().any()                                  # return True if any of the values is missing
+		df.isnull().sum()                                  # check number of missing values
+		df.notnull().all()                                 # return True only if no missing values present
+		df.dropna(subset  = ["list of columns"],
+				  how     = "any/all", 
+				  thresh  = 
+		)
 
 		# duplicate rows
-		df.duplicated()                             # boolean ouput
-		df.duplicated().sum()                       # return number of duplicate entries
-		df.drop_duplicates(keep = "first", inplace = True)  # keep first entry and delete rest of the duplicate entries
+		df.duplicated()                                    # boolean ouput
+		df.duplicated().sum()                              # return number of duplicate entries
+		df.drop_duplicates(keep = "first", inplace = True) # keep first entry and delete rest of the duplicate entries
 
 		# drop column
 		df.drop("column_name", axis = 1)
 
-		df.categorical_column.nunique()             # return number of levels in a categorical variable
-		df.categorical_column.value_counts(dropna = False)  # similar to table(df$category) in R
+		df.categorical_column.nunique()                    # return number of levels in a categorical variable
+		df.categorical_column.value_counts(dropna = False) # similar to table(df$category) in R
 		
 		# statistics
-		df.corr(method="pearson")                   # return correlation matrix
-		df.skew()                                   # return skewness of numeric variables
+		df.corr(method="pearson")                          # return correlation matrix
+		df.skew()                                          # return skewness of numeric variables
 		df["column_name"].max()
 		df["column_name"].mean()
 		df["column_name"].mode()
-		df["column_name"].std()                     # standard deviation of column
-		df.column_name.quantile([0.1, 0.5])         # return quantile value
-		df.column_name.cumsum()                     # cumulative sum
-		df.column_name.cumprod()                    # cumulative product
+		df["column_name"].std()                            # standard deviation of column
+		df.column_name.quantile([0.1, 0.5])                # return quantile value
+		df.column_name.cumsum()                            # cumulative sum
+		df.column_name.cumprod()                           # cumulative product
 		
 		# sample rows or columns
-		df.sample(n             =   ,               # number of rows/columns to sample
-				  frac          =   ,               # either use n or frac
-				  replace       = False,            # sample with ro without replacement
-				  random_state  =  4,
-				  axis          =   ,               # sample either row or columns of dataframe
+		df.sample(n             =   ,                      # number of rows/columns to sample
+				  frac          =   ,                      # either use 'n' or 'frac'
+				  replace       = False,                   # sample with ro without replacement
+				  random_state  =  4,                      # seed for reproducability 
+				  axis          =   ,                      # sample either row or columns of dataframe
 		)
 
 		# visualisations
 		df.hist()
-		df.plot(kind="bar", x = , y = )             # refer documentation
+		df.plot(kind="bar", x = , y = )                    # refer documentation
 		df.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
 		df.plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
 		
@@ -187,12 +190,21 @@
 		
 		# change columns types
 		df.column.astype(str)
-		df.column.astype("category", categories = ['good', 'excellent'], ordered=True)  # change column to string/categorical variable
-		pd.to_numeric(df.column, errors = "coerce")   # change column to numeric
-		df.select_dtypes(include=["int64"], exclude=["float64"])  # select columns with specific data types
+		
+		df.column.astype("category",
+						 categories = ['good', 'excellent'],
+						 ordered    = True
+		)
+		
+		pd.to_numeric(df.column, 
+					  errors = "coerce")
+		
+		df.select_dtypes(include    = ["int64"],
+						 exclude    = ["float64"]
+		)
 		
 		# index and column names
-		df.index = index_variable                     # index variable must be equal to the number of rows in the dataframe
+		df.index = index_variable                          # index variable must be equal to the number of rows in the dataframe
 		df.index.name = "index name"
 		df.columns
 		df.columns.name
@@ -201,40 +213,49 @@
 		df.set_index(["school", "rollno"], inplace = True)
 		df.sort_index()
 		df.reset_index()
-		df.loc["dgv":"dav"]                         # outer indexing (on "school")
-		df.loc[1:10]  		                        # inner indexing (on "rollno")
-		df.loc[(["dgv", "dav"], slice(1, 10)), :]   # colon slicing not permitted inside tuple, instead use slice()
-		df.reindex()                                # conform data frame to new index. arrange rows or add new rows
+		df.loc["dgv":"dav"]                                # outer indexing (on "school")
+		df.loc[1:10]  		                               # inner indexing (on "rollno")
+		df.loc[(["dgv", "dav"], slice(1, 10)), :]          # colon slicing not permitted inside tuple, instead use slice()
+		df.reindex()                                       # conform data frame to new index. arrange rows or add new rows
 		
 		# filtering
-		df[df.age > 10]
-		df[df.age == df.age.max()]
-		df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
-		df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
-		df[df.name == "Aman" | df.name = "Arjun"]      # return Aman and Arjun both
-		df.all()                                       # return True if all the elements are True
-		df.any()                                       # return True if any of the elements is True
+			
+			# single condition
+			df[df.age > 10]
+			df[df.age == df.age.max()]
+			df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
+			
+			# multiple conditions
+			df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
+			df[(df.name == "Aman") | (df.name = "Arjun")]  # return Aman and Arjun both
+			
+		df.all()                                           # return True if all the elements are True
+		df.any()                                           # return True if any of the elements is True
 
 		# sort dataframe
 		df.sort_values(by = ["column_name", "column_name"], ascending = False)
 
 		# rename columns
 		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
-		df.columns = ["column1", "column2"]            # rename all columns
+		df.columns = ["column1", "column2"]                # rename all columns
 
 		# change columns order
 		ordered = ['col_3', 'col_1', 'col_2']
 		df = df[ordered]
 		
 		# loc, iloc
-		df.loc[1:5,:]                               # print row [1,5]. need to specify the row and column header names
+		df.loc[1:5,:]                                      # print row [1,5]. need to specify the row and column header names
 		df.loc[[1, 4, 7], ["column1", "column2"]]
 		df.loc[1:10, "column1":"column2"]
 		df.loc[age == df.age.max(), :]
-		df.iloc[1:10, 2:4]                          # print row [1, 10). need to specify the row and column indices
+		df.iloc[1:10, 2:4]                                 # print row [1, 10). need to specify the row and column indices
 
 		# fill NAs
-		df.column_name.fillna(df.column_name.mean(), axis = "index or columns", method = "ffil/bfil", limit = 1)
+		df.column_name.fillna(df.column_name.mean(),
+							  axis    = "index or columns",
+							  method  = "ffil/bfil",
+							  limit = 1
+		)
 		df.fillna(df.mean())
 		df.fillna({
 			"column_name": value,
@@ -252,50 +273,52 @@
 		df.replace(["old_value_list"], ["new_value_list"])                 # mapping
 
 		# apply functions to dataframe
-		df.apply(function, axis = )                    # iterate over columns of dataframe
-		df.column_name.apply(lambda x: x**2)           # iterate over values of column
-		df.age.apply(np.argmax, axis = 1)              # max to get max value, np.argmax to get row name with max value
+		df.apply(function, axis = )                        # iterate over columns of dataframe
+		df.column_name.apply(lambda x: x**2)               # iterate over values of column
+		df.age.apply(np.argmax, axis = 1)                  # max to get max value, np.argmax to get row name with max value
 
 		# group by
-		group = df.groupby("categorical_column")    # returns GroupBy object
-		group.function()                            # apply function to each group separately
+
+			group = df.groupby("categorical_column")       # returns GroupBy object
+			group.function()                               # apply function to each group separately
 
 		# group by and summarize
-		df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
-		df.groupby(["categorical_columns"]).agg({
-			"column": [max, min], 
-			"column": [size, "count"]               # size and "count" are same. "count" is a numpy function. see numpy functions
-		})
-		
-		df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
 
-		df.groupby(["categorical_column", boolean_filter]).another_column.function_name()
-		
-		# change GroupBy to DataFrame
-		df = pd.DataFrame(df.groupby())
-		df = df.add_suffix('_Count').reset_index()  # or df.add_prefix()
+			df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
+			df.groupby(["categorical_columns"]).agg({
+				"column": [max, min], 
+				"column": [size, "count"]                  # size and "count" are same. "count" is a numpy function. see numpy functions
+			})
+			
+			df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
 
-		# set column names after groupby
-		df.columns = ["_".join(colname) for colname in df.columns]
-		
+			df.groupby(["categorical_column", boolean_filter]).another_column.function_name()
+			
+			# change GroupBy to DataFrame
+			df = pd.DataFrame(df.groupby())
+			df = df.add_suffix('_count').reset_index()     # or df.add_prefix()
+
+			# set column names after groupby
+			df.columns = ["_".join(colname) for colname in df.columns]
+			
 		# Melt: wide to long dataframe
 		pd.melt(df,
-				id_vars = ["columns_to_keep"],
-				value_vars = ["columns to melt"],   # optional, if not provided, function will melt all vars except id_vars
-				var_name = ,  					    # new categorical column name
-				value_name =                        # new numerical column name
-		)  										    # similar to gather in tidyr
+				id_vars    = ["columns_to_keep"],
+				value_vars = ["columns to melt"],          # optional, if not provided, function will melt all vars except id_vars
+				var_name   = ,  					       # new categorical column name
+				value_name =                               # new numerical column name
+		)  										           # similar to gather in tidyr
 		
 		# Unmelt: long to wide dataframe
-		df.pivot_table(index = ,                    # columns not to unmelt
-					   columns = ,                  # columns to melt
-					   values =                     # numerical column name
-		)  						                    # in case of duplicate values, use aggfunc to aggregate
+		df.pivot_table(index   = ,                         # name of columns not to unmelt
+					   columns = ,                         # columns to melt
+					   values  =                           # numerical column name
+		)  						                           # in case of duplicate values, use aggfunc to aggregate
 
 		# concatenate dataframes - column + column or row + row
-		pd.concat(objs         =  [df1, df2],       # make sure the columns names/index is same - reset indexx if needed
-				  axis         =  ,                 # 0-index+index, 1-column+column
-				  ignore_index = False              # keep index names
+		pd.concat(objs         =  [df1, df2],              # make sure the columns names/index is same - reset indexx if needed
+				  axis         =  ,                        # 0-index+index, 1-column+column
+				  ignore_index = False                     # keep index names
 		)
 
 		# merge/join dataframe
@@ -305,21 +328,26 @@
 		df.stack()
 		df.stack.unstack()
 
-		# crosstabs
-		pd.crosstab(df.categorical_column1, df.categorical_column2,    # could pass column lists as well
-					margins = True,
-					normalize = {0, 1} or {"all", "index", "columns"}  # similar to prop.table() in R
-		)  # similar to table(category1, catedory2) in R
+		# crosstabs 
 
-		pd.crosstab(df.categorical_column1, df.categorical_column2
-					 values = df.numerical_column,
-					 aggfunc = np.average
-		)  # similar to group by and summarize
+			# table(category1, catedory2)
+			pd.crosstab(df.categorical_column1,
+						df.categorical_column2,            # could pass column lists as well
+						margins   = True,
+						normalize = {0, 1}                 # or {"all", "index", "columns"}. Similar to prop.table() in R
+			)
 
-		# one hot encoding
+			# group by and summarize
+			pd.crosstab(df.categorical_column1,
+						df.categorical_column2
+						values  = df.numerical_column,
+						aggfunc = np.average
+			)  
+
+		# one-hot encoding
 		df_dummy = pd.get_dummies(df,
-								  columns = [column for column in categorical_columns if column not in ["target_column"]],
-								  prefix = 
+								  columns = categorical_columns,     # encodes all object or category type columns
+								  prefix  = 
 		)
 
 		# subset dataframe based on column names
@@ -330,7 +358,7 @@
 
 		OR
 
-		df.filter(regex='^id.*', axis=1)            # subset dataframe on column or index names according to given pattern 
+		df.filter(regex='^id.*', axis=1)                   # subset dataframe on column or index names according to given pattern 
 
 		# write csv
 		df.to_csv("filename.csv", sep = , index = False)
