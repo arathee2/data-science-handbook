@@ -537,48 +537,55 @@
 	# sampling is to be done in case of highly unbalanced class. Only training data has to be sampled.
 
 		# ROSE
-		library(ROSE)
 
-		# oversampling
-		oversampled_train_data <- ovun.sample(target ~ ., data = train, method = "over",
-                                    	N = 2*length(train$target[train$target == "class_with_more_observations"]),
-                                      	seed = 1)$data
-		
-		# undersampling
-		undersampled_train_data <- ovun.sample(target ~ ., data = train, method = "under",
-                                    	N = 2*length(train$target[train$target == "class_with_less_observations"]),
-                                      	seed = 1)$data
+			library(ROSE)
 
-		# mixed sampling
-		mix_sampled_train_data <- ovun.sample(target ~ ., data = train, method = "both", p=0.5, 
-                                  		N=nrow(train),
-                                  		seed = 1)$data
+			# oversampling
+			oversampled_train_data <- ovun.sample(target ~ ., data = train, method = "over",
+	                                    	N = 2*length(train$target[train$target == "class_with_more_observations"]),
+	                                      	seed = 1)$data
+			
+			# undersampling
+			undersampled_train_data <- ovun.sample(target ~ ., data = train, method = "under",
+	                                    	N = 2*length(train$target[train$target == "class_with_less_observations"]),
+	                                      	seed = 1)$data
 
-		# ROSE (type of mixed sampling)
-		rose_train_data <- ROSE(target ~ ., data = train, seed = 1)$data
+			# mixed sampling
+			mix_sampled_train_data <- ovun.sample(target ~ ., data = train, method = "both", p=0.5, 
+	                                  		N=nrow(train),
+	                                  		seed = 1)$data
+
+			# ROSE (type of mixed sampling)
+			rose_train_data <- ROSE(target ~ ., data = train, seed = 1)$data
 
 		# SMOTE
-		library(DMwR)
 
-		smote_train_data <- SMOTE(target ~ ., data = train, perc.over = 100, perc.under = 200, k = 5)
+			library(DMwR)
+			smote_train_data <- SMOTE(target ~ ., data = train, perc.over = 100, perc.under = 200, k = 5)
+
+			library(smotefamily)
+			library(FNN)
+
+			smote_train_data <- SMOTE(train[, !colnames(train) %in% c("target")], train$target, K = 5, dup_size = 0)
 
 		# caret
-		library(caret)
 
-		set.seed(4)
-		down_train <- downSample(x = train[, -ncol(train)], y = train$target)  # ncol(train) - column number of target variable
-		up_train <- upSample(x = train[, -ncol(train)], y = train$target)
-		
-		OR
-		
-		algo.control = trainControl(method = "cv", 
-									number = 5,
-									classProbs = T,
-									summaryFunction = defaultSummary,  # twoClassSummary for binary classification
-									verboseIter = T,
-									allowParallel = T,
-									sampling = "up/down/smote/rose"
-									)
+			library(caret)
+
+			set.seed(4)
+			caret_train_date <- downSample(x = train[, !colnames(train) %in% c("target")], y = train$target)
+			caret_train_date <- upSample(x = train[, !colnames(train) %in% c("target")], y = train$target)
+			
+			OR
+			
+			algo.control = trainControl(method = "cv", 
+										number = 5,
+										classProbs = T,
+										summaryFunction = defaultSummary,  # twoClassSummary for binary classification
+										verboseIter = T,
+										allowParallel = T,
+										sampling = "up/down/smote/rose"
+										)
 
 ==============================================================================================================================
 
@@ -660,8 +667,8 @@
 ### Check constant factors
 
 		logical <- sapply(data_frame, function(x) is.factor(x))
-		factor.variables <- data_frame[ ,names(which(logical == TRUE))]
-		ifelse(factor.variables <- sapply(factor.variables, function(x) length(levels(x))) == 1,"constant factor","0")
+		factor.variables <- data_frame[ , names(which(logical == TRUE))]
+		ifelse(factor.variables <- sapply(factor.variables, function(x) length(levels(x))) == 1,"constant_factor","0")
 		table(factor.variables)
 
 ==============================================================================================================================

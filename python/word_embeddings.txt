@@ -48,7 +48,7 @@
 		new_model = Word2Vec.load('model.bin')
 		print(new_model)
 
-		# to load these embeddings - refer this section on line #93 - ### use pre-trained embeddings in Keras
+		# to load these embeddings - refer this section on line #93 - '### use pre-trained embeddings in Keras'
 
 	## access pre-trained word embeddings in gensim
 
@@ -91,23 +91,43 @@
 	## use gensim word embeddings in Keras
 
 		# load gensim word embedding model (contains all english words) - either created from scratch or access pre-trained embeddings
-		model = 
+		model = # refer section '## create word embeddings from scratch in gensim' or '## access pre-trained word embeddings in gensim' to load model
 
 		# create weight matrix - holds only the word vectors of the words that are present in training data
-		embedding_weights = np.zeros((VOCAB_SIZE, EMBEDDING_SIZE))
+		embedding_weights = np.zeros((VOCABULARY_SIZE, EMBEDDING_SIZE))
 		
-		# create a word2id dictionary using training data
-		word2id =  
+		# create a word2id dictionary either using training data or using Keras' Tokenizer API - refer section '# convert text to integers' in 'dl-in-python.txt'
+		word2id = tokenizer.word_index
 		
 		# copy word vectors from model to weight matrix
-		for word, index in word2id.items():
-			try:
-				embedding_weights[index, :] = model[word]
-			except KeyError:
-				pass
+			
+			for word, index in word2id.items():
+				try:
+					embedding_weights[index, :] = model[word]
+				except KeyError:
+					pass
+			OR
+
+			for word, index in word2id.items():
+			    if word in model.vocab:
+			        embedding_weights[index] = model.word_vec(word)
+
+			OR
+
+			for word, index in word2id.items():
+				if index > (VOCABULARY_SIZE - 1):
+					break
+				else:
+					if model[word] is not None:
+						embedding_matrix[index] = model[word]
+
+		# print null word embeddings
+		print('Total words: {}'.format(VOCABULARY_SIZE))
+		print('Number of words with null word embeddings: {}'.format(np.sum(np.sum(embedding_weights, axis=1) == 0)))
+		print('Missing word embedding ratio: {}%'.format(((np.sum(np.sum(embedding_weights, axis=1) == 0))*100)/VOCABULARY_SIZE))
 
 		# use weight matrix in Embedding layer
-		model.add(Embedding(input_dim     = VOCAB_SIZE,              # vocabulary size
+		model.add(Embedding(input_dim     = VOCABULARY_SIZE,         # vocabulary size - number of unique words in data
 							output_dim    = EMBEDDING_SIZE,          # length of vector with which each word is represented
 							input_length  = MAX_SEQ_LENGTH,          # length of input sequence
 							weights       = embedding_weights,       # word embedding matrix
@@ -115,7 +135,7 @@
 		))
 
 		# to learn word embeddings while training the neural network, don't pass the 'weights' and 'trianable' argument
-		model.add(Embedding(input_dim     = VOCAB_SIZE,              # vocabulary size
+		model.add(Embedding(input_dim     = VOCABULARY_SIZE,         # vocabulary size - number of unique words in data
 							output_dim    = EMBEDDING_SIZE,          # length of vector with which each word is represented
 							input_length  = MAX_SEQ_LENGTH           # length of input sequence
 		))

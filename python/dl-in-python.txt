@@ -172,6 +172,12 @@
 			n_classes = y_train.shape[1]
 
 			# preprocess test data in the exact same way as train data
+			X_test  = X_test.reshape((samples, height, width, channels))
+			X_test  = X_test.astype('float32')
+			X_test  = X_test/255
+
+			y_test   = to_categorical(y_test)                              # for validation purpose - y_test won't be available in real test data
+
 
 		## 1. create architecture
 
@@ -221,6 +227,97 @@
 	### rnn
 
 		## 0. preprocess
+
+			# define constants
+			VOCABULARY_SIZE = 20000
+			EMBEDDING_SIZE = 300
+			MAX_SEQ_LENGTH = 30
+
+			# split data
+			X_train, X_test, y_train, y_test = 
+
+			# sentence cleaning
+			def clean_sentence(sentence, remove_punct=True, sentence_case="lower", remove_stops=True, min_word_length=0):
+			    '''
+				input:
+					sentence        :  string
+					remove_punct    :  whether to remove punctuations from the sentence
+					sentence_case   :  change sentence to "lower" case, "upper" case, or keep "same" case as provided
+					remove_stops    :  whether to remove stopwords from sentence
+					min_word_length :  remove words shorter than min_word_length
+
+				output: clean sentence
+			    '''
+
+			    # remove punctuation
+			    from string import punctuation
+			    if remove_punct:
+			    	sentence = sentence.translate(punctuation)
+			    
+			    # convert words to lower case
+			    if sentence_case == "lower":
+			    	sentence = sentence.lower()
+			    elif sentence_case == "upper":
+			    	sentence = sentence.upper()
+
+			    # tokenise words
+			    from nltk.tokenize import word_tokenize
+				sentence = word_tokenize(sentence)
+			    
+			    # remove stopwords
+			    from nltk.corpus import stopwords
+			    if remove_stops:
+			    	stops = set(stopwords.words("english"))
+				    sentence = [word for word in words if word not in stops]
+
+			    # remove extremely short words
+			    sentence = [word for word in sentence if len(word) > min_word_length]
+
+			    # joing back words to get sentence
+			    sentence = " ".join(sentence)
+
+			    # clean the sentence
+			    sentence = re.sub(r"[^A-Za-z0-9^,!.\/'+-=]", " ", sentence)       # compile regex for quick processing
+
+			    # stemming
+			    from nltk.stem.snowball import SnowballStemmer
+			    sentence = word_tokenize(sentence)
+			    stemmer = SnowballStemmer('english')
+			    stemmed_words = [stemmer.stem(word) for word in sentence]
+			    sentence = " ".join(stemmed_words)
+
+			return sentence
+
+			X_train = training_data.sentence_column.apply(lambda x: clean_sentence(x), axis=1)
+			
+			# convert text to integers
+			from keras.preprocessing.text import Tokenizer
+			tokenizer = Tokenizer(num_words   = VOCABULARY_SIZE,          # number of words to keep, based on frequency
+								  filter      = '',                       # characters to remove - default is all punctuation, plus tabs and line breaks
+								  char_level  = False,                    # whether to character tokenise or word tokenise
+								  oov_token   = None                      # out of vocabulary token
+			)
+			tokenizer.fit_on_texts(training_data)
+			train_sequences = tokenizer.texts_to_sequences(X_train)
+
+			# pad sentence in order to have same length for each sentence
+			from keras.preprocessing.sequence import pad_sequences
+			train_sequences = pad_sequences(train_sequences, maxlen=MAX_SEQ_LENGTH)
+
+			# one-hot encode y
+			from keras.utils import to_categorical
+			y_train   = to_categorical(y_train)
+			n_classes = y_train.shape[1]
+
+			# prepare test data in the same manner - clean the text, convert text to integers (using the train fit) and then pad
+			X_test = test_data.sentence_column.apply(lambda x: clean_sentence(x), axis=1)
+			test_sequences = tokenizer.texts_to_sequences(X_test)
+			test_sequences = pad_sequences(test_sequences, maxlen=MAX_SEQ_LENGTH)
+
+			y_test = to_categorical(y_test)                               # for validation purpose - y_test won't be available in real test data
+
+			# prepare word embedding - refer 'word_embeddings.txt'
+
 
 		## 1. create architecture
 
@@ -325,7 +422,7 @@
 									  write_grads             =  True,       # whether to visualize gradient histograms
 									  write_images            =  False,      # whether to write model weights to visualize as image
 									  embeddings_freq         =  0,          # frequency (in epochs) at which selected embedding layers will be saved
-									  embeddings_layer_names  =  None        # a list of names of layers to keep eye on. If None then watch all embedding layers
+									  embeddings_layer_names  =  None        # list of names of layers to keep an eye on. If None then watch all embedding layers
 			)
 			
 			# combine all callbacks and pass to fit method
@@ -414,7 +511,7 @@
 
 	# RNN
 
-		# embeddings - for text data
+		# embeddings - for sentence data
 		vocab_size        = 5000
 		max_review_length = 400
 		from keras.preprocessing import sequence
