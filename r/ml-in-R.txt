@@ -338,6 +338,10 @@
 		xgb.predict <- predict(xgb.model, data.cv)
 		confusionMatrix(xgb.predict, cv$target)
 
+		predictor.names <- dimnames(data.matrix(train[, !(names(train) %in% c("target"))]))[[2]]
+		importance_matrix <- xgb.importance(predictor.names, model = xgb.model)
+		xgb.plot.importance(importance_matrix[1:20,])  # plot top 20 important variables
+
 ==============================================================================================================================
 
 ### caret

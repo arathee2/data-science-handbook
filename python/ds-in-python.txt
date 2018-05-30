@@ -363,6 +363,16 @@
 		# write csv
 		df.to_csv("filename.csv", sep = , index = False)
 
+		# remove constant columns
+		def drop_constant_columns(dataframe):
+		    """
+		    Drops constant value columns of pandas dataframe.
+		    """
+		    keep_columns = [column for column in dataframe.columns if len(dataframe[column].unique()) > 1]
+		    return dataframe[keep_columns].copy()
+
+		df = drop_constant_columns(df)
+		
 ==============================================================================================================================
 
 ### matplotlib

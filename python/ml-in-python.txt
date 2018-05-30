@@ -525,6 +525,17 @@
 			X_train = imputer.transform(X_train)
 			X_test = imputer.transform(X_test)
 
+			# fancy impute
+			from fancyimpute import KNN
+			imputer = KNN(k              =  5,             # number of neighboring rows to use for imputation
+						  orientation    =  "rows",        # axis of the input matrix to be treated as a sample - "rows" or "columns"
+						  print_interval =  100,           # integer
+						  min_value      =  ,              # minimum possible imputed value
+						  max_value      =  ,              # maximum possible imputed value
+						  verbose        =  True           # boolean
+			)
+			X_complete = imputer.complete(X_incomplete)    # X_incomplete contains missing values
+
 		## scale
 
 			# stanadard scaler - not to be used in machine learning pipelines
