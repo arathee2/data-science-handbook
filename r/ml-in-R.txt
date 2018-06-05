@@ -44,18 +44,17 @@
 
 	## Variable Selection
 
-		# 1. Select important variables using stepAIC()
+		# 1. Select the best model with all the important variables using stepAIC()
 		linear.model <- stepAIC(linear.model, direction = "both/backward/forward")
 
-		# 2. Remove one variable which has high vif (more than 2, 3 or 4) and high p-value (more than 0.01, 0.05 or 0.1).
-		vif(linear.model)        # check vif values
-		summary(linear.model)    # check p-values
+		# 2. Remove the variable which has high vif (more than 2, 3 or 4) and high p-value (more than 0.01, 0.05 or 0.1)
+		vif(linear.model)        # check vif values - note down the variable with highest vif
+		summary(linear.model)    # check p-values   - remove the noted variable if p-value is also less than threhsold
 
 		# 3. Rebuild model after removing one variable at a time, using the above step
 		linear.model <- lm(formula = , data = train)
 
-		# Step 2 and 3 are repeated until all the variables have a required vif (say, less than 3), and a required p-value (say, less than 0.001)
-		# Tip: When vif values are low enough, you can skip checking vif values. Only check the p-values.
+		# Step 2 and 3 are repeated until all the variables have a required vif (say, less than 3), and a required p-value (say, less than 0.01)
 
 ==============================================================================================================================
 
@@ -81,23 +80,26 @@
 		library(ROCR)
 		library(pROC)
 
+		# roc curve
 		roc_curve <- roc(cv$target, algo.predict, plot=TRUE, auc=TRUE, grid=TRUE, col="blue")
 		plot(roc_curve)
 		lines(roc_curve2)  # add roc_curve2 to roc_curve plot
 
-		glm.predict <- predict(model, cv)
-		glm.ROCR <- prediction(glm.predict, cv$target)
-		glm.AUC <- as.numeric(performance(glm.ROCR,"auc")@y.values)
+		# auc
+		predict <- predict(model, cv)
+		rocr <- prediction(predict, cv$target)
+		auc <- as.numeric(performance(rocr, "auc")@y.values)
 
-		glm.prediction <- prediction(abs(glm.predict), cv$target)
-		glm.performance <- performance(glm.prediction,"tpr", "fpr")
-		plot(glm.performance)
+		# roc curve
+		rocr <- prediction(abs(predict), cv$target)
+		roc <- performance(rocr, "tpr", "fpr")
+		plot(roc)
 
 	## Lift chart
 
-		glm.prediction <- prediction(abs(glm.predict), cv$target)
-		glm.performance <- performance(glm.prediction, "lift", "rpp")  # google ROCR performance functions for more charts
-		plot(glm.performance)
+		rocr <- prediction(abs(predict), cv$target)
+		lift.chart <- performance(rocr, "lift", "rpp")  # google ROCR performance functions for more charts
+		plot(lift.chart)
 
 ==============================================================================================================================
 
@@ -593,7 +595,7 @@
 
 ==============================================================================================================================
 
-### One-Hot Encoding
+### one-hot Encoding
 
 		library(caret)
 
@@ -602,7 +604,7 @@
 
 ==============================================================================================================================
 
-### Handling missing values
+### handling missing values
 
 	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
 		
@@ -741,6 +743,96 @@
 				select(-new.numerical.var) # wide to long
 
 		spread(data_frame, categorical.var, corresponding.numerical.var) # long to wide
+
+==============================================================================================================================
+
+## stringr
+
+		library(stringr)
+
+		tolower(character.variable)
+		toupper(character.variable)
+
+		substr("Amandeep", 1, 4)                     # return 'Aman'
+
+		# split
+		strsplit(character.variable, pattern)        # split at given pattern
+		
+		# extract
+		str_extract(variable, pattern)
+		
+		# replace
+		sub("#", "%", character.variable)            # substitute the first '#' with '%'
+		gsub("#", "%", character.variable)           # substitute all the '#' with '%'
+		str_replace(character.variable, "#", "%")    # same as gsub()
+		
+		# check string presence
+		grepl(pattern, character.variable)           # return logical vector whether pattern appears or not
+		str_detect(character.variable, pattern)      # check if same as above
+		
+		str_length() or nchar()
+		str_trim(character.vector)
+		str_pad(character.vector, width = , side = "", pad = "")
+
+==============================================================================================================================
+
+## text-analysis
+
+		library(tm)
+		library(SnowballC)
+		library(wordcloud)
+		library(RColorBrewer)
+
+	# cleaning data
+
+		bag <- Corpus(VectorSource(data_frame$textVariable))
+
+		bag <- tm_map(bag, tolower)
+		
+		bag <- tm_map(bag, PlainTextDocument)
+
+		bag <- tm_map(bag, removePunctuation)
+
+		bag <- tm_map(bag, removeWords, c("your custom words", stopwords("english")))
+
+		bag <- tm_map(bag, stripWhitespace)
+
+		bag <- tm_map(bag, stemDocument)
+
+	# converting to data frame
+
+		frequencies <- DocumentTermMatrix(bag)
+
+		findFreqTerms(frequencies, lowfreq = 20) # to words that appear atleast 20 times
+
+		sparseWords <- removeSparseTerms(frequencies, 0.995) # words that appear in 99.5 percent tweets
+		
+		sparseWords <- as.data.frame(as.matrix(sparseWords)) # converting the matrix of sparse words to data frame
+
+		colnames(sparseWords) <- make.names(colnames(sparseWords))
+
+	# wordcloud
+
+		bag <- TermDocumentMatrix(bag)
+		bag <- as.matrix(bag)
+		bag <- sort(rowSums(bag), decreasing = T)
+		bag.df <- data.frame(word = names(bag), freq = bag)
+		
+		set.seed(154)
+				
+		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
+	    			max.words=1500, random.order=FALSE, rot.per=0.35, 
+        			colors=brewer.pal(8, "Dark2"), scale = c(5,0.5))
+
+==============================================================================================================================
+
+## Data Table
+
+		library(DT)
+		datatable(data_frame)
+
+		# table in R markdown
+		kable(data_frame)
 
 ==============================================================================================================================
 

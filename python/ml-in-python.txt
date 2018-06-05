@@ -487,6 +487,12 @@
 
 		## impute missing values
 
+			# ways to deal with missing values
+			# 1. delete observation/delete columns with a lot of missing values (>50%)
+			# 2. impute with mean/median/mode
+			# 3. assign a unique category such as -1
+			# 4. predict missing values using trees or knn
+
 			# Imputer - for numeric columns
 			from sklearn.preprocessing import Imputer
 			imputer = Imputer(missing_values = "NaN", strategy = "mean", axis = 0)
@@ -536,7 +542,7 @@
 			)
 			X_complete = imputer.complete(X_incomplete)    # X_incomplete contains missing values
 
-		## scale
+		## scale numeric columns
 
 			# stanadard scaler - not to be used in machine learning pipelines
 			from sklearn.preprocessing import scale
@@ -563,7 +569,7 @@
 			X_train_scaled = normalizer.transform(X_train)
 			X_test_scaled = normalizer.transform(X_test)
 
-		## encode categorical values
+		## encode categorical columns
 
 			# LabelEncoder
 			from sklearn.preprocessing import LabelEncoder
@@ -669,7 +675,8 @@
 				df_pca = model.transform(sparse_df)
 				model.components_
 
-				# non-negative matrix factorization (NMF) - interpretable, unlike pca
+			## non-negative matrix factorization (NMF) - interpretable, unlike pca
+
 				from sklearn.decomposition import NMF
 				model = NMF(n_components = n)      # always specify n_components, unlike PCA()
 				model.fit(df)                      # data should have non-negative entries only
