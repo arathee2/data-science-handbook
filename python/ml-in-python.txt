@@ -131,205 +131,276 @@
 			
 	### models
 
-		# linear regression
-		from sklearn.linear_model import LinearRegression
-		model = LinearRegression()                         # instantiate model
-		model.fit(X_train, y_train)                        # fit model
-		y_pred = model.predict(X_test)                     # predict using model
-		model.score(X_test, y_test)                        # evaluate model
+		## linear regression
 
-		# regularization
-		from sklearn.linear_model import Lasso             # l1-regularization
-		model = Lasso(alpha = , normalize = )
-		model.fit(X_train, y_train)
-		coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
-		plt.plot(range(len(names)), coefficients)          # variable importance
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
+			from sklearn.linear_model import LinearRegression
+			model = LinearRegression()                         # instantiate model
+			model.fit(X_train, y_train)                        # fit model
+			y_pred = model.predict(X_test)                     # predict using model
+			model.score(X_test, y_test)                        # evaluate model
 
-		from sklearn.linear_model import Ridge             # l2-regularization
-		model = Ridge(alpha = , normalize = )
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
 
-		from sklearn.linear_model import ElasticNet        # mix of l1 and l2 regularization
-		model = ElasticNet(alpha = , normalize = )
-		model.fit(X_train, y_train)
-		coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
-		plt.plot(range(len(names)), coefficients)          # variable importance
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
+		## regularization
 
-		# logistic regression
-		from sklearn.linear_model import LogisticRegression
-		from sklearn.feature_selection import RFE
-		model = LogisticRegression(penalty  =  "l2",
-								   C        =  1.0,
-								   verbose  =  1
-		)
-		# rfe = RFE(model, n)                              # recursive feature elimination. select top n features
-		# fit = rfe.fit(X_train, y_train)
-		# print(fit.n_features_, fit.support_, fit.ranking_)
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
+			# lasso - l1
+			from sklearn.linear_model import Lasso             # l1-regularization
+			model = Lasso(alpha = , normalize = )
+			model.fit(X_train, y_train)
+			coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
+			plt.plot(range(len(names)), coefficients)          # variable importance
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
 
-		# multiclass logistic regression
-		from sklearn.multiclass import OneVsRestClassifier
-		model = OneVsRestClassifier(LogisticRegression())  # also used when the target column is changed to dummy target columns
+			# ridge - l2
+			from sklearn.linear_model import Ridge             # l2-regularization
+			model = Ridge(alpha = , normalize = )
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
 
-		# knn
-		from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-		model = KNeighborsClassifier(n_neighbors = 6)
-		model = KNeighborsRegressor()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
+			# elasticnet - l1 + l2
+			from sklearn.linear_model import ElasticNet        # mix of l1 and l2 regularization
+			model = ElasticNet(alpha = , normalize = )
+			model.fit(X_train, y_train)
+			coefficients = model.fit(X_train, y_train).coef_   # extract coefficients for each feature
+			plt.plot(range(len(names)), coefficients)          # variable importance
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
 
-		# support vector machines
-		from sklearn.svm import SVC, SVR
-		model = SVC(C = , kernel = "")
-		model = SVR(C = , kernel = "")
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
 
-		# decision tree
-		from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
-		import graphviz
-		model = DecisionTreeClassifier(criterion         =  "gini/entropy",
-									   max_depth         =  ,
-									   min_samples_split =  ,
-									   min_samples_leaf  =  ,
-									   max_features      =  ,
-									   max_leaf_nodes    =  ,
-									   min_impurity_decrease = ,
-									   class_weight      =  "balanced",
-									   presort           =  "True"        # faster training when dataset is small
-				)
-		model = DecisionTreeRegressor()  # same parameters as DecisionTreeClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.tree_
-		graph_data = export_graphviz(model, 
-									 out_file            =   None,
-									 feature_names       =   ,
-									 class_names         =   ,
-									 filled              =   True,
-									 rounded             =   True,  
-									 special_characters  =   True
-					 )
-		graph = graphviz.Source(graph_data) 
-		graph.render("tree")  # save tree as tree.pdf file
-
-		# random forest
-		from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-		model = RandomForestClassifier(n_estimators        = ,            # number of trees
-									   max_features        = ,            # number of features at each node split
-									   oob_score           = True,
-									   random_state        = 4,           # random seed
-
-				)
-		model = RandomForestRegressor()          # same parameters as RandomForestClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.oob_score_
-
-		# ada boost
-		from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
-		model = AdaBoostClassifier(base_estimator    = ,                  # optional
-								   n_estimators      = 100,               # number of trees
-								   learning_rate     = 0.1,               # trade-off between learning_rate and n_estimators
-								   random_state      = 4,                 # random seed
-
-				)
-		model = AdaBoostRegressor()              # same parameters as RandomForestClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.estimator_errors_
-		model.estimator_weights_
-
-		# gradient boosting
-		from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
-		model = GradientBoostingClassifier(loss                = "deviance",
-										   learning_rate       = 0.1,
-										   n_estimators        = 100,         # number of trees
-										   max_depth           = 3,           # depth of tree
-										   min_samples_split   = 2,
-										   min_samples_leaf    = 1,
-										   subsample           = 1.0,
-										   max_features        = None,
-										   verbose             = 0,
-										   random_state        = 4,
-
-				)
-		model = GradientBoostingRegressor()             # same parameters as GradientBoostingClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		model.score(X_test, y_test)
-		model.feature_importances_
-		model.train_score_[i]                           # train score of i-th iteration
-
-		# xgboost
-		from xgboost import XGBClassifier
-		model = XGBClassifier()
-		model.fit(X_train, y_train)
-		y_pred = model.predict(X_test)
-		predictions = [round(value) for value in y_pred]
-		model.score(X_test, y_test)
+		## logistic regression
 		
-		OR
+			from sklearn.linear_model import LogisticRegression
+			from sklearn.feature_selection import RFE
+			model = LogisticRegression(penalty  =  "l2",
+									   C        =  1.0,
+									   verbose  =  1
+			)
+			# rfe = RFE(model, n)                              # recursive feature elimination. select top 'n' features
+			# fit = rfe.fit(X_train, y_train)
+			# print(fit.n_features_, fit.support_, fit.ranking_)
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
 
-		import xgboost as xgb
-		dtrain = xgb.DMatrix(X_train, label = y_train)
-		dtest = xgb.DMatrix(X_test, label = y_test)
-		parameters = dict(
+			# multiclass logistic regression
+			from sklearn.multiclass import OneVsRestClassifier
+			model = OneVsRestClassifier(LogisticRegression())  # also used when the target column is changed to dummy target columns
+
+
+		## knn
+
+			from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+			model = KNeighborsClassifier(n_neighbors = 6)
+			model = KNeighborsRegressor()
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
+
+
+		## support vector machine
+
+			from sklearn.svm import SVC, SVR
+			model = SVC(C = , kernel = "")
+			model = SVR(C = , kernel = "")
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
+
+
+		## decision tree
+
+			from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, export_graphviz
+			import graphviz
+			model = DecisionTreeClassifier(criterion         =  "gini/entropy",
+										   max_depth         =  ,
+										   min_samples_split =  ,
+										   min_samples_leaf  =  ,
+										   max_features      =  ,
+										   max_leaf_nodes    =  ,
+										   min_impurity_decrease = ,
+										   class_weight      =  "balanced",
+										   presort           =  "True"        # faster training when dataset is small
+					)
+			model = DecisionTreeRegressor()  # same parameters as DecisionTreeClassifier()
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
 			
-			# general Parameters
-			booster            = "gbtree",          		# default = "gbtree"
-			silent             = 0,                 		# default = 0
+			# feature importance
+			model.feature_importances_
+			
+			# plot tree
+			model.tree_
+			graph_data = export_graphviz(model, 
+										 out_file            =   None,
+										 feature_names       =   ,
+										 class_names         =   ,
+										 filled              =   True,
+										 rounded             =   True,  
+										 special_characters  =   True
+						 )
+			graph = graphviz.Source(graph_data) 
+			graph.render("tree")  # save tree as tree.pdf file
 
-			# booster Parameters
-			eta                = 0.3,               		# default = 0.3, range: [0,1
-			gamma              = 0,                 		# default = 0,   range: [0,∞]
-			max_depth          = 6,                 		# default = 6,   range: [1,∞]
-			min_child_weight   = 1,                 		# default = 1,   range: [0,∞]
-			subsample          = 1,                 		# default = 1,   range: (0,1]
-			colsample_bytree   = 1,                 		# default = 1,   range: (0,1]
-			colsample_bylevel  = 1,                 		# default = 1,   range: (0,1]
-			lambda             = 1,                 		# default = 1
-			alpha              = 0,                 		# default = 
 
-			# task Parameters
-			objective          = "binary:logistic", 		# default = "reg:linear"
-			eval_metric        = ["error", "logloss"],
-			num_classes        = 2,                 		# number of classes in case of multi class classification
-			seed               = 4				  		    # reproducability seed
-        )
+		## random forest
 
-        eval_list  = [(dtest,'eval'), (dtrain,'train')]
-        model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
-        y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
-        xgb.plot_importance(model)                          # import matplotlib for this
-        xgb.plot_tree(model, num_trees=2)                   # import graphviz for this
-        model.save_model("model_name")
+			from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+			model = RandomForestClassifier(n_estimators        = ,            # number of trees
+										   max_features        = ,            # number of features at each node split
+										   oob_score           = True,
+										   random_state        = 4,           # random seed
 
-        # voting ensemble
-        from sklearn.ensemble import VotingClassifier
-        estimators = [
-        			("knn", KNeighborsClassifier()),
-        			('cart', DecisionTreeClassifier()),
-        			('svm', SVC())
-        ]
-        model = VotingClassifier(estimators)
-        cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
+					)
+			model = RandomForestRegressor()          # same parameters as RandomForestClassifier()
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
+			
+			# feature importance
+			model.feature_importances_
+
+			# oobs score
+			model.oob_score_
+
+
+		## ada boost
+
+			from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
+			model = AdaBoostClassifier(base_estimator    = ,                  # optional
+									   n_estimators      = 100,               # number of trees
+									   learning_rate     = 0.1,               # trade-off between learning_rate and n_estimators
+									   random_state      = 4,                 # random seed
+
+					)
+			model = AdaBoostRegressor()              # same parameters as RandomForestClassifier()
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
+			model.feature_importances_
+			model.estimator_errors_
+			model.estimator_weights_
+
+
+		## gradient boosting
+
+			# start with a small learning rate such as 0.01 - find optimal number of trees using training and validation error plot
+			# most important parameters to tune are - learning_rate, n_estimators, max_depth, subsample and max_features
+			from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor
+			model = GradientBoostingClassifier(loss                = "deviance",
+											   learning_rate       = 0.1,         # good choice - [<0.1]
+											   n_estimators        = 100,         # number of trees - good choice - [100-2000]
+											   max_depth           = 3,           # depth of tree - good choice - [3-7]
+											   max_leaf_nodes      = None,        # max_depth=k is equivalent to max_leaf_nodes=k+1 -- use one of them -- using max_leaf_nodes is significantly faster but gives slightly higher error
+											   subsample           = 1.0,         # subset of rows - good choice - [0.3-0.7]
+											   max_features        = None,        # subset of columns - good choice ['sqrt', 0.4-0.8]
+											   min_samples_split   = 2,
+											   min_samples_leaf    = 1,
+											   verbose             = 1,
+											   random_state        = 4,
+
+					)
+			model = GradientBoostingRegressor()             # same parameters as GradientBoostingClassifier()
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
+			model.feature_importances_
+			model.train_score_[i]                           # train score of i-th iteration
+
+		## xgboost
+
+			# start with a small learning rate such as 0.01 - find optimal number of trees using training and validation error plot
+			# most important parameters to tune are - learning_rate, n_estimators, max_depth, subsample and colsample
+			
+			# scikit-learn wrapper
+			from xgboost import XGBClassifier
+			model = XGBClassifier(learning_rate      = 0.1,     # good choice - [<0.1]
+								  n_estimators       = 100,     # number of trees - good choice - [100-2000]
+								  max_depth          = 3,       # maximum depth of tree - good choice - [3-7]
+								  subsample          = 1.0,     # subset of rows - good choice - [0.3-0.7]
+								  colsample_bytree   = 1.0,     # subset of columns at each tree - good choice ['sqrt', 0.4-0.8]
+								  colsample_bylevel  = 1.0,     # subset of columns at each split - good choice ['sqrt', 0.4-0.8]
+								  nthread            = -1       # number of cores to use
+			)
+
+			eval_set = [(X_train, y_train), (X_test, y_test)]
+			eval_metric = 'rmse'/'mae'/'error'/'logloss'/'mlogloss'/'auc'   # pass a list to pass multiple metrics
+
+			model.fit(X_train, y_train, early_stopping_rounds=10, eval_metric="error", eval_set=eval_set, verbose=True)
+			y_pred = model.predict(X_test)
+			predictions = [round(value) for value in y_pred]
+			model.score(X_test, y_test)
+			model.feature_importances_
+			
+			# plot learning curve
+
+				results = model.evals_result()
+				epochs = len(results['validation_0']['error'])
+				x_axis = range(0, epochs)
+				
+				# plot evaluation metric
+				fig, ax = pyplot.subplots()
+				ax.plot(x_axis, results['validation_0']['logloss'], label='Train')
+				ax.plot(x_axis, results['validation_1']['logloss'], label='Test')
+				ax.legend()
+				pyplot.ylabel('Log Loss')
+				pyplot.title('XGBoost Log Loss')
+				pyplot.show()
+
+			# manual xgboost
+			import xgboost as xgb
+			dtrain = xgb.DMatrix(X_train, label = y_train)
+			dtest = xgb.DMatrix(X_test, label = y_test)
+			parameters = dict(
+				
+				# general parameters
+				booster            = "gbtree",          		# default = "gbtree"
+				silent             = 0,                 		# default = 0
+
+				# booster parameters
+				eta                = 0.3,               		# default = 0.3, range: [0,1]
+				gamma              = 0,                 		# default = 0,   range: [0,∞]
+				max_depth          = 6,                 		# default = 6,   range: [1,∞]
+				min_child_weight   = 1,                 		# default = 1,   range: [0,∞]
+				subsample          = 1,                 		# default = 1,   range: (0,1]
+				colsample_bytree   = 1,                 		# default = 1,   range: (0,1]
+				colsample_bylevel  = 1,                 		# default = 1,   range: (0,1]
+				lambda             = 1,                 		# default = 1
+				alpha              = 0,                 		# default = 0
+
+				# task parameters
+				objective          = "binary:logistic", 		# default = "reg:linear"
+				eval_metric        = ["error", "logloss"],
+				num_classes        = 2,                 		# number of classes in case of multi class classification
+				seed               = 4				  		    # reproducability seed
+	        )
+
+	        eval_list  = [(dtest,'eval'), (dtrain,'train')]
+	        
+	        model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
+	        y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
+	        
+	        # feature importance
+	        xgb.plot_importance(model)                          # import matplotlib for this
+	        
+	        # plot tree
+	        xgb.plot_tree(model,                                # import graphviz for this
+	        			  num_trees = 2,                        # plot 2nd tree
+	        			  rankdir   = 'LR'                      # plot tree in a left-to-right format
+	        )
+	        
+
+        ## voting ensemble
+
+	        from sklearn.ensemble import VotingClassifier
+	        estimators = [
+	        			("knn", KNeighborsClassifier()),
+	        			('cart', DecisionTreeClassifier()),
+	        			('svm', SVC())
+	        ]
+	        model = VotingClassifier(estimators)
+	        cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
 
 	    ## save/load model
 	    	
@@ -351,7 +422,7 @@
 
 	### model evaluation
 
-			# return default metric
+		## return default metric
 			model.score(X_test, y_test)                     # return accuracy/r-squared
 			
 		## regression
@@ -393,7 +464,7 @@
 			from sklearn.metrics import log_loss
 			log_loss(y_test, y_pred)                           # see scikit-learn documentation
 
-		## cross validation
+		## cross-validation
 
 			# create folds
 			from sklearn.model_selection import KFold
@@ -407,9 +478,9 @@
 			folds = LeaveOneOut()
 			folds = ShuffleSplit(n_splits = 5, test_size = 0.3, random_state = 4)
 
-			# cross validation without hyperparameter tuning - select best model among different models
+			# cross-validation without hyperparameter tuning - select best model among different models
 			score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
-			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)  # pass model/pipeline after instantiating it
+			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score, n_jobs=-1, verbose=1)  # pass model/pipeline after instantiating it
 			cv_results.mean()*100
 			cv_results.std()*100
 
@@ -451,6 +522,30 @@
 			model_cv.cv_results_
 			model_cv.best_score_
 			model_cv.best_params_
+
+		## feature selection
+
+			# train model on complete data
+			model.fit(X_train, y_train)
+
+			# select threshold using feature importance
+			thresholds = sort(model.feature_importances_)
+			
+			# build model using all the thresholds - builds model using one best feature, two best features and so on..
+			for thresh in thresholds:
+				
+				# select a subset of features in the train and test data using threshold
+				selection = SelectFromModel(model, threshold=thresh, prefit=True)
+				X_train_subset = selection.transform(X_train)
+				X_test_subset = selection.transform(X_test)
+
+				# re-train model on subset X_train
+				model.fit(X_train_subset, y_train)
+				
+				# evaluate model on subset X_test
+				score = model.score(X_test_subset, y_test)
+
+				print("Thresh=%.3f, n=%d, Score: %.2f%%" % (thresh, X_train_subset.shape[1], score*100.0))
 
 		## compare machine learning models
 

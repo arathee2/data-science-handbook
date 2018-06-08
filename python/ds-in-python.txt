@@ -137,7 +137,10 @@
 		df.head(n)                                         # return first "n" rows of df
 		df.tail(n)                                         # return last "n" rows of df
 		df.dtypes                                          # return data type of each column
-		df.describe()                                      # similar to summary() in R
+		df.describe(percentiles  = None,                   # percentiles to display - range --> [0, 1]
+					include      = 'all',                  # data types to include
+					exclude      = None                    # data types to exclude
+		)
 		df.info()
 
 		# check missing values
@@ -189,19 +192,17 @@
 		scatter_matrix(df)
 		
 		# change columns types
+		pd.to_numeric(df.column, errors = "coerce")
+		
 		df.column.astype(str)
 		
 		df.column.astype("category",
 						 categories = ['good', 'excellent'],
-						 ordered    = True
-		)
+						 ordered    = True)
 		
-		pd.to_numeric(df.column, 
-					  errors = "coerce")
 		
 		df.select_dtypes(include    = ["int64"],
-						 exclude    = ["float64"]
-		)
+						 exclude    = ["float64"])
 		
 		# index and column names
 		df.index = index_variable                          # index variable must be equal to the number of rows in the dataframe
@@ -273,7 +274,7 @@
 		df.replace(["old_value_list"], ["new_value_list"])                 # mapping
 
 		# apply functions to dataframe
-		df.apply(function, axis = )                        # iterate over columns of dataframe
+		df.apply(function, axis = 0/1)                     # iterate over columns/rows of dataframe
 		df.column_name.apply(lambda x: x**2)               # iterate over values of column
 		df.age.apply(np.argmax, axis = 1)                  # max to get max value, np.argmax to get row name with max value
 
@@ -837,7 +838,7 @@
 		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
 		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
 		from functools import reduce
-		reduce(function, sequence)                    # returns a single value unlike map() and filter()
+		reduce(function, sequence)                    # reduce list to one number using a function
 
 		# list comprehension
 		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
@@ -1030,6 +1031,11 @@
 
 		frequency = "2Q"                   # change frequency to half yearly - upsample
 		df.resample(frequency).function()  # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
+
+		# convert variable to date
+		df.date_columns = pd.to_datetime(df.date_columns, format = '%m/%d/%Y')
+		OR
+		df[date_columns] = df[date_columns].apply(lambda date_column: pd.to_datetime(date_column, format = '%m/%d/%Y'), axis=0)
 
 		# date methods
 		df.data_column.dt.hour             # extract hour
