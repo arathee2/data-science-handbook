@@ -274,7 +274,7 @@
 									   random_state      = 4,                 # random seed
 
 					)
-			model = AdaBoostRegressor()              # same parameters as RandomForestClassifier()
+			model = AdaBoostRegressor()              # same parameters as AdaBoostClassifier()
 			model.fit(X_train, y_train)
 			y_pred = model.predict(X_test)
 			model.score(X_test, y_test)
@@ -331,8 +331,17 @@
 			y_pred = model.predict(X_test)
 			predictions = [round(value) for value in y_pred]
 			model.score(X_test, y_test)
-			model.feature_importances_
 			
+			# feature importance
+			model.feature_importances_
+	        xgb.plot_importance(model)                          # import matplotlib for this
+	        
+	        # plot tree
+	        xgb.plot_tree(model,                                # import graphviz for this
+	        			  num_trees = 2,                        # plot 2nd tree
+	        			  rankdir   = 'LR'                      # plot tree in a left-to-right format
+	        )
+	        
 			# plot learning curve
 
 				results = model.evals_result()
@@ -380,16 +389,7 @@
 	        
 	        model = xgb.train(parameters, dtrain, num_round = 10, eval_list, early_stopping_rounds = 10)
 	        y_pred = model.predict(dtest, ntree_limit = model.best_ntree_limit)  # pass ntree_limit only if early_stopping_rounds used
-	        
-	        # feature importance
-	        xgb.plot_importance(model)                          # import matplotlib for this
-	        
-	        # plot tree
-	        xgb.plot_tree(model,                                # import graphviz for this
-	        			  num_trees = 2,                        # plot 2nd tree
-	        			  rankdir   = 'LR'                      # plot tree in a left-to-right format
-	        )
-	        
+
 
         ## voting ensemble
 
@@ -399,7 +399,7 @@
 	        			('cart', DecisionTreeClassifier()),
 	        			('svm', SVC())
 	        ]
-	        model = VotingClassifier(estimators)
+	        model = VotingClassifier(estimators, voting='soft', weights=[2,1,2], n_jobs=-1)
 	        cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score)
 
 	    ## save/load model
