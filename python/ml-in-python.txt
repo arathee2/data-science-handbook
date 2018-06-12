@@ -251,6 +251,7 @@
 										   max_features        = ,            # number of features at each node split
 										   oob_score           = True,
 										   random_state        = 4,           # random seed
+										   verbose             = 1
 
 					)
 			model = RandomForestRegressor()          # same parameters as RandomForestClassifier()
@@ -447,7 +448,7 @@
 				tp = cm[1][1]
 				sensitivity = tp/(tp+fn)
 				specificity = tn/(tn+fp)
-				accuracy = (tp+fn)/(tn+fp+fn+tp)
+				accuracy = (tp+tn)/(tn+fp+fn+tp)
 				print(pd.DataFrame({"Accuracy": [accuracy], "Sensitivity": [sensitivity], "Specificity": [specificity]}))
 
 			from sklearn.metrics import classification_report
@@ -580,13 +581,33 @@
 
 	### preprocessing techniques
 
+		## cap outliers
+		def cap_outliers(array, sigma_value=3):
+		    upper_limit = array.mean() + sigma_value*array.std()
+		    lower_limit = array.mean() - sigma_value*array.std()
+		    array[array<lower_limit] = lower_limit
+		    array[array>upper_limit] = upper_limit
+		    return array
+		
+		df[num_attributes] = df[num_attributes].apply(cap_outliers)
+
+		## aggregate categorical variables
+		df.groupby('categorical_variable').target.mean()        # replace the categories with the aggregated values
+
 		## impute missing values
 
 			# ways to deal with missing values
-			# 1. delete observation/delete columns with a lot of missing values (>50%)
+			# 1. delete rows/columns with a lot of missing values (>40%)
 			# 2. impute with mean/median/mode
-			# 3. assign a unique category such as -1
+			# 3. in categorical columns, assign a unique category such as -1
 			# 4. predict missing values using trees or knn
+
+			# visualise missing values
+			import missingno as msno
+			msno.matrix(df)                                # matrix of missing values
+			msno.bar(df)                                   # missing value bar chart
+			msno.heatmap(df)                               # correlation heatmap - 1 means both variables are missing together; -1 means not missing together even in a single observation
+			msno.dendrogram(df)                            # dendogram of variables
 
 			# Imputer - for numeric columns
 			from sklearn.preprocessing import Imputer
@@ -701,8 +722,14 @@
 					 ("model_name", model)]
 			pipeline = Pipeline(steps)
 			pipeline.fit(X_train, y_train)
+			
+			# predict - last item has to be a model
 			y_pred = pipeline.predict(X_test)
 
+			# transform - there should be no model in the pipeline
+			X_train = pipeline.transform(X_train)
+			X_test  = pipeline.transform(X_test)
+			
 			# multiple pipelines
 			from sklearn.pipeline import FeatureUnion
 			pipeline_1 = Pipeline([(),()])
@@ -714,6 +741,10 @@
 					])
 			final_pipeline = Pipeline([('union', union), (), (), ("model_name", model)])
 			final_pipeline.fit(X_train, y_train)
+
+
+			# extract model from pipeline
+			model = final_pipeline.named_steps['model_name']
 
 	### unsupervised learning
 
@@ -757,18 +788,21 @@
 				model = PCA(n_components = )       # first do model = PCA(). optimum n_components_ is known after plotting the bar plot - using elbow method
 				model.fit(df)                      # scale data before applying pca
 				df_pca = model.transform(df)
-				model.components_
-				features = range(model.n_components_)
-				plt.bar(features, model.explained_variance_)
+				
+				np.round(pca.explained_variance_ratio_.cumsum(), 4)*100
+				
+				features = range(pca.n_components_)
+				cumulative_variance = np.round(np.cumsum(pca.explained_variance_ratio_)*100, decimals=4)
 				plt.xticks(features)
-				plt.show()
+				plt.plot(cumulative_variance)
 
 				# pca for sparse matrices such as bag-of-words model or tf-idf model
 				from sklearn.decomposition import TruncatedSVD
 				model = TruncatedSVD(n_components = )
 				model.fit_transform(sparse_df)     # sparse_df is scipy.sparse.csr_matrix, not a numpy array
 				df_pca = model.transform(sparse_df)
-				model.components_
+				
+				np.round(pca.explained_variance_ratio_.cumsum(), 4)*100
 
 			## non-negative matrix factorization (NMF) - interpretable, unlike pca
 

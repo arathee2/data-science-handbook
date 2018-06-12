@@ -152,6 +152,13 @@
 				  thresh  = 
 		)
 
+		# visualise missing values
+		import missingno as msno
+		msno.matrix(df)                                # matrix of missing values
+		msno.bar(df)                                   # missing value bar chart
+		msno.heatmap(df)                               # correlation heatmap - 1 means both variables are missing together; -1 means not missing together even in a single observation
+		msno.dendrogram(df)                            # dendogram of variables
+
 		# duplicate rows
 		df.duplicated()                                    # boolean ouput
 		df.duplicated().sum()                              # return number of duplicate entries
@@ -213,7 +220,7 @@
 		# hierarchical indexing
 		df.set_index(["school", "rollno"], inplace = True)
 		df.sort_index()
-		df.reset_index()
+		df.reset_index(drop=True)                          # drop stops the function to create a new 'index' column after reset
 		df.loc["dgv":"dav"]                                # outer indexing (on "school")
 		df.loc[1:10]  		                               # inner indexing (on "rollno")
 		df.loc[(["dgv", "dav"], slice(1, 10)), :]          # colon slicing not permitted inside tuple, instead use slice()
@@ -567,7 +574,7 @@
 		# heatmap
 		mycmap = sns.light_palette(color, reverse=False, as_cmap=True)  # sequential palette from light to color
 		mycmap = sns.dark_palette(color, reverse=False, as_cmap=True)   # sequential palette from dark to color
-		mycmap = sns.diverging_palette(h_neg, h_pos, center="light/dark", as_cmap=True)  # h_neg to light/dark to h_pos
+		mycmap = sns.diverging_palette(h_neg=, h_pos=, s=, l=, center="light/dark", as_cmap=True)  # h_neg to light/dark to h_pos
 		
 		sns.heatmap(data          =  df.corr(),                  # 2d array data such as a pivot table
 					cmap          =  mycmap,                     # colors of the heatmap
@@ -830,15 +837,15 @@
 				print(str(key) + ":" + str(value))
 		function_name(first_name = "Amandeep", last_name = "Rathee")
 
-		# lambda functions
-		lambda variables: operations                  # return result of operation
-		square = lambda x: x**2                       # return square of x
-		maximum = lambda x, y: x if (x > y) else y
-
 		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
 		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
 		from functools import reduce
 		reduce(function, sequence)                    # reduce list to one number using a function
+
+		# lambda functions
+		lambda variables: operations                  # return result of operation
+		square = lambda x: x**2                       # return square of x
+		maximum = lambda x, y: x if (x > y) else y
 
 		# list comprehension
 		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
