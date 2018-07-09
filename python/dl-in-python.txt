@@ -133,7 +133,8 @@
 		## 4. evaluate model
 
 			# evaluate model performance on test set
-			model.evaluate(X_test, y_test, verbose = 1)
+			loss, accuracy = model.evaluate(X_test, y_test, verbose = 1)
+			print("Loss: {0}, Accuracy: {1}".format(loss, accuracy))
 			print(model.metrics_names)                                       # no idea what this function does
 			
 			# predict values on test set

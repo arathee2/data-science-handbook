@@ -131,6 +131,24 @@
 			
 	### models
 
+		## knn
+
+			from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+			model = KNeighborsClassifier(n_neighbors = 6)
+			model = KNeighborsRegressor()
+			model.fit(X_train, y_train)
+			y_pred = model.predict(X_test)
+			model.score(X_test, y_test)
+
+
+		## naive bayes
+
+			from sklearn.naive_bayes import GaussianNB, BernoulliNB, MultinomialNB
+			model = GaussianNB()
+			model.fit(X_train, y_train)
+			model.score(X_test, y_test)
+
+
 		## linear regression
 
 			from sklearn.linear_model import LinearRegression
@@ -172,30 +190,23 @@
 		
 			from sklearn.linear_model import LogisticRegression
 			from sklearn.feature_selection import RFE
-			model = LogisticRegression(penalty  =  "l2",
-									   C        =  1.0,
-									   verbose  =  1
+			model = LogisticRegression(penalty      =  "l2",
+									   C            =  1.0,
+									   class_weight =  {0:0.5, 1:0.5}, # handle class imbalance
+									   verbose      =  1
 			)
-			# rfe = RFE(model, n)                              # recursive feature elimination. select top 'n' features
-			# fit = rfe.fit(X_train, y_train)
-			# print(fit.n_features_, fit.support_, fit.ranking_)
 			model.fit(X_train, y_train)
 			y_pred = model.predict(X_test)
 			model.score(X_test, y_test)
 
+			# feature selection
+			rfe = RFE(model, n)                              # recursive feature elimination. select top 'n' features
+			fit = rfe.fit(X_train, y_train)
+			print(fit.n_features_, fit.support_, fit.ranking_)
+			
 			# multiclass logistic regression
 			from sklearn.multiclass import OneVsRestClassifier
 			model = OneVsRestClassifier(LogisticRegression())  # also used when the target column is changed to dummy target columns
-
-
-		## knn
-
-			from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
-			model = KNeighborsClassifier(n_neighbors = 6)
-			model = KNeighborsRegressor()
-			model.fit(X_train, y_train)
-			y_pred = model.predict(X_test)
-			model.score(X_test, y_test)
 
 
 		## support vector machine
@@ -221,7 +232,7 @@
 										   min_impurity_decrease = ,
 										   class_weight      =  "balanced",
 										   presort           =  "True"        # faster training when dataset is small
-					)
+			)
 			model = DecisionTreeRegressor()  # same parameters as DecisionTreeClassifier()
 			model.fit(X_train, y_train)
 			y_pred = model.predict(X_test)
@@ -239,7 +250,7 @@
 										 filled              =   True,
 										 rounded             =   True,  
 										 special_characters  =   True
-						 )
+			)
 			graph = graphviz.Source(graph_data) 
 			graph.render("tree")  # save tree as tree.pdf file
 
@@ -253,7 +264,7 @@
 										   random_state        = 4,           # random seed
 										   verbose             = 1
 
-					)
+			)
 			model = RandomForestRegressor()          # same parameters as RandomForestClassifier()
 			model.fit(X_train, y_train)
 			y_pred = model.predict(X_test)
@@ -274,7 +285,7 @@
 									   learning_rate     = 0.1,               # trade-off between learning_rate and n_estimators
 									   random_state      = 4,                 # random seed
 
-					)
+			)
 			model = AdaBoostRegressor()              # same parameters as AdaBoostClassifier()
 			model.fit(X_train, y_train)
 			y_pred = model.predict(X_test)
@@ -301,7 +312,7 @@
 											   verbose             = 1,
 											   random_state        = 4,
 
-					)
+			)
 			model = GradientBoostingRegressor()             # same parameters as GradientBoostingClassifier()
 			model.fit(X_train, y_train)
 			y_pred = model.predict(X_test)
@@ -481,7 +492,7 @@
 
 			# cross-validation without hyperparameter tuning - select best model among different models
 			score = "r2/neg_mean_squared_error/neg_mean_absolute_error/accuracy/neg_log_loss/roc_auc/f1/recall"
-			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score, n_jobs=-1, verbose=1)  # pass model/pipeline after instantiating it
+			cv_results = cross_val_score(model, X_train, y_train, cv = folds, scoring = score, n_jobs=-1, verbose=1)  # pass model/pipeline after instantiation; returns scores, not model
 			cv_results.mean()*100
 			cv_results.std()*100
 
@@ -523,6 +534,7 @@
 			model_cv.cv_results_
 			model_cv.best_score_
 			model_cv.best_params_
+			model = model.best_estimator_                      # returns best model/pipeline object
 
 		## feature selection
 
@@ -591,7 +603,7 @@
 		
 		df[num_attributes] = df[num_attributes].apply(cap_outliers)
 
-		## aggregate categorical variables
+		## aggregate categorical variables - alternate to one-hot encoding
 		df.groupby('categorical_variable').target.mean()        # replace the categories with the aggregated values
 
 		## impute missing values
@@ -660,10 +672,6 @@
 
 		## scale numeric columns
 
-			# stanadard scaler - not to be used in machine learning pipelines
-			from sklearn.preprocessing import scale
-			X_scaled = scale(X)
-
 			# MinMaxScaler
 			from sklearn.preprocessing import MinMaxScaler
 			min_max_scaler = MinMaxScaler(feature_range=(0, 1))
@@ -671,9 +679,16 @@
 			X_train_scaled = min_max_scaler.transform(X_train)
 			X_test_scaled = min_max_scaler.transform(X_test)
 
-			# StandardScaler (0-mean, 1-standard deviation)
+			# StandardScaler (remove mean and divide by standard deviation)
 			from sklearn.preprocessing import StandardScaler
 			standard_scaler = StandardScaler()
+			standard_scaler.fit(X_train)
+			X_train_scaled = standard_scaler.transform(X_train)
+			X_test_scaled = standard_scaler.transform(X_test)
+
+			# RobustScaler (remove median and divide by IQR)
+			from sklearn.preprocessing import RobustScaler
+			standard_scaler = RobustScaler(quantile_range=(25.0, 75.0))
 			standard_scaler.fit(X_train)
 			X_train_scaled = standard_scaler.transform(X_train)
 			X_test_scaled = standard_scaler.transform(X_test)
@@ -708,7 +723,7 @@
 			X_train_subset = categorical_encoder.transform(X_train_subset)
 			X_test_subset = categorical_encoder.transform(X_test_subset)
 
-			# binarizer - convert all values above the threshold to 1 and all values below the threshold to 0
+			# Binarizer - convert all values above the threshold to 1 and all values below the threshold to 0
 			from sklearn.preprocessing import Binarizer
 			binarizer = Binarizer(threshold=0.5).fit_transform(X)
 
@@ -742,7 +757,6 @@
 			final_pipeline = Pipeline([('union', union), (), (), ("model_name", model)])
 			final_pipeline.fit(X_train, y_train)
 
-
 			# extract model from pipeline
 			model = final_pipeline.named_steps['model_name']
 
@@ -762,6 +776,16 @@
 
 			# hierarchical clustering
 
+				# sklearn-way
+				from sklearn.cluster import AgglomerativeClustering
+				model = AgglomerativeClustering()
+				model.fit(X)
+				model.labels_
+				model.n_leaves_
+				clusters = model.predict(X)
+				new_labels = model.predict(X_new)
+
+				# scipy-way
 				from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 				
 				# complete linkage : distance between clusters is the distance between the farthest points of the clusters.
@@ -791,9 +815,7 @@
 				
 				np.round(pca.explained_variance_ratio_.cumsum(), 4)*100
 				
-				features = range(pca.n_components_)
 				cumulative_variance = np.round(np.cumsum(pca.explained_variance_ratio_)*100, decimals=4)
-				plt.xticks(features)
 				plt.plot(cumulative_variance)
 
 				# pca for sparse matrices such as bag-of-words model or tf-idf model

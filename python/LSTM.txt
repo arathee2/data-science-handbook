@@ -1,0 +1,106 @@
+#### LSTM
+	
+	# data shape = (samples, time_steps, features)
+		
+		# samples    = number of observations
+		# time_steps = number of elements in a sequence
+		# features   = either the number of unique features such as pressure and temperature
+		#              OR
+		#              the size of one-hot-encoded vector of elements
+		#              OR
+		#              multi-dimensional in case of CNN-LSTM architecture --> (samples, time_steps, height, width, channels)
+
+		# output shape = can be 1 or more
+		#                1    - when doing regression
+		#                more - when doing classification
+		#                more - when predicting multiple features as the same time such coordinates (a, b) or (temp and pressure)
+		
+
+	### Vanilla LSTM
+	model = Sequential()
+	model.add(LSTM(2, input_shape=(10, 25)))  # input shape = (time steps, features)
+	model.add(Dense(1))
+
+	# stateful LSTM -- what is the importance? google!
+	model.add(LSTM(2, stateful=True, batch_input_shape=(32, 10, 25)))
+	epochs = 1000
+	for i in range(epochs):
+		model.fit(X, y, epochs=1, shuffle=False, batch_input_shape=(32, 10, 25))
+		model.reset_states()
+	predictions = model.predict(X, batch_size=32)
+	
+	#### Types of LSTM architectures
+
+		# one-to-one LSTM
+		model = Sequential()
+		model.add(LSTM(..., input_shape=(1, ...))) # 1 time-step
+		model.add(Dense(1))                        # one output at each time-step
+
+		# one-to-many LSTM
+		model = Sequential()
+		model.add(Conv2D(...))
+		...
+		model.add(LSTM(...))
+		model.add(TimeDistributed(Dense(1)))      # many outputs (1-output but has many time-steps)
+
+		# many-to-one LSTM
+		model = Sequential()
+		model.add(LSTM(..., input_shape=(steps, ...))) # many time-steps as inputs
+		model.add(Dense(1))                            # one output
+
+		# many-to-many LSTM (len(input) == len(output))
+		model = Sequential()
+		model.add(LSTM(..., input_shape=(steps, ...), return_sequences=True)) # many time-steps as input
+		model.add(TimeDistributed(Dense(1)))                                  # many outputs
+
+		# many-to-many LSTM (len(input) != len(output)) encoder-decoder architecture
+		model = Sequential()
+		model.add(LSTM(..., input_shape=(in_steps, ...)))            # many time-steps as inputs
+		model.add(RepeatVector(out_steps))                           # inputs equal outputs here
+		model.add(LSTM(..., return_sequences=True))
+		model.add(TimeDistributed(Dense(1, activation='sigmoid')))   # many outputs
+
+	# Vanilla LSTM
+	
+		model = Sequential()
+		model.add(LSTM(..., input_shape=(...)))
+		model.add(Dense(...))
+
+	# Stacked LSTM
+		
+		model = Sequential()
+		model.add(LSTM(..., return_sequences=True, input_shape=(...)))
+		model.add(LSTM(..., return_sequences=True))
+		model.add(LSTM(..., return_sequences=True))  # return sequences returns 3D output to next layer instead of 2D
+		model.add(LSTM(...))
+		model.add(Dense(...))
+		
+	# CNN-LSTM
+
+		# apply cnn --> then lstm
+		# cnn (extracts spatial structure) is used to extract features from images - 
+		# lstm (extracts temporal structure of a sequence) is applied to, say, a series of images
+		# cnn is applied to each time-step and hence we should use TimeDistributed()
+		# TimeDistributed() makes it compatible with lstm (that is, cnn outputs what lstm expects)
+		
+		# data shape --> [samples, timesteps, width, height, channels]
+
+		model = Sequential()
+		
+		# define CNN model
+		# cnn should be applied to each time step, hence use TimeDistributed()
+		model.add(TimeDistributed(Conv2D(...))
+		model.add(TimeDistributed(MaxPooling2D(...)))
+		model.add(TimeDistributed(Flatten()))
+		
+		# define LSTM model
+		model.add(LSTM(...))
+		model.add(Dense(...))
+
+	# encoder-decoder
+
+		
+
+	# bidirectional LSTM
+
+		model.add(Bidirectional(LSTM(...), input_shape=(...), merge_mode='concat'))

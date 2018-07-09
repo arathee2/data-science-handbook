@@ -20,6 +20,174 @@
 
 ==============================================================================================================================
 
+### python
+
+		# os commands
+		os.getcwd()
+		os.chdir(r"")
+
+		# print
+		print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+		print("Value of x is: {1} and value of y is: {0}".format(y, x))
+		print("Value of x is:", x, "and value of y is:", y)
+
+		# dictionary
+		dictionary = {'key': 'value', 'key': 'value'}       # key and value can be string, integer or float
+		dict([('key', 'value'), ('key', 'value')])
+		dict(zip([key_list], [value_list]))
+		dict(key='value', key='value')
+		dictionary.keys()
+		dictionary.values()
+		dictionary.items()
+
+		# sort sequence
+		student_tuples = [
+						  '''('name', 'section', 'age')'''
+        					 ('john',   'A',      15),
+	        				 ('jane',   'B',      12),
+    	    				 ('dave',   'B',      10)
+        ]
+        sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age in ascending order
+
+		# if-else condition
+		if condition:
+			code
+		elif condition:
+			code
+		else:
+			code
+
+		# while loop
+		while condition:
+			code
+
+		# for loop
+		for var in seq:
+			print(var)
+
+		for index, var in enumerate(seq):
+			print(str(index) + "-" + str(var))
+
+		for x, y, z in zip(sequence1, sequence2, sequence3):
+			print(x, y, z)
+
+		# for loops for dictionaries
+		for key, value in dict.items():
+			print(str(key) + "-" + str(value))
+
+		# for loops for numpy arrays
+		for var in np.nditer(numpy_array):
+			print(var)
+
+		global var    # use global variable instead of local variable inside a function
+		nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
+
+		# default arguments
+		def function_name(x = 2):
+			print(x**2)
+
+		# multiple arguments
+		def function_name(*args):
+		""" print all the parameters """
+			for param in args:
+				print(param)
+		function_name(1, 2, "hi")
+
+		# keyword arguments
+		def function_name(**kwargs):
+		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
+			for key, value in kwargs.items():
+				print(str(key) + ":" + str(value))
+		function_name(first_name = "Amandeep", last_name = "Rathee")
+
+		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
+		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
+		from functools import reduce
+		reduce(function, sequence)                    # reduce list to one number using a function
+
+		# lambda functions
+		lambda variables: operations                  # return result of operation
+		square = lambda x: x**2                       # return square of x
+		maximum = lambda x, y: x if (x > y) else y
+
+		# list comprehension
+		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
+		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
+		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
+		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
+
+		# dictionary comprehension
+		result = {number: number**2 for number in range(5)}
+
+		# error handling
+		def root(number):
+			if root < 0
+				raise ValueError("negative numbers not allowed.")
+
+			try:
+				return number ** 0.5
+			except:
+				print("Please enter an int or float.")
+
+		# iterators and iterables
+		iterator = iter(iterable)                     # iterable can be any sequence-lists, string, dictonaries etc.
+		next(iteration)                               # print the next item in iterable
+
+		list(enumerate(sequence, start = 0))          # return a list of tuples with index and the item of sequence
+		list(zip(sequence1, sequence2, sequence3))    # return a list of tuples. each tuple has corresponding items from each sequence
+
+		# load dataframe in chunks
+		for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
+
+		# generators
+		generator = (num for num in range(10))        # generator can be iterated over. instead of returning a list at once it returns number as and when required.
+		def generator_function(n):
+			""" return numbers upto n """
+			i = 0
+			while i < n
+			yield i                                   # generates i and returns as the while loop runs
+			i += 1
+
+	# importing data
+
+		# import text file
+		file = open("filename.txt", mode = "r")       # open file in read-only mode
+		fulltext = file.read()
+		firstline = file.readline()                   # read line iteratively
+		file.close()
+		print(file.closed)                            # check if file is closed
+
+		OR
+
+		with open("filename.txt", "r") as file:
+			print(file.readline())
+
+		# import flat file using numpy
+		np.loadtxt("filename", delimiter = ",", skiprows = 1, usecols = [1:10], dtype = )
+		np.genfromtxt("filename", delimiter = ",", names = True, dtype = None)
+		np.recfromcsv("filename")                     # same as genfromtxt() with parameters shown above as default
+
+		# import flat file using pandas
+		df = pd.read_csv("filename", nrows = , header = , sep = "", names = ["column names"],
+						 comment = ["", ""], na_values = ["", ""], parse_dates = , index_col = )
+
+		array = df.values                             # extract numpy array from dataframe
+
+		# pickled files - python specific
+		import pickle
+		
+		with open("data.pkl", "rb") as file:          # rb - readonly binary
+    			  data = pickle.load(file)
+    	print(data)
+
+		# import excel file
+		df = pd.ExcelFile("filename")
+		df.sheet_names()  # print sheet names
+		df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])        # extract sheet by specifying sheet name
+		df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
+
+==============================================================================================================================
+
 ### numpy
 	
 	import numpy as np
@@ -446,7 +614,7 @@
 		plt.ylim([ymin, ymax])
 		plt.axis([xmin, xmax, ymin, ymax])
 		plt.axis("off/equal/square/tight")
-		plt.figure(figsize=(10,10))
+		plt.figure(figsize=(10,10))                    # change it before plotting
 
 		# legends
 		plt.scatter(x, y, color = "green", label = "male")
@@ -758,173 +926,6 @@
 
 ==============================================================================================================================
 
-### python
-
-		# os commands
-		os.getcwd()
-		os.chdir(r"")
-
-		# print
-		print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
-		print("Value of x is: {1} and value of y is: {0}".format(y, x))
-		print("Value of x is:", x, "and value of y is:", y)
-
-		# dictionary
-		dictionary = {'key': 'value', 'key': 'value'}       # key and value can be string, integer or float
-		dict([('key', 'value'), ('key', 'value')])
-		dict(zip([key_list], [value_list]))
-		dict(key='value', key='value')
-		dictionary.keys()
-		dictionary.values()
-		dictionary.items()
-
-		# sort sequence
-		student_tuples = [
-        	('john', 'A', 15),
-	        ('jane', 'B', 12),
-    	    ('dave', 'B', 10),
-        ]
-        sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age in ascending order
-
-		# if-else condition
-		if condition:
-			code
-		elif condition:
-			code
-		else:
-			code
-
-		# while loop
-		while condition:
-			code
-
-		# for loop
-		for var in seq:
-			print(var)
-
-		for index, var in enumerate(seq):
-			print(str(index) + "-" + str(var))
-
-		for x, y, z in zip(sequence1, sequence2, sequence3):
-			print(x, y, z)
-
-		# for loops for dictionaries
-		for key, value in dict.items():
-			print(str(key) + "-" + str(value))
-
-		# for loops for numpy arrays
-		for var in np.nditer(numpy_array):
-			print(var)
-
-		global var    # use global variable instead of local variable inside a function
-		nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
-
-		# default arguments
-		def function_name(x = 2):
-			print(x**2)
-
-		# multiple arguments
-		def function_name(*args):
-		""" print all the parameters """
-			for param in args:
-				print(param)
-		function_name(1, 2, "hi")
-
-		# keyword arguments
-		def function_name(**kwargs):
-		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
-			for key, value in kwargs.items():
-				print(str(key) + ":" + str(value))
-		function_name(first_name = "Amandeep", last_name = "Rathee")
-
-		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
-		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
-		from functools import reduce
-		reduce(function, sequence)                    # reduce list to one number using a function
-
-		# lambda functions
-		lambda variables: operations                  # return result of operation
-		square = lambda x: x**2                       # return square of x
-		maximum = lambda x, y: x if (x > y) else y
-
-		# list comprehension
-		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
-		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
-		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
-		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
-
-		# dictionary comprehension
-		result = {number: number**2 for number in range(5)}
-
-		# error handling
-		def root(number):
-			if root < 0
-				raise ValueError("negative numbers not allowed.")
-
-			try:
-				return number ** 0.5
-			except:
-				print("Please enter an int or float.")
-
-		# iterators and iterables
-		iterator = iter(iterable)                     # iterable can be any sequence-lists, string, dictonaries etc.
-		next(iteration)                               # print the next item in iterable
-
-		list(enumerate(sequence, start = 0))          # return a list of tuples with index and the item of sequence
-		list(zip(sequence1, sequence2, sequence3))    # return a list of tuples. each tuple has corresponding items from each sequence
-
-		# load dataframe in chunks
-		for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
-
-		# generators
-		generator = (num for num in range(10))        # generator can be iterated over. instead of returning a list at once it returns number as and when required.
-		def generator_function(n):
-			""" return numbers upto n """
-			i = 0
-			while i < n
-			yield i                                   # generates i and returns as the while loop runs
-			i += 1
-
-	# importing data
-
-		# import text file
-		file = open("filename.txt", mode = "r")       # open file in read-only mode
-		fulltext = file.read()
-		firstline = file.readline()                   # read line iteratively
-		file.close()
-		print(file.closed)                            # check if file is closed
-
-		OR
-
-		with open("filename.txt", "r") as file:
-			print(file.readline())
-
-		# import flat file using numpy
-		np.loadtxt("filename", delimiter = ",", skiprows = 1, usecols = [1:10], dtype = )
-		np.genfromtxt("filename", delimiter = ",", names = True, dtype = None)
-		np.recfromcsv("filename")                     # same as genfromtxt() with parameters shown above as default
-
-		# import flat file using pandas
-		df = pd.read_csv("filename", nrows = , header = , sep = "", names = ["column names"],
-						 comment = ["", ""], na_values = ["", ""], parse_dates = , index_col = )
-
-		array = df.values                             # extract numpy array from dataframe
-
-		# pickled files - python specific
-		import pickle
-		
-		with open("data.pkl", "rb") as file:          # rb - readonly binary
-    			  data = pickle.load(file)
-    	print(data)
-
-		# import excel file
-		df = pd.ExcelFile("filename")
-		df.sheet_names()  # print sheet names
-		df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])        # extract sheet by specifying sheet name
-		df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
-
-==============================================================================================================================
-
 ### regular expressions
 
 		# strings
@@ -1036,8 +1037,8 @@
 		# resampling - change (increase - upsampling or decrease - downsampling) frequency of timeseries data
 		# frequencies - T(minute), H(hour), D(day), B(business day), W(week), M(month), Q(quarter), A(year)
 
-		frequency = "2Q"                   # change frequency to half yearly - upsample
-		df.resample(frequency).function()  # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
+		frequency = "2Q"                         # change frequency to half yearly - upsample
+		df.resample(frequency).function()        # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
 
 		# convert variable to date
 		df.date_columns = pd.to_datetime(df.date_columns, format = '%m/%d/%Y')
@@ -1045,13 +1046,17 @@
 		df[date_columns] = df[date_columns].apply(lambda date_column: pd.to_datetime(date_column, format = '%m/%d/%Y'), axis=0)
 
 		# date methods
-		df.data_column.dt.hour             # extract hour
-		df.data_column.dt.dayofweek        # extract dayofweek
-		df.data_column.dt.dayofyear        # extract dayofyear
-		df.data_column.dt.weekofyear       # extract weekofyear
-		df.data_column.dt.month            # extract month
-		df.data_column.dt.year             # extract year
+		df.date_column.dt.hour                   # extract hour
+		df.date_column.dt.dayofweek              # extract dayofweek
+		df.date_column.dt.dayofyear              # extract dayofyear
+		df.date_column.dt.weekofyear             # extract weekofyear
+		df.date_column.dt.month                  # extract month
+		df.date_column.dt.year                   # extract year
 
+		# shift command
+		df.shifted = df.date.shift(periods  = ,  # time steps to shift
+								   axis     = 0  # 0-rows, 1-columns
+		)
 		# visualize time series
 		df.column.plot(style = "k.-")      # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
 		

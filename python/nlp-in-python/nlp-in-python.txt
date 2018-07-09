@@ -5,22 +5,22 @@
 			from string import punctuation
 			text = text.translate(punctuation)
 			
-		## convert words to lower case
+		## convert words to lower or upper case
 
 			text = text.lower()
 			text = text.upper()
 
 		## tokenize text
 
-			# tokenize text in different words
+			# tokenize text into different words
 			from nltk.tokenize import word_tokenize
 			words = word_tokenize(text)
 
-			# tokenize text in different sentences
+			# tokenize text into different sentences
 			from nltk.tokenize import sent_tokenize
 			sentences = sent_tokenize(text)
 
-			# tokenise text in different words - tokenizes emojis, hastags and other social media elements properly
+			# tokenise text into different words - tokenizes emojis, hastags and other social media elements properly
 			from nltk.tokenize import TweetTokenizer
 			tokenizer = TweetTokenizer()
 			tokenizer.tokenize(text)
