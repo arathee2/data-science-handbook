@@ -21,7 +21,7 @@
 	model.add(LSTM(2, input_shape=(10, 25)))  # input shape = (time steps, features)
 	model.add(Dense(1))
 
-	# stateful LSTM -- what is the importance? google!
+	# stateful LSTM -- what is the importance? google! - when order of training example is also important
 	model.add(LSTM(2, stateful=True, batch_input_shape=(32, 10, 25)))
 	epochs = 1000
 	for i in range(epochs):

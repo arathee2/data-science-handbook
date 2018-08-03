@@ -133,8 +133,8 @@
 			    '''
 
 			    # remove all punctuations
-			    from string import punctuation
 			    if remove_punct:
+			    	from string import punctuation
 			    	document = document.translate(punctuation)
 			    
 			    # convert words to lower case
@@ -151,25 +151,26 @@
 			    words = [word.strip() for word in words]
 
 			    # remove stopwords
-			    from nltk.corpus import stopwords
 			    if remove_stops:
+			    	from nltk.corpus import stopwords
 			    	stops = set(stopwords.words("english"))
 				    words = [word for word in words if word not in stops]
 
 				# spell correction
-				from spell_corrector import rectify
 				if spell_correction:
+					from spell_corrector import rectify
 					words = [rectify(word) for word in words]
 				
 				# stemming
-				from nltk.stem.snowball import SnowballStemmer
-				stemmer = SnowballStemmer('english')
-				words = [stemmer.stem(word) for word in words]
+				if stem = True:
+					from nltk.stem.snowball import SnowballStemmer
+					stemmer = SnowballStemmer('english')
+					words = [stemmer.stem(word) for word in words]
 
 			    # remove extremely short words
 			    words = [word for word in words if len(word) > min_word_length]
 
-			    # joing back words to get document
+			    # join back words to get document
 			    document = " ".join(words)
 
 			    # remove unwanted characters

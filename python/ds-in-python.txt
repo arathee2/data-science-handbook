@@ -41,12 +41,12 @@
 		dictionary.items()
 
 		# sort sequence
-		student_tuples = [
+		student_tuples = {
 						  '''('name', 'section', 'age')'''
         					 ('john',   'A',      15),
 	        				 ('jane',   'B',      12),
     	    				 ('dave',   'B',      10)
-        ]
+        }
         sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age in ascending order
 
 		# if-else condition
