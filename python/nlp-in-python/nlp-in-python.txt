@@ -33,6 +33,15 @@
 
 			from nltk import FreqDist
 			from collections import Counter
+			import seaborn as sns
+			import requests
+
+			# download text
+			url = "https://www.gutenberg.org/files/11/11-0.txt"
+			book = requests.get(url)
+			text = book.text
+
+			# plot word frequencies
 			def plot_word_frequency(words, top_n=10):
 			    word_freq = FreqDist(words)                # or word_freq = Counter(text)
 			    words = [element[0] for element in word_freq.most_common(top_n)]
@@ -162,7 +171,7 @@
 					words = [rectify(word) for word in words]
 				
 				# stemming
-				if stem = True:
+				if stem:
 					from nltk.stem.snowball import SnowballStemmer
 					stemmer = SnowballStemmer('english')
 					words = [stemmer.stem(word) for word in words]
@@ -174,6 +183,7 @@
 			    document = " ".join(words)
 
 			    # remove unwanted characters
+			    import re
 			    document = re.sub(char_filter, " ", document)       # compile regex for quick processing
 
 			    # replace multiple whitespaces with single whitespace

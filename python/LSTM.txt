@@ -18,10 +18,10 @@
 
 	### Vanilla LSTM
 	model = Sequential()
-	model.add(LSTM(2, input_shape=(10, 25)))  # input shape = (time steps, features)
+	model.add(LSTM(10, input_shape=(10, 25)))  # input shape = (time steps, features)
 	model.add(Dense(1))
 
-	# stateful LSTM -- what is the importance? google! - when order of training example is also important
+	# stateful LSTM -- when order of training example is also important
 	model.add(LSTM(2, stateful=True, batch_input_shape=(32, 10, 25)))
 	epochs = 1000
 	for i in range(epochs):
@@ -33,8 +33,13 @@
 
 		# one-to-one LSTM
 		model = Sequential()
-		model.add(LSTM(..., input_shape=(1, ...))) # 1 time-step
-		model.add(Dense(1))                        # one output at each time-step
+		model.add(LSTM(..., input_shape=(1, num_features)))      # one time-step as input
+		model.add(Dense(1))                                      # one output at each time-step
+
+		# many-to-one LSTM
+		model = Sequential()
+		model.add(LSTM(..., input_shape=(steps, num_features)))  # many time-steps as inputs
+		model.add(Dense(1))                                      # one output
 
 		# one-to-many LSTM
 		model = Sequential()
@@ -43,11 +48,7 @@
 		model.add(LSTM(...))
 		model.add(TimeDistributed(Dense(1)))      # many outputs (1-output but has many time-steps)
 
-		# many-to-one LSTM
-		model = Sequential()
-		model.add(LSTM(..., input_shape=(steps, ...))) # many time-steps as inputs
-		model.add(Dense(1))                            # one output
-
+		
 		# many-to-many LSTM (len(input) == len(output))
 		model = Sequential()
 		model.add(LSTM(..., input_shape=(steps, ...), return_sequences=True)) # many time-steps as input

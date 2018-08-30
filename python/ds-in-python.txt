@@ -498,7 +498,7 @@
 		)
 
 		# merge/join dataframe
-		df.merge(df1, df2, on = "common_column", how = "inner")
+		df_1.merge(df2, df3, on = "common_column", how = "inner")
 
 		# stacking and unstacking
 		df.stack()
