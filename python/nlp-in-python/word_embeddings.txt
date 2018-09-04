@@ -118,8 +118,11 @@
 				if index > (VOCABULARY_SIZE - 1):
 					break
 				else:
-					if model[word] is not None:
-						embedding_matrix[index] = model[word]
+					try:
+						if model[word] is not None:
+							embedding_weights[index] = model[word]
+					except KeyError:
+						pass
 
 		# print null word embeddings
 		print('Total words: {}'.format(VOCABULARY_SIZE))
