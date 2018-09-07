@@ -1,24 +1,19 @@
 #### LSTM
 	
 	# data shape = (samples, time_steps, features)
-		
+
+		# applies to both X and y
 		# samples    = number of observations
 		# time_steps = number of elements in a sequence
 		# features   = either the number of unique features such as pressure and temperature
 		#              OR
-		#              the size of one-hot-encoded vector of elements
+		#              the size of vocabulary in case of one-hot-encoded vector of elements or word embeddings
 		#              OR
 		#              multi-dimensional in case of CNN-LSTM architecture --> (samples, time_steps, height, width, channels)
 
-		# output shape = can be 1 or more
-		#                1    - when doing regression
-		#                more - when doing classification
-		#                more - when predicting multiple features as the same time such coordinates (a, b) or (temp and pressure)
-		
-
 	### Vanilla LSTM
 	model = Sequential()
-	model.add(LSTM(10, input_shape=(10, 25)))  # input shape = (time steps, features)
+	model.add(LSTM(10, input_shape=(10, 25)))  # input shape = (time_steps, features)
 	model.add(Dense(1))
 
 	# stateful LSTM -- when order of training example is also important
@@ -31,40 +26,41 @@
 	
 	#### Types of LSTM architectures
 
-		# one-to-one LSTM
+		# one-to-one LSTM - equivalent of vanilla neural network
 		model = Sequential()
-		model.add(LSTM(..., input_shape=(1, num_features)))      # one time-step as input
-		model.add(Dense(1))                                      # one output at each time-step
+		model.add(LSTM(..., input_shape=(1, features)))           # single input
+		model.add(Dense(1))                                       # single output
 
 		# many-to-one LSTM
 		model = Sequential()
-		model.add(LSTM(..., input_shape=(steps, num_features)))  # many time-steps as inputs
-		model.add(Dense(1))                                      # one output
+		model.add(LSTM(..., input_shape=(time_steps, features)))  # multiple inputs (one at each timestep)
+		model.add(Dense(1))                                       # single output (at the end of sequence)
 
 		# one-to-many LSTM
 		model = Sequential()
-		model.add(Conv2D(...))
+		model.add(Conv2D(...))                                    # single input at the first timestep: single encoded image (output of a CNN)
 		...
-		model.add(LSTM(...))
-		model.add(TimeDistributed(Dense(1)))      # many outputs (1-output but has many time-steps)
+		model.add(LSTM(..., return_sequences=True))               # make sure return_sequences=True for multiple outputs
+		model.add(TimeDistributed(Dense(1)))                      # multiple outputs (one at each timestep)
 
 		
 		# many-to-many LSTM (len(input) == len(output))
 		model = Sequential()
-		model.add(LSTM(..., input_shape=(steps, ...), return_sequences=True)) # many time-steps as input
-		model.add(TimeDistributed(Dense(1)))                                  # many outputs
+		model.add(LSTM(..., input_shape=(time_steps, features),   # multiple inputs (one at each timestep)
+					   return_sequences=True))                    # make sure return_sequences=True for multiple outputs
+		model.add(TimeDistributed(Dense(1)))                      # multiple outputs (one at each timestep)
 
 		# many-to-many LSTM (len(input) != len(output)) encoder-decoder architecture
 		model = Sequential()
-		model.add(LSTM(..., input_shape=(in_steps, ...)))            # many time-steps as inputs
-		model.add(RepeatVector(out_steps))                           # inputs equal outputs here
-		model.add(LSTM(..., return_sequences=True))
-		model.add(TimeDistributed(Dense(1, activation='sigmoid')))   # many outputs
+		model.add(LSTM(..., input_shape=(in_steps, ...)))            # multiple inputs (one at each timestep of the encoder)
+		model.add(RepeatVector(out_steps))                           # output of encoder at last timestep is fed to first timestep of decoder
+		model.add(LSTM(..., return_sequences=True))                  # make sure return_sequences=True for multiple outputs
+		model.add(TimeDistributed(Dense(1, activation='sigmoid')))   # multiple outputs (one at each timestep of the decoder)
 
 	# Vanilla LSTM
 	
 		model = Sequential()
-		model.add(LSTM(..., input_shape=(...)))
+		model.add(LSTM(..., input_shape=(time_steps, features)))
 		model.add(Dense(...))
 
 	# Stacked LSTM

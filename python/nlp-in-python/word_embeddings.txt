@@ -94,6 +94,8 @@
 		model = # refer section '## create word embeddings from scratch in gensim' or '## access pre-trained word embeddings in gensim' to load model
 
 		# create weight matrix - holds only the word vectors of the words that are present in training data
+		VOCABULARY_SIZE   = len(word_tokenizer.word_index) + 1
+		EMBEDDING_SIZE    = 300
 		embedding_weights = np.zeros((VOCABULARY_SIZE, EMBEDDING_SIZE))
 		
 		# create a word2id dictionary either using training data or using Keras' Tokenizer API - refer section '# convert text to integers' in 'dl-in-python.txt'
