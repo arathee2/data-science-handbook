@@ -1,6 +1,6 @@
 #### LSTM
 	
-	# data shape = (samples, time_steps, features)
+	# data_shape = (samples, time_steps, features)
 
 		# applies to both X and y
 		# samples    = number of observations
@@ -13,10 +13,10 @@
 
 	### Vanilla LSTM
 	model = Sequential()
-	model.add(LSTM(10, input_shape=(10, 25)))  # input shape = (time_steps, features)
+	model.add(LSTM(n_cells, input_shape=(time_steps, features)))
 	model.add(Dense(1))
 
-	# stateful LSTM -- when order of training example is also important
+	# stateful LSTM -- when order of training example is also important - google uses
 	model.add(LSTM(2, stateful=True, batch_input_shape=(32, 10, 25)))
 	epochs = 1000
 	for i in range(epochs):

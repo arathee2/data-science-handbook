@@ -5,6 +5,10 @@
 		from IPython.core.interactiveshell import InteractiveShell
 		InteractiveShell.ast_node_interactivity = "all"
 
+		# ignore warnings
+		import warnings
+		warnings.filterwarnings("ignore")
+		
 		# display matplotlib without plt.show()
 		%matplotlib inline
 
