@@ -1,5 +1,5 @@
 
-#### keras -- deep learning
+#### deep learning with Keras
 
 	### Steps in keras modelling
 			# 0. Preprocess data
@@ -8,6 +8,8 @@
 			# 3. Fit model
 			# 4. Evaluate and predict using model
 
+==============================================================================================================================
+	
 	### multilayer perceptron
 
 		## 0. preprocess
@@ -20,8 +22,8 @@
 
 			# preprocess test data in the exact same way as train data
 
-			n_cols    = X_train.shape[1]
-			n_classes = y_train.shape[1]                              # multiclass classification
+			n_features = X_train.shape[1]
+			n_classes  = y_train.shape[1]                             # multiclass classification
 
 		## 1. create architecture
 
@@ -43,7 +45,7 @@
 
 			model.add(Dense(units                 =   n_neurons,      # number of neurons in the layer     
 							activation            =   activation,     # activation function. None means 'linear' activation
-							input_shape           =   (n_cols,),      # mention this for the first hidden layer only
+							input_shape           =   (n_features,),  # mention this for the first hidden layer only
 							use_bias              =   True,           # whether the layer uses bias vector or not
 							kernel_initializer    =   initializer,    # weights initializer
 							bias_initializer      =   initializer,    # bias initializer
@@ -79,7 +81,7 @@
 			model.add(Dense(n_neurons, activation = ""))
 
 			# add last layer
-			model.add(Dense(1))                                       # for regression
+			model.add(Dense(1, activation = "linear"))                # for regression
 			model.add(Dense(1, activation = "sigmoid"))               # for binary classification - use binary crossentropy loss
 			model.add(Dense(n_classes, activation = "softmax"))       # for multiclass classification - use categorical crossentropy loss
 
@@ -149,6 +151,7 @@
 			plt.legend(['train', 'test'], loc="upper left")
 			plt.show()
 
+==============================================================================================================================
 
 	### cnn
 
@@ -206,7 +209,8 @@
 			model.add(MaxPooling2D(pool_size = (2, 2)))
 			model.add(Dropout(0.2))
 			# followed by [m*(n*(CONV) ==> POOL ==> (REGULARISE)?) ==> flatten ==> k*dense] layers
-			
+			# number of filters keep increasing as CNN becomes deeper
+
 			model.add(Conv2D())
 			model.add(Conv2D())
 			model.add(MaxPooling2D())
@@ -226,15 +230,12 @@
 
 		## transfer learning
 
-		
+==============================================================================================================================
+
 	### rnn
 
 		## 0. preprocess
-
-			# define constants
-			VOCABULARY_SIZE = 20000
-			EMBEDDING_SIZE = 300
-			MAX_SEQ_LENGTH = 30
+			# data_shape = (samples, time_steps, n_features) # applies to both X and y
 
 			# split data
 			X_train, X_test, y_train, y_test = 
@@ -244,7 +245,7 @@
 						 "This is document two. A document can contain multiple sentences!",
 						 "This is the third document. :)"]
 
-			# document cleaning
+			# i) document cleaning
 			def clean_document(document, remove_punct=True, sentence_case="lower", remove_stops=True, spell_correction=False, stem=True, min_word_length=0, char_filter = r"[^\w]"):
 			    '''
 				input:
@@ -313,9 +314,9 @@
 
 			X_train = training_data.sentence_column.apply(lambda x: clean_sentence(x), axis=1)
 			
-			# convert text to integers
+			# ii) convert text to integers
 			from keras.preprocessing.text import Tokenizer
-			tokenizer = Tokenizer(num_words   = VOCABULARY_SIZE,          # number of words to keep, based on frequency
+			tokenizer = Tokenizer(num_words   = top_n,                    # optional - number of words to keep, based on frequency
 								  filter      = '',                       # characters to remove - default is all punctuation, plus tabs and line breaks
 								  char_level  = False,                    # whether to character tokenise or word tokenise
 								  oov_token   = None                      # out of vocabulary token
@@ -323,7 +324,12 @@
 			tokenizer.fit_on_texts(training_data)
 			train_sequences = tokenizer.texts_to_sequences(X_train)
 
-			# pad document in order to have same length for each document
+			# define constants for text data
+			VOCABULARY_SIZE = 20000              # get vocabulary size either by using training data or by using Keras' Tokenizer API
+			EMBEDDING_SIZE  = 300                # set embeddings size     - n_features
+			MAX_SEQ_LENGTH  = 30                 # set the sequence length - time_steps
+
+			# iii) pad document in order to have same length for each document
 			from keras.preprocessing.sequence import pad_sequences
 			train_sequences = pad_sequences(train_sequences, maxlen=MAX_SEQ_LENGTH)
 
@@ -332,23 +338,272 @@
 			y_train   = to_categorical(y_train)
 			n_classes = y_train.shape[1]
 
-			# prepare test data in the same manner - clean the text, convert text to integers (using the train fit) and then pad
+			# iv) prepare word embedding - refer 'word_embeddings.txt'
+
+
+			# v) prepare test data in the same manner - clean the text, convert text to integers (using the train fit) and then pad
 			X_test = test_data.sentence_column.apply(lambda x: clean_sentence(x), axis=1)
 			test_sequences = tokenizer.texts_to_sequences(X_test)
 			test_sequences = pad_sequences(test_sequences, maxlen=MAX_SEQ_LENGTH)
 
 			y_test = to_categorical(y_test)                               # for validation purpose - y_test won't be available in real test data
 
-			# prepare word embedding - refer 'word_embeddings.txt'
-
 
 		## 1. create architecture
+
+			# import libraries
+			from keras.models import Sequential
+			from keras.layers import Dense
+			from keras.layers import SimpleRNN
+			from keras.layers import LSTM
+			from keras.layers import GRU
+			from keras.layers import Bidirectional
+			from keras.layers import TimeDistributed
+			from keras.layers import RepeatVector
+
+			# hidden layer parameters
+			n_cells      =  # number of neurons to add in the hidden layer
+			time_steps   =  # length of sequences; MAX_SEQ_LENGTH in case of textual data; number of frames in case of videos
+			n_features   =  # number of features of each entity in the sequence; VOCABULARY_SIZE in case of textual data; Price, Temperature and Pressure in case of time series data; height*width*channels in case of images or videos
+
+			# output layer parameters
+			n_classes         =  # 1 in case of regression and binary classification, number of classes in case of multiclass classification
+			output_activation =  # "linear" in case of regression, "sigmoid" for binary classification, "softmax" for multiclass classification
+
+			==================================================================================================================
+			# vanilla RNN
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim     =  VOCABULARY_SIZE,         # vocabulary size - number of unique words in data
+								output_dim    =  EMBEDDING_SIZE,          # length of vector with which each word is represented
+								input_length  =  MAX_SEQ_LENGTH,          # length of input sequence
+								weights       =  [embedding_weights],     # word embedding matrix
+								trainable     =  True                     # True - update embeddings_weight matrix
+			))
+
+			# add hidden RNN layer; skip input_shape if embedding layer is present
+			model.add(SimpleRNN(n_cells, input_shape=(time_steps, n_features)))
+
+			# add output layer
+			model.add(Dense(n_classes, activation=output_activation)
+
+
+			==================================================================================================================
+			# stacked RNN
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+			
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim=VOCABULARY_SIZE, output_dim=EMBEDDING_SIZE, input_length=MAX_SEQ_LENGTH, weights=[embedding_weights], trainable=True))
+
+			# add first hidden RNN layer; return_sequences is True to give output at each timestep
+			model.add(SimpleRNN(n_cells, input_shape=(time_steps, n_features), return_sequences=True))
+			
+			# add second hidden RNN layer
+			model.add(SimpleRNN(n_cells, return_sequences=True))
+			
+			# add third hidden RNN layer
+			model.add(SimpleRNN(n_cells, return_sequences=True))
+			
+			# add fourth hidden RNN layer
+			model.add(SimpleRNN(n_cells))
+			
+			# add output layer
+			model.add(Dense(n_classes, activation=output_activation)
+			
+
+			==================================================================================================================
+			# bidirectional RNN
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim=VOCABULARY_SIZE, output_dim=EMBEDDING_SIZE, input_length=MAX_SEQ_LENGTH, weights=[embedding_weights], trainable=True))
+
+			# add hidden bidirectional RNN layer
+			model.add(Bidirectional(SimpleRNN(n_cells, input_shape=(time_steps, n_features), merge_mode='concat')) 
+
+			# add output layer
+			model.add(Dense(n_classes, activation=output_activation))
+
+
+			==================================================================================================================
+			# LSTM network
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim=VOCABULARY_SIZE, output_dim=EMBEDDING_SIZE, input_length=MAX_SEQ_LENGTH, weights=[embedding_weights], trainable=True))
+
+			# add hidden LSTM layer
+			model.add(LSTM(n_cells, input_shape=(time_steps, n_features)))
+
+			# add output layer
+			model.add(Dense(n_classes, activation=output_activation))
+
+
+			==================================================================================================================
+			# GRU network
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim=VOCABULARY_SIZE, output_dim=EMBEDDING_SIZE, input_length=MAX_SEQ_LENGTH, weights=[embedding_weights], trainable=True))
+
+			# add hidden GRU layer
+			model.add(GRU(n_cells, input_shape=(time_steps, n_features)))
+
+			# add output layer
+			model.add(Dense(n_classes, activation=output_activation))
+
+
+			==================================================================================================================
+			# many-to-one RNN
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+
+			# many inputs: one input at each timestep
+			model.add(SimpleRNN(n_cells, input_shape=(time_steps, n_features)))
+
+			# one output: one output at the last timestep
+			model.add(Dense(n_classes, activation=output_activation))
+
+
+			==================================================================================================================
+			# many-to-many RNN - input sequence is equal to output sequence
+			==================================================================================================================
+
+			# instantiate model
+			model = Sequential()
+
+			# many inputs: one input at each timestep; return_sequences is True to give output at each timestep
+			model.add(SimpleRNN(n_cells, input_shape=(time_steps, n_features), return_sequences=True))
+
+			# many outputs: one output at each timestep
+			model.add(TimeDistributed(Dense(n_classes, activation=output_activation)))
+
+
+			==================================================================================================================
+			# encoder-decoder RNN: input sequence is not equal to output sequence
+			==================================================================================================================
+
+			# encoder parameters
+			encoder_n_cells   =  # number of neurons to add in the hidden layer of the encoder RNN
+			input_timesteps   =  # length of input sequences
+
+			# decoder parameters
+			decoder_n_cells   =  # number of neurons to add in the hidden layer of the decoder RNN
+			output_timesteps  =  # length of output sequences
+
+			# instantiate model
+			model = Sequential()
+
+			# encoder RNN: one input at each timestep of the encoder
+			model.add(SimpleRNN(encoder_n_cells, input_shape=(input_timesteps, n_features)))
+
+			# encoded sequence: output of encoder at the last timestep is repeated so that it could be fed at each timestep in the decoder RNN
+			model.add(RepeatVector(output_timesteps))
+
+			# decoder RNN with encoded sequence fed at every timestep; return_sequences is True to give output at each timestep
+			model.add(SimpleRNN(decoder_n_cells, return_sequences=True))
+
+			# many outputs: one output at each timestep of the decoder
+			model.add(TimeDistributed(Dense(n_classes, activation=output_activation)))
+
+
+			==================================================================================================================
+			# one-to-many RNN
+			==================================================================================================================
+
+			time_steps = 1  # length of input sequence is one
+
+			# instantiate model
+			model = Sequential()
+
+			# one input: one input at the first timestep; return_sequences is True to give output at each timestep
+			model.add(SimpleRNN(n_cells, input_shape=(time_steps, n_features), return_sequences=True))
+
+			# many outputs: one output at each timestep
+			model.add(TimeDistributed(Dense(n_classes, activation=output_activation)))
+
+
+			==================================================================================================================
+			# stateful RNN: when order of training example is also important
+			==================================================================================================================
+			# https://keras.io/getting-started/faq/#how-can-i-use-stateful-rnns
+
+			# define number fo epochs
+			epochs = 10
+
+			# instantiate model
+			model = Sequential()
+			
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim=VOCABULARY_SIZE, output_dim=EMBEDDING_SIZE, input_length=MAX_SEQ_LENGTH, weights=[embedding_weights], trainable=True))
+
+			# add hidden RNN layer
+			model.add(SimpleRNN(n_cells, stateful=True, batch_input_shape=(32, 10, 25)))
+			
+			# fit model
+			for i in range(epochs):
+				model.fit(X, y, epochs=1, shuffle=False, batch_input_shape=(32, 10, 25))
+				model.reset_states()
+			
+			# make predictions in batches
+			predictions = model.predict(X, batch_size=32)
+			
+			==================================================================================================================
+			# CNN RNN
+			==================================================================================================================
+
+			# image_data_shape = (n_images, height, width, channels)
+			time_steps =  1
+			n_features =  height*width*channels
+			
+			# video_data_shape = (n_videos, n_frames, height, width, channels)
+			time_steps =  n_frames
+			n_features =  height*width*channels
+			
+
+			# instantiate model
+			model = Sequential()
+
+			# add embedding layer in case of textual data
+			model.add(Embedding(input_dim=VOCABULARY_SIZE, output_dim=EMBEDDING_SIZE, input_length=MAX_SEQ_LENGTH, weights=[embedding_weights], trainable=True))
+
+			# CNN - 2D for images, 1D for text; TimeDistributed() in case of video
+			model.add(TimeDistributed(Conv2D(...))
+			model.add(TimeDistributed(MaxPooling2D(...)))
+			model.add(TimeDistributed(Flatten()))
+
+			# add hidden RNN layer 
+			model.add(SimpleRNN(n_cells, input_shape=(time_steps, n_features), return_sequences=True))
+
+			# add output layer
+			model.add(TimeDistributed(Dense(n_classes, activation=output_activation)))
+
 
 		## 2. compile model
 
 		## 3. fit model
 
 		## 4. evaluate model
+
+==============================================================================================================================
 
 	### miscellaneous
 
@@ -460,142 +715,3 @@
 			from keras.models import load_model
 			model = load_model("my_model.h5")
 
-
-
-
-
-
-
-
-
-
-	## learning rate schedules
-
-		# time-based decay - drop learning rate after each epoch
-		epochs = 10
-		learning_rate = 0.1
-		decay_rate = learning_rate / epochs
-		momentum = 0.9
-		sgd = SGD(lr = learning_rate, momentum = momentum, decay = decay_rate, nesterov = False)
-
-		# drop-based decay - drop learning rate after each specified number of epochs
-		from keras.callbacks import LearningRateScheduler
-		def step_decay(epoch):
-			"""
-			half the learning rate every 10 epochs
-			input: epoch
-			output: learning rate
-			"""
-			initial_lr = 0.1                     # initial learning rate
-			drop = 0.5                           # drop learning rate by half
-			epochs_drop = 10.0                   # number of epochs after which to drop learning rate
-			lr = initial_lr * math.pow(drop, math.floor((1+epoch)/epochs_drop))
-			return lr
-
-		lr_scheduler = LearningRateScheduler(step_decay)
-		callbacks_list = [lr_scheduler]
-
-	# RNN
-
-		# embeddings - for sentence data
-		vocab_size        = 5000
-		max_review_length = 400
-		from keras.preprocessing import sequence
-		X_train = sequence.pad_sequences(X_train, maxlen=max_review_length, padding='pre', truncating='pre', value=0)
-		X_test = sequence.pad_sequences(X_test, maxlen=max_review_length, padding='pre', truncating='pre', value=0)
-		model = Sequential()
-		model.add(Embedding(input_dim          =   vocab_size,         # vocabulary size
-							output_dim         =   32,                 # dimension of embedding
-							input_length       =   max_review_length   # length of review
-		))
-		# add subsequent layers here like (Flatten() and Dense()) or LSTM()
-		""" 
-		The model will take as input an integer matrix of size (batch, input_length).
-		The largest integer (i.e. word index) in the input should be no larger than 4999 (vocabulary size-1).
-		Now model.output_shape == (None, max_review_length, 32), where None is the batch dimension.
-		Refer documentation for a small comprehensive code - very nice!
-		"""
-
-		"""
-		In time series prediction, scale full dataset(X and y), divide into train and test, fit the model and predict.
-		After prediction, undo the scaling by using min_max_scaler.inverse_transform(y_pred) for y_train, y_pred_train, y_test and y_ pred_test.
-		Then compare y_train with y_pred_train and y_test with y_pred_test.
-		"""
-
-		# reshape data - [n_samples, time_steps, input_dim] for time series data - input_dim can be n_cols
-		# play with time_steps and input_dim values but time_stepsxinput_dim must be constant in every case
-		X_train = X_train.reshape((n_rows, time_steps, n_cols))
-		X_test = X_test.reshape((n_rows, time_steps, n_cols))
-
-		# simple LSTM
-		from keras.models import Sequential
-		from keras.layers import Dense
-		from keras.layers import LSTM
-
-		model = Sequential()
-		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
-					   activation            =   "",
-					   recurrent_activation  =   "",                   # activation to use for the recurrent step
-					   input_shape           =   (time_steps, n_cols), # specify input shape if LSTM is the first layer
-					   dropout               =   0.2,                  # dropout at input for each cell of LSTM
-					   recurrent_dropout     =   0.1                   # dropout at output for each cell of LSTM
-		))
-		model.add(Dense(1))
-
-		OR
-		
-		model = Sequential()
-		model.add(Embedding(input_dim = , output_dim = , input_length = ))
-		model.add(LSTM(units = n_cells, activation = ""))
-		model.add(Dense(1))
-
-		# stateful LSTM - mention batch shape, reset state after each epoch, don't shuffle data and evaluate/predict in same batches
-		batch_input_shape = (batch_size, time_steps, n_cols)
-		model.add(LSTM(units                 =   n_cells,              # number of LSTM cells aka neurons
-					   activation            =   ,
-					   batch_input_shape     =   batch_input_shape,    # add this to each LSTM layer in case of stateful LSTM
-					   stateful              =   True                  # statefulness set to True
-		))
-		model.add(Dense(1))
-
-		for i in range(n_epochs):                                      # create manual epochs. Can't set epochs because can't pass states to next epoch.
-			model.fit(x             =   X_train,
-					  y             =   y_train,
-					  batch_size    =   64,
-					  epochs        =   1,                             # epochs should be 1 since manual epochs in process
-					  verbose       =   1,
-					  shuffle       =   False                          # don't shuffle data before each epoch
-			)
-			model.reset_states()                                       # reset state after each epoch
-
-		y_pred = model.predict(X_train, batch_size = 64)               # prediction should be in batches
-		model.reset_states()                                           # reset state after predicting on a specific dataset
-		y_pred = model.predict(X_test, batch_size = 64)                # prediction should be in batches
-		
-		model.evaluate(X_test, y_test, batch_size = 64)
-		model.reset_states()
-
-		# stacked LSTMs
-		"""
-		LSTMs can be stacked. The last LSTM layer has to have return_sequences = True
-		"""
-		model.add(LSTM(units = n_cells, batch_input_shape = batch_input_shape, stateful = True, return_sequences = True))
-		model.add(LSTM(units = n_cells, batch_input_shape = batch_input_shape, stateful = True))
-		model.add(Dense(1))
-
-		# LSTM and CNN
-		from keras.models import Sequential
-		from keras.layers import Dense
-		from keras.layers import LSTM
-		from keras.layers.convolutional import Convolution1D
-		from keras.layers.convolutional import MaxPooling1D
-		from keras.layers.embeddings import Embedding
-
-		model = Sequential()
-		model.add(Embedding(input_dim = vocab_size, output_dim = 32, input_length = max_review_length))
-		model.add(Convolution1D(filters = 32, kernel_size = 3))        # same parameters as Convolution2D
-		model.add(MaxPooling1D(pool_size = 2)
-		model.add(LSTM(100))
-		model.add(Dense(1))
-
-==============================================================================================================================
