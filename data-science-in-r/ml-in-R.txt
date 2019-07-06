@@ -1,3 +1,280 @@
+==============================================================================================================================
+
+### R
+
+        # arithmetic
+        +   # addition
+        -   # subtraction
+        *   # multiplication
+        /   # division
+        ^   # exponentiation
+        %%  # modulo
+
+        # data types
+        runs      <- 84       # numeric
+        greeting  <- "hello"  # character
+        is_r_cool <- TRUE     # boolean - TRUE and FALSE
+
+        class(item)           # get data type of item
+        identical(x, y)       # return TRUE only if object x is exactly equal to object y
+
+        # vectors
+
+            # create vector
+            my_vector <- c(1, 2, 3)      # numeric vector
+            my_vector <- c(TRUE, FALSE)  # boolean vector
+            my_vecotr <- c("a", "b")     # character vector
+            my_vector <- c(1, TRUE)      # Throws error! Vectors can hold one only data type
+
+            my_vector <- numeric(10)     # create empty numeric vector of length ten with zeros
+            my_vector <- character(10)   # create empty character vector of length ten with ""
+            my_vector <- logical(10)     # create empty logical vector of length ten with FALSE
+
+            # vector functions
+            names(my_vector)   <- c("ID", "Gender")  # assign names to vector
+            vector_arithmetic  <- a + b              # operation takes elementwise
+            vector_sum         <- sum(my_vector)
+            vector_length      <- length(my_vector)
+            vector_mean        <- mean(my_vector)
+            vector_median      <- median(my_vector)
+            vector_sd          <- var(my_vector)
+            vector_var         <- sd(my_vector)
+
+            # subsetting vectors using indices
+            element  <- my_vector[3]          # extract third element
+            elements <- my_vector[c(2,3,4)]   # extract element at index 2, 3 and 4
+            elements <- my_vector[-c(2,3,4)]  # extract all elements except the ones at indices 2, 3 and 4
+            elements <- my_vector[2:10]       # extract elements from 2 through 10 inclusive
+
+            # subsetting using boolean
+            boolean   <- my_vector > 0       # creates a boolean vector by checking if every element is greater than zero
+            my_vector <- my_vector[boolean]  # returns only those elements which are TRUE
+            OR
+            my_vector <- my_vector[my_vector > 0]
+
+        # matrices
+
+            # create matrix
+            my_matrix <- matrix(1:9, byrow=TRUE, nrow=3)
+            OR
+            v1 <- c(1,2)
+            v2 <- c(1,2)
+            v2 <- c(1,2)
+            elements  <- c(v1, v2, v3)  # results in c(1, 2, 1, 2, 1, 2)
+            my_matrix <- matrix(elements, byrow=TRUE, nrow=2)
+
+            # elementwise matrix arithmetic
+            matrix_arithmetic <- a + b
+            matrix_arithmetic <- A/5
+
+            # matrix multiplication
+            matrix_product <- a %*% b
+
+            # matrix functions
+            rownames(my_matrix) <- c(1,2,3)          # set row names
+            colnames(my_matrix) <- c("A", "B", "C")  # set column names
+            row_sum <- rowSums(my_matrix)            # return vector of sum of all rows
+            col_sum <- colSums(my_matrix)            # return vector of sum of all columns
+
+            # matrix subsetting
+            my_matrix[]                              # return entire matrix
+            my_matrix[,]                             # return entire matrix
+            my_matrix[, 1:5]                         # return all rows and columns 1-5
+            my_matrix[1:10, c("A", "B")]             # return rows 1-10 and columns A and B
+
+            # matrix concatenation
+            C <- rbind(A, B)  # put rows of A and B together. Number of columns must be equal!
+            C <- cbind(A, B)  # put columns of A and B together. Number of rows must be equal!
+
+        # factors
+
+            # create factor
+            temperature <- c("Medium", "High", "Medium", "Low")
+            temperature <- factor(temperature_vector, order = TRUE, levels = c("Low", "Medium", "High"))
+
+            # create levels
+            gender <- factor(c("M", "F", "F", "M", "M"))
+            levels(factor_survey_vector) <- c("Female", "Male")  # replace M and F by Male and Female.
+
+        # dataframes
+
+            # create dataframes
+            my_df <- data.frame(A=vector_A, B=vector_B)
+
+            # dataframe functions
+            str(my_df)  # get structure of data
+            dim(my_df)  # get dimensions of dataframe
+
+            # dataframe subsetting - same as matrices
+            my_matrix[, 1:5]                         # return all rows and columns 1-5
+            my_matrix[1:10, c("A", "B")]             # return rows 1-10 and columns A and B
+            my_df$colname                            # return a column. Works if there is no space in column name.
+
+            subset(my_df, subset=condition)
+
+            # sort dataframe
+            ordered_indices <- order(my_df, decreasing = FALSE)   # return indices of sorted elements
+            my_df <- my_df[ordered_indices]                       # sort dataframe
+
+        # list
+
+            # create list
+            my_list <- list(v=my_vector, m=my_matrix, df=my_df)
+
+            # subsetting list
+            list$elementname
+            list[[2]]         # select second element
+
+        # conditionals
+
+            # logic operators
+            == != > < >= <=
+            &
+            |
+            !
+
+            # if statement
+            if (){
+                condition
+            } else if() {
+                condition
+            } else {
+
+            }
+
+        # loops
+
+            # for loop
+            for (item in sequence){
+                # standard for loop to iterate over each item of a sequence
+                break  # break for loop
+                next   # skip further code and go to next iteration
+            }
+
+            for (i in 1:length(sequence) {
+                # to get control over indices
+            }
+
+            # while loop
+            while(condition is true){
+
+            }
+
+        # functions
+
+            # named functions
+            my_function <- function(a, b, c=1){
+                # function body
+                return(item)
+            }
+
+            # anonymous functions - mostly used as a parameter to other functions such as apply functions
+            function(parameters){body}
+
+        # apply functions
+        apply(vector/matrix/df, 1/2, function, ...) # specify row/column. Mention function name without (). Pass parameters to function as additional arguments to apply() in place of ...
+        lapply(list/vector/df, function, ...) # apply function to the vector. return a list.
+        sapply(list/vector/df, function, ...) # apply functon on vector. if possible, return vector else matrix else list.
+        tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
+        mapply()
+        rapply()
+
+        # helpful functions
+        unqiue(vector)              # return unique elements of the vector
+        sort(vector)                # return indices of sorted elements
+        mean(vector)
+        median(vector)
+        var(vector)
+        sd(vector)
+        sum(vector)
+        length(vector)
+        abs(vector)
+        round(vector)
+        sort(vector)
+        rep(x, times)
+        seq(start, end, by=)       # return sequence from start to end. Use "by" to set difference between two numbers
+        rev(vector)                # return reversed vector
+        unlist(list)               # flatten a list
+        append(v1, v2)             # return a list by appending two vectors one after the other
+        is.*(object)               # check class of object by using "numeric", "character", "logical", "factor" or "vector" in place of *
+        as.*(object)               # convert class of object by using "numeric", "character", "logical", "factor" or "vector" in place of *
+
+
+        which.max(vector)
+        which.min(vector)
+        which(vector == "value")
+        match("value",var)
+
+        rnorm(n, mean = 0, sd = 1)
+        sample(vector/number, size, replace = FALSE, prob = NULL) # trainSmall <- train[sample(nrow(train), x), ]
+
+==============================================================================================================================
+
+### dplyr
+
+        library("dplyr")
+
+        select(data_frame, column_names)
+        filter(data_frame, condition)
+        arrange(data_frame, desc(factor_variable)) # ascending by default
+        mutate(data_frame, new_variable_name = equation)
+        group_by(data_frame, factor_variable)
+        summarize(data_frame, newVarName =  function()) # group_by(factorVariable) %>% summarize(count = n()) used commonly.
+        count(data_frame, variable) # works similar table
+        top_n(20, data_frame) # for top 20 rows
+
+        piping : data_frame %>% operation1 %>% operation2 and so on...
+
+==============================================================================================================================
+
+### tidyr
+
+        library(tidyr)
+
+        separate(data_frame, variable.to.separate, c("new","names"), sep = ", ") # separate rohtak, haryana. Quotations important.
+
+        unite(data_frame, new.variable, c(var1, var2), sep = " ") # combine first name and last name into name. No quotations for new variable names.
+
+        gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) %>%
+                filter(new.numerical.var == 1) %>%
+                select(-new.numerical.var) # wide to long
+
+        spread(data_frame, categorical.var, corresponding.numerical.var) # long to wide
+
+==============================================================================================================================
+
+## stringr
+
+        library(stringr)
+
+        tolower(character.variable)
+        toupper(character.variable)
+
+        substr("Amandeep", 1, 4)                     # return 'Aman'
+
+        # check string presence
+        grepl(pattern, character.variable)           # return logical vector whether pattern appears or not
+        grep(pattern, character.variable)            # return indices of match in the variable
+        str_detect(character.variable, pattern)      # check result
+
+        # replace
+        sub(pattern, replacement, vector)            # substitute only the first occurence of pattern
+        gsub(pattern, replacement, vector)           # substitute all occurences of patterns
+        str_replace(character.variable, "#", "%")    # same as gsub()
+
+        # split
+        strsplit(character.variable, pattern)        # split at given pattern
+
+        # extract
+        str_extract(variable, pattern)
+
+        # miscellaneous
+        str_length() or nchar()
+        str_trim(character.vector)
+        str_pad(character.vector, width = , side = "", pad = "")
+
+==============================================================================================================================
+
 ### Linear Regression
 
 	# check r-squared value. It has to be maximized for it be a good model. also check significance of variables. Remove
@@ -31,9 +308,9 @@
 		error <- rmse(cv$target, linear.predict)
 
 	# ROCR and AUC (Area Under Curve)
-		
+
 		library(ROCR)
-		
+
 		linear.predict <- predict(linear.model, cv)
 		linear.ROCR <- prediction(linear.predict, cv$target)
 		linear.auc <- as.numeric(performance(linear.ROCR,"auc")@y.values)
@@ -59,14 +336,14 @@
 ==============================================================================================================================
 
 ### Logistic Regression
-	
+
 	## Binomial
 
 		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))  # OR family = multinomial()
 		glm.predict <- predict(glm.model, cv, type = "response")
 		table(cv$target, glm.predict>0.5)
 		error <- ce(cv$target, glm.predict)
-	
+
 	## Multinomial
 
 		library ("nnet")
@@ -76,7 +353,7 @@
 		multinom.predict <- predict(multinom.model, cv, "probs")
 
 	## ROCR and AUC(area under curve)
-	
+
 		library(ROCR)
 		library(pROC)
 
@@ -112,7 +389,7 @@
 		knn.cvX <- cv[, predictors]
 		knn.trainY <- train$target
 		knn.cvY <- cv$target
-		
+
 		# make sure all variables are numeric
 		set.seed(1)
 		knn.model <- knn(train = knn.trainX, test = knn.cvX, cl = knn.trainY, k = under.root.observations)
@@ -123,7 +400,7 @@
 ### Regularized Regression
 
 		library("glmnet")
-		
+
 		# input numerical data only
 		predictors <- names(train)[names(train) != "target"]
 		trainX <- data.matrix(train[ ,predictors])
@@ -137,7 +414,7 @@
 									 nfolds = 10, nlambda = 100)
 		cv.glmnet.model
 		plot(cv.glmnet.model)
-		
+
 		glmnet.model <- glmnet(trainX, trainY,
 								family = "gaussian","binomial","multinomial",
 								alpha = ,  # 0 - ridge, 1 - lasso, 0.5 - elnet
@@ -161,21 +438,21 @@
 ==============================================================================================================================
 
 ### Decision Trees
-	
+
 	# for classification use method = "class" in rpart and type = "class" in predict
 		library("rpart")
 		library("rpart.plot")
-		
+
 	# model
-		
+
 		tree.model <- rpart(target ~ ., data = train, method = "class/anova", parms = list(split = "gini/information"),
 							control = rpart.control(cp = , minsplit = , minbucket = ))
-		prp(tree.model) 
+		prp(tree.model)
 		tree.predict <- predict(tree.model, cv, type = "class") # no need to specify "class" for regression
 		table(cv$target, tree.predict)
 
 	# ROCR and AUC(area under curve)
-		
+
 		tree.predict <- predict(tree.model, cv) # type = "class" not to be included here
 		tree.ROCR <- prediction(tree.predict[,2], cv$target)
 		tree.auc <- as.numeric(performance(tree.ROCR,"auc")@y.values)
@@ -183,9 +460,9 @@
 ==============================================================================================================================
 
 ### Random Forest
-		
+
 		library("randomForest")
-		
+
 	# model
 
 		set.seed(10)
@@ -199,7 +476,7 @@
 		varImpPlot(rf.model)
 		rf.predict <- predict(rf.model, cv)
 		table(cv$target, rf.predict)
-		
+
 	# party-cforest
 
 		library("party")
@@ -240,7 +517,7 @@
 		library(h2o)
 
 		localH2O <- h2o.init(ip = 'localhost', port = 54321, max_mem_size = '2g')
-		
+
 		names(train) <- NULL # optional. so that the algorithm does not take column name as a separate level in the target variable
 		h2o.train <- as.h2o(train)
 		h2o.cv <- as.h2o(cv)
@@ -267,7 +544,7 @@
 ==============================================================================================================================
 
 ### xgboost
-		
+
 		library(xgboost)
 
 		# XGBOOST caret
@@ -349,10 +626,10 @@
 ### caret
 
 		library("caret")
-		
+
 		f <- as.formula(paste("target ~", paste(names(train)[!names(train) %in% c("target")], collapse = " + ")))
 
-		algo.control = trainControl(method = "cv", 
+		algo.control = trainControl(method = "cv",
 									number = 5,
 									classProbs = T,
 									summaryFunction = defaultSummary,  # twoClassSummary for binary classification
@@ -414,7 +691,7 @@
 		    if(i == 1) cat("Fold", "\t", "Accuracy", "\n")
 
 		    x <- x + 1
-		    #Segment your data by fold using the which() function 
+		    #Segment your data by fold using the which() function
 		    cv.indices <- which(folds == i, arr.ind=TRUE)
 			train <- data.frame[-cv.indices, ]
 			cv <- data.frame[cv.indices, ]
@@ -424,7 +701,7 @@
 			# calculate accuracy for current fold
 			accurate.predictions <- 0
 			confusion.matrix <- as.matrix(table(cv$target, predictions))
-			
+
 			for(i in 1:nrow(confusion.matrix)){
 				accurate.predictions <- accurate.predictions + confusion.matrix[i,i]
 			}
@@ -477,17 +754,17 @@
 		set.seed(1)
 		kcluster <- kmeans(vector OR data_frame, centers = no.of.centroids, iter.max = no.of.max.iterations)
 		str(kcluster)
-		
+
 		# rest of this for cluster-then-predict
 		# in cluster-then-predict problems, (remove target var->normalize(optional)->cluster->kcca)=>build "k" train and test sets using subset from original train according to clusters.
 		# example -> newTrain1 = subset(originalTrain, kclusterPredictTrain == 1), newTrain2 = subset(originalTrain, kclusterPredictTest == 2)
-		
+
 		kclusterKcca <- as.kcca(kcluster, originalDataFrame OR originalVector)
 		kcluster.predict.train <- predict(kclusterKcca)
 		kcluster.predict.test <- predict(kclusterKcca, newdata = test.data.as.vector)
 
 		#easy way to split according to clusters in k-means
-		
+
 		KmeansCluster = split(data_frame, kcluster$cluster) # KmeansCluster[[1]] and so on to access 1st and other successive clusters
 
 ==============================================================================================================================
@@ -550,14 +827,14 @@
 			oversampled_train_data <- ovun.sample(target ~ ., data = train, method = "over",
 	                                    	N = 2*length(train$target[train$target == "class_with_more_observations"]),
 	                                      	seed = 1)$data
-			
+
 			# undersampling
 			undersampled_train_data <- ovun.sample(target ~ ., data = train, method = "under",
 	                                    	N = 2*length(train$target[train$target == "class_with_less_observations"]),
 	                                      	seed = 1)$data
 
 			# mixed sampling
-			mix_sampled_train_data <- ovun.sample(target ~ ., data = train, method = "both", p=0.5, 
+			mix_sampled_train_data <- ovun.sample(target ~ ., data = train, method = "both", p=0.5,
 	                                  		N=nrow(train),
 	                                  		seed = 1)$data
 
@@ -581,10 +858,10 @@
 			set.seed(4)
 			caret_train_date <- downSample(x = train[, !colnames(train) %in% c("target")], y = train$target)
 			caret_train_date <- upSample(x = train[, !colnames(train) %in% c("target")], y = train$target)
-			
+
 			OR
-			
-			algo.control = trainControl(method = "cv", 
+
+			algo.control = trainControl(method = "cv",
 										number = 5,
 										classProbs = T,
 										summaryFunction = defaultSummary,  # twoClassSummary for binary classification
@@ -607,7 +884,7 @@
 ### handling missing values
 
 	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
-		
+
 		# check missing values
 		colSums(is.na(data_frame))*100/nrow(data_frame)
 		sapply(data_frame, function(x) sum(is.na(x))*100/length(x))
@@ -620,7 +897,7 @@
 		library("missForest")
 		df_imputed <- missForest(data_frame)
 		df_imputed$ximp
-		
+
 		library("mice")
 		md.pattern(data_frame)
 
@@ -636,7 +913,7 @@
 ==============================================================================================================================
 
 ### Removing Variables
-		
+
 		data_frame <- data_frame[ , !(names(data_frame) %in% c("x1","x2","x3"))]
 		data_frame$var <- NULL
 		new_data_frame <- setdiff(names(data_frame), c("x1","x2","x3"))  # check if setdiff() or data_frame[, setdiff()]
@@ -644,11 +921,11 @@
 ==============================================================================================================================
 
 ### Correlation and scatterplot matrix
-	
+
 	# correlation matrix
 
 		library(corrplot)
-		
+
 		numeric <- sapply(data_frame, is.numeric)
 		cordata <- data_frame[ ,numeric]
 		cordata <- na.omit(cordata)
@@ -663,7 +940,7 @@
 ==============================================================================================================================
 
 ### Binning
-	
+
 		library("Hmisc")
 
 		bins <- cut2(data_frame$variable, g = number_of_bins) # cuts the variable on basis of quantile.
@@ -680,7 +957,7 @@
 ==============================================================================================================================
 
 ### Boruta Analysis to find importance of variable in a data set
-	
+
 	library(Boruta)
 
 		set.seed(13)
@@ -689,90 +966,6 @@
 		boruta.cor.matrix <- attStats(boruta.model)
 		important.features <- names(data_frame)[boruta.model$finalDecision!="Rejected"]
 		important.features
-
-==============================================================================================================================
-
-### R functions
-	
-		which.max(vector)
-		which.min(vector)
-		which(vector == "value")
-		match("value",var)
-		subset(data_frame, condition)
-		rep(x, times)
-		rnorm(n, mean = 0, sd = 1)
-		sample(vector/number, size, replace = FALSE, prob = NULL) # trainSmall <- train[sample(nrow(train), x), ]
-
-		apply(array/matrix/data_frame, 1/2, function, ...) # need to specify row/column.
-		lapply(list/vector/data_frame, function, ...) # work on columns. return list.
-		sapply(list/vector/data_frame, function, ...) # work on columns. return vector if possible else matrix else list.
-		tapply(function.applied.to.this.var, result.displayed.according.to.this.var, function)
-
-		rowSums(vector, na.rm = T)
-		colSums(vector, na.rm = T)
-
-==============================================================================================================================
-
-### dplyr
-		
-		library("dplyr")
-
-		select(data_frame, column_names)
-		filter(data_frame, condition)
-		arrange(data_frame, desc(factor_variable)) # ascending by default
-		mutate(data_frame, new_variable_name = equation)
-		group_by(data_frame, factor_variable)
-		summarize(data_frame, newVarName =  function()) # group_by(factorVariable) %>% summarize(count = n()) used commonly.
-		count(data_frame, variable) # works similar table
-		top_n(20, data_frame) # for top 20 rows
-
-		piping : data_frame %>% operation1 %>% operation2 and so on...
-
-==============================================================================================================================
-
-### tidyr
-
-		library(tidyr)
-
-		separate(data_frame, variable.to.separate, c("new","names"), sep = ", ") # separate rohtak, haryana. Quotations important.
-		
-		unite(data_frame, new.variable, c(var1, var2), sep = " ") # combine first name and last name into name. No quotations for new variable names.
-
-		gather(data_frame, new.factor.var, new.numerical.var, column.start.name:column.end.name) %>%
-				filter(new.numerical.var == 1) %>% 
-				select(-new.numerical.var) # wide to long
-
-		spread(data_frame, categorical.var, corresponding.numerical.var) # long to wide
-
-==============================================================================================================================
-
-## stringr
-
-		library(stringr)
-
-		tolower(character.variable)
-		toupper(character.variable)
-
-		substr("Amandeep", 1, 4)                     # return 'Aman'
-
-		# split
-		strsplit(character.variable, pattern)        # split at given pattern
-		
-		# extract
-		str_extract(variable, pattern)
-		
-		# replace
-		sub("#", "%", character.variable)            # substitute the first '#' with '%'
-		gsub("#", "%", character.variable)           # substitute all the '#' with '%'
-		str_replace(character.variable, "#", "%")    # same as gsub()
-		
-		# check string presence
-		grepl(pattern, character.variable)           # return logical vector whether pattern appears or not
-		str_detect(character.variable, pattern)      # check if same as above
-		
-		str_length() or nchar()
-		str_trim(character.vector)
-		str_pad(character.vector, width = , side = "", pad = "")
 
 ==============================================================================================================================
 
@@ -788,7 +981,7 @@
 		bag <- Corpus(VectorSource(data_frame$textVariable))
 
 		bag <- tm_map(bag, tolower)
-		
+
 		bag <- tm_map(bag, PlainTextDocument)
 
 		bag <- tm_map(bag, removePunctuation)
@@ -806,7 +999,7 @@
 		findFreqTerms(frequencies, lowfreq = 20) # to words that appear atleast 20 times
 
 		sparseWords <- removeSparseTerms(frequencies, 0.995) # words that appear in 99.5 percent tweets
-		
+
 		sparseWords <- as.data.frame(as.matrix(sparseWords)) # converting the matrix of sparse words to data frame
 
 		colnames(sparseWords) <- make.names(colnames(sparseWords))
@@ -817,11 +1010,11 @@
 		bag <- as.matrix(bag)
 		bag <- sort(rowSums(bag), decreasing = T)
 		bag.df <- data.frame(word = names(bag), freq = bag)
-		
+
 		set.seed(154)
-				
+
 		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
-	    			max.words=1500, random.order=FALSE, rot.per=0.35, 
+	    			max.words=1500, random.order=FALSE, rot.per=0.35,
         			colors=brewer.pal(8, "Dark2"), scale = c(5,0.5))
 
 ==============================================================================================================================
@@ -837,19 +1030,26 @@
 ==============================================================================================================================
 
 ### Date and Time
-	
-		data_frame$date <- as.POSIXct(strptime(variable, format = "")) # format can be - "%d/%m/%Y %H:%M:%S"
-		data_frame$day <- as.integer(format(data_frame$date, "%d")) # day
-		data_frame$month <- as.factor(format(data_frame$date, "%B")) # month
-		data_frame$year <- as.integer(format(data_frame$date, "%Y")) # year
-		data_frame$weekday <- as.factor(format(data_frame$date, "%A")) # weekday
-		data_frame$hour <- as.integer(format(data_frame$date, "%H")) # hour
-		data_frame$minute <- as.integer(format(data_frame$date, "%M")) # minute
+
+        # get date and time
+        today <- Sys.Date()
+        now <- Sys.time()
+
+        # manipulate date and time
+		data_frame$date <- as.POSIXct(strptime(variable, format = ""))  # format is like "%d/%m/%Y %H:%M:%S"
+		data_frame$day <- as.integer(format(data_frame$date, "%d"))     # day
+		data_frame$month <- as.factor(format(data_frame$date, "%B"))    # month
+		data_frame$year <- as.integer(format(data_frame$date, "%Y"))    # year
+		data_frame$weekday <- as.factor(format(data_frame$date, "%A"))  # weekday
+		data_frame$hour <- as.integer(format(data_frame$date, "%H"))    # hour
+		data_frame$minute <- as.integer(format(data_frame$date, "%M"))  # minute
+        data_frame$time <- format(time, "%I:%M %p")                     # extract time in the form of 11:26 AM
+        # to get full list of date formats check - https://www.statmethods.net/input/dates.html
 
 ==============================================================================================================================
 
 ### Efficient Code
-	
+
 	# Never grow a vector. Always use matrices instead of data frames whenever possible.
 
 		# check time taken by code
