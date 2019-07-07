@@ -1,66 +1,84 @@
 ==============================================================================================================================
+# histogram
+ggplot(aes(x=numeric_variable, fill = categorical_variable), color = "boundary_color") +
+geom_histogram(binwidth = , color = , fill = )
 
-## geom_histogram(binwidth = , color = , fill = ) + ggplot(aes(fill = factor_variable), color = "boundary_color") # 1D continuous
+# count plot
+ggplot(aes(x = categorical_variable)) +
+geom_bar(position = , color = )  # displays category counts
 
-## geom_freqpoly() # 1D
+# bar plot
+ggplot(aes(x = reorder(categorical_variable, numeric_variable), y = )) +
+geom_col()
+OR
+geom_bar(stat = "identity")  # category vs corresponding num (example: country vs population)
 
-## geom_density(stat = "identity") + ggplot(aes(color = factor_variable)) # 1D
+# scatter plot
+ggplot(df, aes(x=numeric_variable, y=numeric_variable, color=categorical_variable, size=numeric_variable)) +
+geom_point(alpha = 0.5) +
+geom_smooth(method = "lm")
+
+# line plot
+ggplot(df, aes(x=numeric_variable, y=numeric_variable, color=categorical_variable)) +
+geom_line()
+
+# boxplot
+ggplot(df, aes(x=categorical_variable, y=numeric_variable)) +
+geom_boxplot(aes(color = categorical_variable), alpha = 0.1) # category vs num
+
+# heatmap
+ggplot(df, aes(x = categorical_variable, y = categorical_variable, fill = numeric_variable)) +
+geom_tile()
+
+==============================================================================================================================
+# frequency plot
+geom_freqpoly() # 1D
+
+# density plot
+geom_density(stat = "identity") + ggplot(aes(color = categorical_variable)) # 1D
+
+stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")
+
+# line plots
+geom_line(stat = "summary", fun.y = function, fun.args = list(probs = 0.9), linetype = 1, aes(color = categorical_variable))
+geom_segment(aes(x = , xend = , y = , yend = ), color = "#ffffff") # to draw a line
+
+==============================================================================================================================
+# add more variables
+facet_wrap(~categorical_variable)
+
+facet_grid(vertical_categorical_variable~horizontal_categorical_variable)
 
 ==============================================================================================================================
 
-## geom_bar(position = , color = ) + ggplot(aes(x = , fill = factor)) # 1D category
-## geom_bar(stat = "identity") + ggplot(aes(x = reorder(categorical.var, numeric.var), y = )) # 2D category vs num
-## stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")  	
+coord_cartesian(xlim = c(), ylim = c()) # doesn't remove data, only zooms-in or zooms=out the graph.
+
+coord_trans(x = log, y = sqrt, limx = c(), limy = c()) # Used to transform the coordinate axis.
+
+coord_flip()
+
+coord_polar()  # can be used with bar plot to create pie charts.
+
+coord_map()
 
 ==============================================================================================================================
+# manipulate graph
+scale_x_continuous(breaks = seq(), limits = c(), labels = c())
 
-## geom_point(alpha = 0.5) + ggplot(aes(fill = factor_variable)) + geom_smooth(method = "lm") # 2D num vs num
+scale_color_gradient(low = "green", high = "red")
 
-==============================================================================================================================
+# convert x and y axis to log scale
+scale_x_log10()
+scale_y_log10()
 
-## geom_boxplot(aes(color = factor_variable), alpha = 0.1) # 2D factor vs num
+# set display limits in graph to each element in aes() such as axis and colors
+expand_limits(x=c(start_point, end_point), y=c(start_point, end_point))
 
-==============================================================================================================================
+scale_size_area()
 
-## geom_tile() + ggplot(aes(x = , y = , fill = numeric.variable)) # 2D factor vs factor. Use dplyr group_by(fac1,fac2) and n().
+scale_color_brewer()
 
-==============================================================================================================================
-
-## geom_line(stat = "summary", fun.y = function, fun.args = list(probs = 0.9), linetype = 1, aes(color = factor_variable))
-
-==============================================================================================================================
-
-## geom_segment(aes(x = , xend = , y = , yend = ), color = "#ffffff") # to draw a line
-
-==============================================================================================================================
-
-## facet_wrap(~categorical_variable)
-
-## facet_grid(vertical_categorical_variable~horizontal_categorical_variable)
-
-==============================================================================================================================
-
-## coord_cartesian(xlim = c(), ylim = c()) # doesn't remove data, only zooms-in or zooms=out the graph.
-
-## coord_trans(x = log, y = sqrt, limx = c(), limy = c()) # Used to transform the coordinate axis.
-
-## coord_flip()
-
-## coord_polar() # can be used with bar plot to create pie charts.
-
-## coord_map()
-
-==============================================================================================================================
-
-## scale_x_continuous(breaks = seq(), limits = c(), labels = c())
-
-## scale_color_gradient(low = "green", high = "red")
-
-## scale_size_area()
-
-## scale_color_brewer()
-
-## scale_fill_brewer()
+scale_fill_brewer()
 
 ==============================================================================================================================
 
@@ -78,38 +96,39 @@
 		theme_gdocs() + scale_fill_gdocs()
 		theme_wsj() + scale_fill_wsj(palette = "black_green")
 
-## scale_fill/color_manual/continuous/discrete(guide = guide_legend("legend.title"),
-		labels = c("legend.names"), values = c("legend.colors"))
+scale_fill/color_manual/continuous/discrete(guide = guide_legend("legend.title"),
+                                            labels = c("legend.names"),
+                                            values = c("legend.colors"))
 
-## theme(axis.line, axis.text.x = element_text(angle = 45, hjust = 1, face="bold", color="#993333", size=14), 
-		axis.ticks, axis.title.x, legend.position = "none/bottom")
+theme(axis.line, axis.text.x = element_text(angle = 45, hjust = 1, face="bold", color="#993333", size=14),
+	  axis.ticks, axis.title.x, legend.position = "none/bottom")
 
-## geom_text(aes(label = var), vjust = +/- 1) # text on top of graphs.
+geom_text(aes(label = var), vjust = +/- 1) # text on top of graphs.
 
-## annotate("text", label = "custom.text",x = x.postition, y = y.position, size = , colour = "text.color")
+annotate("text", label = "custom.text",x = x.postition, y = y.position, size = , colour = "text.color")
 
 ==============================================================================================================================
 
 ## labels
-		
+
 		library(ggrepel)
-		geom_text_repel(aes(label = variable), size = 3)	
+		geom_text_repel(aes(label = variable), size = 3)
 		xlab("x axis label name")
 		ylab("y axis label name")
 		ggtitle("graph title")
 		labs(title = "title", x = "x label", y = "y label")
-		
+
 ==============================================================================================================================
 
 ## GGally
-	
+
 		library(GGally)
 		ggpairs(data_frame[, numeric_vars])
 
 ==============================================================================================================================
 
 ## gridExtra
-	
+
 		library(gridExtra)
 		p1 <- ggplot()
 		p2 <- ggplot()
@@ -117,25 +136,25 @@
 
 ==============================================================================================================================
 
-## Maps
-	
+## maps
+
 		library(ggmap)
 
 		usa <- ggmap(get_googlemap(center=as.numeric(geocode("usa")), scale=2, zoom=13), extent="normal")
 		usa <- get_map(location="united states", zoom = 4, maptype = "terrain",source="google",color="color")
 		usa <- get_map(location = c(left, bottom, right, top), source = "osm")
-		
+
 		ggmap(usa) + geom_point(data = data_frame, aes(x = Longitude, y = Latitude))
-		
-		
+
+
 		library(maps)
-		
+
 		usa <- map_data("state")
 		data_frame <- merge(usa, data_frame, by = "")
-		
+
 		ggplot(data_frame, aes(x = long, y = lat, group = group))
 
-		
+
 		library(leaflet)
 		map <- leaflet(data) %>%
 				setView(lng = -71.0589, lat = 42.3601, zoom = 12) %>%
@@ -150,14 +169,14 @@
 						   								fillOpacity = 0.7, bringToFront = TRUE),
 						   radius = ~population, stroke = F
 						  ) %>%
-				addRectangles(lng1 = -118.456554, lat1 = 34.078039, 
+				addRectangles(lng1 = -118.456554, lat1 = 34.078039,
 							  lng2 = -118.436383, lat2 = 34.062717,
 							  fillColor = "transparent"
 							 ) %>%
 				addLegend(position = "bottomright",
 						  pal = pal <- colorNumeric(palette = "YlGnBu", domain = data$gdp),
 						  values = ~gdp,
-						  title = "GDP", 
+						  title = "GDP",
 						  labFormat = labelFormat(prefix = "$"),
 						  opacity = 1
 						 ) %>%
@@ -171,7 +190,7 @@
 				# plugin: mini map to navigate easily
 				addMiniMap(toggleDisplay = TRUE)
 
-		
+
 		print(map)
-		
+
 ==============================================================================================================================

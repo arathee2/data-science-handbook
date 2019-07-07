@@ -214,14 +214,14 @@
 
         library("dplyr")
 
-        select(data_frame, column_names)
-        filter(data_frame, condition)
-        arrange(data_frame, desc(factor_variable)) # ascending by default
-        mutate(data_frame, new_variable_name = equation)
-        group_by(data_frame, factor_variable)
-        summarize(data_frame, newVarName =  function()) # group_by(factorVariable) %>% summarize(count = n()) used commonly.
-        count(data_frame, variable) # works similar table
-        top_n(20, data_frame) # for top 20 rows
+        select(data_frame, column_names)                   # select a subset of columns
+        filter(data_frame, condition1, condition2)         # subset dataframe based on conditions
+        arrange(data_frame, desc(factor_variable))         # sort dataframe. Replace "desc(variable)" with "variable" for ascending order
+        mutate(data_frame, variable_name = equation)       # create new or overwrite existing variable with or without using other variables
+        group_by(data_frame, categorical_variable)         # group data by converting each category into one row.
+        summarize(data_frame, new_var_name =  function())  # summarize vector into a number using functions such as mean() and sum(). group_by(categorical_variable) %>% summarize(count = n()) commonly used.
+        count(data_frame, variable)                        # works similar table
+        top_n(20, data_frame)                              # select top 20 rows
 
         piping : data_frame %>% operation1 %>% operation2 and so on...
 
