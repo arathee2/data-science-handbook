@@ -8,7 +8,7 @@
 		# ignore warnings
 		import warnings
 		warnings.filterwarnings("ignore")
-		
+
 		# display matplotlib without plt.show()
 		%matplotlib inline
 
@@ -125,13 +125,21 @@
 
 		# error handling
 		def root(number):
-			if root < 0
-				raise ValueError("negative numbers not allowed.")
+			if not isinstance(number, int):
+                raise TypeError("Enter an integer.")                     # function breaks here and returns TypeError
+            elif root < 0:
+				raise ValueError("Enter a positive integer.")            # function breaks here and returns ValueError
+            else:
+                return math.sqrt(number)
 
-			try:
-				return number ** 0.5
-			except:
-				print("Please enter an int or float.")
+		def dummy():
+            try:
+				root = root(-9)                                          # ValueError is raised, directly jump to except ValueError part
+                return root
+			except TypeError as t:
+				print(t)
+            except ValueError as v:
+                print(v)                                                 # print v, that is, "Enter a positive integer."
 
 		# iterators and iterables
 		iterator = iter(iterable)                     # iterable can be any sequence-lists, string, dictonaries etc.
@@ -179,7 +187,7 @@
 
 		# pickled files - python specific
 		import pickle
-		
+
 		with open("data.pkl", "rb") as file:          # rb - readonly binary
     			  data = pickle.load(file)
     	print(data)
@@ -193,7 +201,7 @@
 ==============================================================================================================================
 
 ### numpy
-	
+
 	import numpy as np
 
 		array = np.array([1, 2, 3, 4], dtype = )      # creates a numpy array
@@ -201,27 +209,27 @@
 		array.size                                    # number of elements
 		array.itemsize                                # size of each element in memory
 		array.dtype                                   # data type of array
-		
+
 		np.zeros((5,3))
 		np.ones((5,3))
 		np.empty((5,3))
-		
+
 		random.seed(4)                                # set seed for random number
 		random.rand()                                 # create random number in [0.0,1.0)
 		random.randint(low, high, (size))             # create array of given size with random numbers in [low, high)
 		random.random((3, 4))                         # create 3x4 array with random numbers in [0.0,1.0)
 		random.choice([0,1,2], size, replace, p)      # generate random numbers of size from array with probability p
 		random.shuffle(array)                         # modify a sequence in-place by shuffling its contents
-		
+
 		np.arange(start, stop, step)                  # similar to seq() in R
 		np.linspace(start, stop, num, endpoint=True)  # generate "num" elements between [start, stop]
-		
+
 		array.reshape((3, 4))                         # return an array of changed size
 		array.resize((3, 4))                          # changes the array in-place
 		array.transpose()                             # return transpose of matrix
 		array.sum(axis = 0/1)                         # 0 - column-wise, 1 - row-wise
 		array.cumsum(axis = 0/1)                      # cumulative sum across column/row
-		
+
 		np.unique(array)
 		np.exp(array)                                 # array or pandas Series
 		np.sqrt(array)
@@ -235,7 +243,7 @@
 		np.cov(x, y)
 		np.corrcoef(x, y)                             # pearson correlation coefficient
 
-		column_stack((a, b))  						  # similar to cbind in R. 
+		column_stack((a, b))  						  # similar to cbind in R.
 		row_stack((a, b))                             # similar to rbind in R
 		vstack((a, b))                                # vertically stack array a and b.
 		hstack((a, b))         						  # horizontally stack array a and b
@@ -252,7 +260,7 @@
 		logical_and(array1, array2)                   # returns an array with boolean values
 		logical_or(array1, array2)
 		logical_not(array)
-	
+
 		# distributions - google numpy distribution functions
 		np.random.normal(mean, std, size)
 		np.random.binomial(n, p, size)
@@ -276,7 +284,7 @@
 		pd.set_option("display.max_columns", 20)    # set display limit to all columns
 		pd.get_options("display.max_rows")
 		pd.reset_options("display.max_columns")
-		
+
 		pd.set_option("max_colwidth", 20)
 
 		# os module
@@ -299,12 +307,12 @@
 						 na_values    =   ,                # list of values to be read as na
 						 parse_dates  =   ,                # refer documentation
 		)
-		
+
 		df = pd.DataFrame(data        =   ,                # numpy ndarray or python dictionary
 						  index       = [],                # list of indices, defaults to arange(n)
 						  columns     = [],                # list of column names
 		)
-		
+
 		df.shape                                           # return shape as tuple
 		df.head(n)                                         # return first "n" rows of df
 		df.tail(n)                                         # return last "n" rows of df
@@ -320,8 +328,8 @@
 		df.isnull().sum()                                  # check number of missing values
 		df.notnull().all()                                 # return True only if no missing values present
 		df.dropna(subset  = ["list of columns"],
-				  how     = "any/all", 
-				  thresh  = 
+				  how     = "any/all",
+				  thresh  =
 		)
 
 		# visualise missing values
@@ -341,7 +349,7 @@
 
 		df.categorical_column.nunique()                    # return number of levels in a categorical variable
 		df.categorical_column.value_counts(dropna = False) # similar to table(df$category) in R
-		
+
 		# statistics
 		df.corr(method="pearson")                          # return correlation matrix
 		df.skew()                                          # return skewness of numeric variables
@@ -352,12 +360,12 @@
 		df.column_name.quantile([0.1, 0.5])                # return quantile value
 		df.column_name.cumsum()                            # cumulative sum
 		df.column_name.cumprod()                           # cumulative product
-		
+
 		# sample rows or columns
 		df.sample(n             =   ,                      # number of rows/columns to sample
 				  frac          =   ,                      # either use 'n' or 'frac'
 				  replace       = False,                   # sample with ro without replacement
-				  random_state  =  4,                      # seed for reproducability 
+				  random_state  =  4,                      # seed for reproducability
 				  axis          =   ,                      # sample either row or columns of dataframe
 		)
 
@@ -366,29 +374,29 @@
 		df.plot(kind="bar", x = , y = )                    # refer documentation
 		df.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
 		df.plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
-		
+
 		from pandas.tools.plotting import scatter_matrix
 		scatter_matrix(df)
-		
+
 		# change columns types
 		pd.to_numeric(df.column, errors = "coerce")
-		
+
 		df.column.astype(str)
-		
+
 		df.column.astype("category",
 						 categories = ['good', 'excellent'],
 						 ordered    = True)
-		
-		
+
+
 		df.select_dtypes(include    = ["int64"],
 						 exclude    = ["float64"])
-		
+
 		# index and column names
 		df.index = index_variable                          # index variable must be equal to the number of rows in the dataframe
 		df.index.name = "index name"
 		df.columns
 		df.columns.name
-		
+
 		# hierarchical indexing
 		df.set_index(["school", "rollno"], inplace = True)
 		df.sort_index()
@@ -397,18 +405,18 @@
 		df.loc[1:10]  		                               # inner indexing (on "rollno")
 		df.loc[(["dgv", "dav"], slice(1, 10)), :]          # colon slicing not permitted inside tuple, instead use slice()
 		df.reindex()                                       # conform data frame to new index. arrange rows or add new rows
-		
+
 		# filtering
-			
+
 			# single condition
 			df[df.age > 10]
 			df[df.age == df.age.max()]
 			df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
-			
+
 			# multiple conditions
 			df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
 			df[(df.name == "Aman") | (df.name = "Arjun")]  # return Aman and Arjun both
-			
+
 		df.all()                                           # return True if all the elements are True
 		df.any()                                           # return True if any of the elements is True
 
@@ -422,7 +430,7 @@
 		# change columns order
 		ordered = ['col_3', 'col_1', 'col_2']
 		df = df[ordered]
-		
+
 		# loc, iloc
 		df.loc[1:5,:]                                      # print row [1,5]. need to specify the row and column header names
 		df.loc[[1, 4, 7], ["column1", "column2"]]
@@ -466,21 +474,21 @@
 
 			df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
 			df.groupby(["categorical_columns"]).agg({
-				"column": [max, min], 
+				"column": [max, min],
 				"column": [size, "count"]                  # size and "count" are same. "count" is a numpy function. see numpy functions
 			})
-			
+
 			df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
 
 			df.groupby(["categorical_column", boolean_filter]).another_column.function_name()
-			
+
 			# change GroupBy to DataFrame
 			df = pd.DataFrame(df.groupby())
 			df = df.add_suffix('_count').reset_index()     # or df.add_prefix()
 
 			# set column names after groupby
 			df.columns = ["_".join(colname) for colname in df.columns]
-			
+
 		# Melt: wide to long dataframe
 		pd.melt(df,
 				id_vars    = ["columns_to_keep"],
@@ -488,7 +496,7 @@
 				var_name   = ,  					       # new categorical column name
 				value_name =                               # new numerical column name
 		)  										           # similar to gather in tidyr
-		
+
 		# Unmelt: long to wide dataframe
 		df.pivot_table(index   = ,                         # name of columns not to unmelt
 					   columns = ,                         # columns to melt
@@ -508,7 +516,7 @@
 		df.stack()
 		df.stack.unstack()
 
-		# crosstabs 
+		# crosstabs
 
 			# table(category1, catedory2)
 			pd.crosstab(df.categorical_column1,
@@ -522,12 +530,12 @@
 						df.categorical_column2
 						values  = df.numerical_column,
 						aggfunc = np.average
-			)  
+			)
 
 		# one-hot encoding
 		df_dummy = pd.get_dummies(df,
 								  columns = categorical_columns,     # encodes all object or category type columns
-								  prefix  = 
+								  prefix  =
 		)
 
 		# subset dataframe based on column names
@@ -538,7 +546,7 @@
 
 		OR
 
-		df.filter(regex='^id.*', axis=1)                   # subset dataframe on column or index names according to given pattern 
+		df.filter(regex='^id.*', axis=1)                   # subset dataframe on column or index names according to given pattern
 
 		# write csv
 		df.to_csv("filename.csv", sep = , index = False)
@@ -552,7 +560,7 @@
 		    return dataframe[keep_columns].copy()
 
 		df = drop_constant_columns(df)
-		
+
 ==============================================================================================================================
 
 ### matplotlib
@@ -561,13 +569,13 @@
 
 		# line plot
 		plt.plot(x, y, marker = "", linestyle = "")
-		
+
 		# histogram
 		plt.hist(x, bins = 30, rwidth = 0.9)           # or pass a list of bin cutoff points
-		
+
 		# scatter plot
 		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
-		
+
 		# boxplot
 		plt.boxplot(x)
 
@@ -590,7 +598,7 @@
 		plt.xticks(arange(2), ("male", "female"))      # customize x-axis ticks
 		plt.yticks(rotation = "")                      # customize y-axis ticks
 		plt.tick_params()
-		
+
 		# transformation
 		plt.xscale("log")                              # transform x-axis to log scale
 		plt.yscale("log")                              # transform y-axis to log scale
@@ -634,7 +642,7 @@
 		)
 
 		OR
-		
+
 		plt.text(x, y, s = "show this text at (x,y)")  # display text on x,y point
 		plt.grid(True)                                 # to enable the text
 
@@ -650,7 +658,7 @@
 
 		# colors - for categorical plots
 		mycolors = sns.color_palette(["list_of_colors"])         # colors are applied to hue else for category present on x/y axis
-		
+
 		# histogram
 		sns.distplot(a            =  df.numeric_column,
 					 bins         =  30,
@@ -737,7 +745,7 @@
 					data2         =  ,                           # 2d plot
 					shade         =  True,                       # add color to show varying density
 					vertical      =  False,                      # 1d - change orientation, 2d - no effect
-					gridsize      =  20,                         # number of discrete points in the evaluation grid 
+					gridsize      =  20,                         # number of discrete points in the evaluation grid
 					legend        =  True,                       # 1d - show legend because label not shown on axis, 2d - no effect
 					cumulative    =  False,                      # 1d - cumulative plot, 2d - can't pass this argument
 					cbar          =  False                       # 2d - add color bar
@@ -747,7 +755,7 @@
 		mycmap = sns.light_palette(color, reverse=False, as_cmap=True)  # sequential palette from light to color
 		mycmap = sns.dark_palette(color, reverse=False, as_cmap=True)   # sequential palette from dark to color
 		mycmap = sns.diverging_palette(h_neg=, h_pos=, s=, l=, center="light/dark", as_cmap=True)  # h_neg to light/dark to h_pos
-		
+
 		sns.heatmap(data          =  df.corr(),                  # 2d array data such as a pivot table
 					cmap          =  mycmap,                     # colors of the heatmap
 					center        =  None,                       # value at which to center diverging data
@@ -839,7 +847,7 @@
 					y = ,
 					selection_color = "red",
 					nonselection_fill_alpha = ,
-					nonselection_fill_color = 
+					nonselection_fill_color =
 		)
 
 		# hover appearence
@@ -883,7 +891,7 @@
 
 		# tabbed layout
 		from bokeh.models.widgets import Tabs, Panel
-		
+
 		first = Panel(child = row(p1, p2), title = "first")
 		second = Panel(child = row(p3), title = "second")
 
@@ -893,7 +901,7 @@
 		# linking plots
 
 	## annotations and guide
-		
+
 		# legend locatiion
 		plot = plot.circle()
 		plot.legend.location = "top_left"
@@ -907,7 +915,7 @@
 				("label", "@column_name"),
 				("label", "@column_name")
 				])
-		
+
 		plot = figure(tools = [hover, "pan", "wheel_zoom"])  # or plot.add_tools(hover)
 		show(plot)
 
@@ -938,7 +946,7 @@
 		string.strip(); string.lstrip(); string.rstrip()   # strip whitespace
 		split_result = string.split(".")                   # return list of substrings separated by "."
 		".".join(split_result)                             # join list items using "."
-		
+
 		"amandeep" + " rathee" == "amandeep rathee"        # concatenate strings
 		"yo"*3                                             # return "yoyoyo"
 
@@ -954,7 +962,7 @@
 
 		# split
 		re.split(pattern, string)                          # split the string at given pattern
-		
+
 		# substitute
 		re.sub(pattern, replacement, string)               # replace first occurence of pattern by repl in the string
 
@@ -995,22 +1003,22 @@
 
 		# pandas string methods
 		s = pd.Series(['a_b_c', 'B', 'C', 'Aaba', ' Baca ', np.nan, 'CABA', 'dog', 'cat'])
-		
+
 		s.str.get(0)                                  # get first element from each string
 		s.str[0]                                      # get first element from each string
-		
+
 		s.str.lower()
 		s.str.upper()
-		
+
 		s.str.len()
-		
+
 		s.str.strip()
 		s.str.lstrip()
 		s.str.rstrip()
-		
+
 		s.str.split("_", expand=False)                # split "a_b_c" to [a, b, c]. Refer documentation for more functionality.
 		s.str.rsplit("_")                             # same as split but works in reverse direction i.e. from end to start of a string
-		
+
 		s.str.join("_")                               # join on whitespaces using "_"
 
 		s.str.replace(pattern, "custom_string")       # replace pattern with "custom_string"
@@ -1033,7 +1041,7 @@
 
 		pd.read_csv("url", sep = )
 		pd.read_excel("url", sheetname = None)        # read all sheets of excel file from url as a dictionary with sheet names as keys
-		
+
 ==============================================================================================================================
 
 ### time series with pandas
@@ -1063,5 +1071,5 @@
 		)
 		# visualize time series
 		df.column.plot(style = "k.-")      # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
-		
+
 ==============================================================================================================================
