@@ -1,1075 +1,1124 @@
 
-### jupyter-notebook
+# jupyter-notebook
 
-		# display variables without print()
-		from IPython.core.interactiveshell import InteractiveShell
-		InteractiveShell.ast_node_interactivity = "all"
+        # display variables without print()
+        from IPython.core.interactiveshell import InteractiveShell
+        InteractiveShell.ast_node_interactivity = "all"
 
-		# ignore warnings
-		import warnings
-		warnings.filterwarnings("ignore")
+        # ignore warnings
+        import warnings
+        warnings.filterwarnings("ignore")
 
-		# display matplotlib without plt.show()
-		%matplotlib inline
+        # display matplotlib without plt.show()
+        %matplotlib inline
 
-		# keep track of time
-		%%time                                        # run cell code one time - use on top of the cell
-		%time                                         # run a single line of code - use before a line
-		%%timeit                                      # run cell code seven times and return mean time - use on top of the cell
-		%time                                         # run cell code seven times and return mean time - use before a line
+        # keep track of time
+        # run cell code one time - use on top of the cell
+        % % time
+        # run a single line of code - use before a line
+        %time
+        # run cell code seven times and return mean time - use on top of the cell
+        % % timeit
+        # run cell code seven times and return mean time - use before a line
+        %time
 
-		# run different kernel
-		%R
-		rnorm(10)
+        # run different kernel
+        %R
+        rnorm(10)
 
 ==============================================================================================================================
 
-### python
+# python
 
-		# os commands
-		os.getcwd()
-		os.chdir(r"")
+        # os commands
+        os.getcwd()
+        os.chdir(r"")
 
-		# print
-		print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
-		print("Value of x is: {1} and value of y is: {0}".format(y, x))
-		print("Value of x is:", x, "and value of y is:", y)
+        # print
+        print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+        print("Value of x is: {1} and value of y is: {0}".format(y, x))
+        print("Value of x is:", x, "and value of y is:", y)
 
-		# dictionary
-		dictionary = {'key': 'value', 'key': 'value'}       # key and value can be string, integer or float
-		dict([('key', 'value'), ('key', 'value')])
-		dict(zip([key_list], [value_list]))
-		dict(key='value', key='value')
-		dictionary.keys()
-		dictionary.values()
-		dictionary.items()
+        # operators
+        x + y
+        x - y
+        x * y
+        x / y
+        x // y                                                  # calculate quotient
+        x % y                                                   # calculate remainder, also called modulus
+        x ** y                                                  # x raised to power y
 
-		# sort sequence
-		student_tuples = {
-						  '''('name', 'section', 'age')'''
-        					 ('john',   'A',      15),
-	        				 ('jane',   'B',      12),
-    	    				 ('dave',   'B',      10)
-        }
-        sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age in ascending order
+        # data types
 
-		# if-else condition
-		if condition:
-			code
-		elif condition:
-			code
-		else:
-			code
+            # str
+            x = 'hello'
+            type(x)                                             # return str
+            isinstance(x, str)                                  # return True
 
-		# while loop
-		while condition:
-			code
+            # int
+            x = 10
 
-		# for loop
-		for var in seq:
-			print(var)
+            # float
+            x = 10.0
 
-		for index, var in enumerate(seq):
-			print(str(index) + "-" + str(var))
+            # list
+            my_list = [item1, item2, item3]
+            my_list = list(item1, item2, item3)
 
-		for x, y, z in zip(sequence1, sequence2, sequence3):
-			print(x, y, z)
+            # tuples
+            my_tuple = (item1, item2, item3)
+            my_tuple = tuple(item1, item2, item3)
 
-		# for loops for dictionaries
-		for key, value in dict.items():
-			print(str(key) + "-" + str(value))
+            # sets
+            my_set = set()
 
-		# for loops for numpy arrays
-		for var in np.nditer(numpy_array):
-			print(var)
+            # dictionary
+            my_dictionary = {'key': 'value', 'key': 'value'}    # key and value can be string, integer or float
+            my_dictionary = dict([('key', 'value'), ('key', 'value')])
+            my_dictionary = dict(zip([key_list], [value_list]))
+            my_dictionary = dict(key='value', key='value')
+            my_dictionary.keys()
+            my_dictionary.values()
+            my_dictionary.items()
 
-		global var    # use global variable instead of local variable inside a function
-		nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
+        # sorting
 
-		# default arguments
-		def function_name(x = 2):
-			print(x**2)
+            # simple sorting
+            sorted(iterable)                                        # iterable can be list, dictionary or other iterable
 
-		# multiple arguments
-		def function_name(*args):
-		""" print all the parameters """
-			for param in args:
-				print(param)
-		function_name(1, 2, "hi")
+            # complex sorting
+            student_tuples = {
+                              '''('name', 'section', 'age')'''
+                                 ('john',   'A',      15),
+                                 ('jane',   'B',      12),
+                                 ('dave',   'B',      10)
+            }
+            sorted(student_tuples.items(), key=lambda student: student[2], reverse=False)  # sort by age in ascending order
 
-		# keyword arguments
-		def function_name(**kwargs):
-		""" print all the key (parameter name) value (parameter value) pairs passed to the function """
-			for key, value in kwargs.items():
-				print(str(key) + ":" + str(value))
-		function_name(first_name = "Amandeep", last_name = "Rathee")
+        # if-else condition
+        if condition:
+            # code
+        elif condition:
+            # code
+        else:
+            # code
 
-		map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
-		filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
-		from functools import reduce
-		reduce(function, sequence)                    # reduce list to one number using a function
+        # while loop
+        while condition:
+            # code
+            continue                                            # continue to next iteration
+            break                                               # exit loop
 
-		# lambda functions
-		lambda variables: operations                  # return result of operation
-		square = lambda x: x**2                       # return square of x
-		maximum = lambda x, y: x if (x > y) else y
+        # for loop
+        for var in seq:
+            print(var)
+            continue                                            # continue to next iteration
+            break                                               # exit loop
 
-		# list comprehension
-		squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
-		squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
-		squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
-		pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
+        for index, var in enumerate(seq):
+            print(str(index) + "-" + str(var))
 
-		# dictionary comprehension
-		result = {number: number**2 for number in range(5)}
+        for x, y, z in zip(sequence1, sequence2, sequence3):
+            print(x, y, z)
 
-		# error handling
-		def root(number):
-			if not isinstance(number, int):
-                raise TypeError("Enter an integer.")                     # function breaks here and returns TypeError
-            elif root < 0:
-				raise ValueError("Enter a positive integer.")            # function breaks here and returns ValueError
-            else:
-                return math.sqrt(number)
+        # for loops for dictionaries
+        for key, value in dict.items():
+            print(str(key) + "-" + str(value))
 
-		def dummy():
+        # for loops for numpy arrays
+        for var in np.nditer(numpy_array):
+            print(var)
+
+        global var    # use global variable instead of local variable inside a function
+        nonlocal var  # in case of nested functions, access the var present in outer function instead of local function
+
+        # default arguments
+        def function_name(x = 2):
+            print(x**2)
+
+        # multiple arguments
+        def function_name(*args):
+        """ print all the parameters """
+            for param in args:
+                print(param)
+        function_name(1, 2, "hi")
+
+        # keyword arguments
+        def function_name(**kwargs):
+        """ print all the key (parameter name) value (parameter value) pairs passed to the function """
+            for key, value in kwargs.items():
+                print(str(key) + ":" + str(value))
+        function_name(first_name = "Amandeep", last_name = "Rathee")
+
+        map(function, sequence)                       # useful for applying lambda functions to sequences like lists. extract results by list(map())
+        filter(function, sequence)                    # use to filter out elements of sequence. access the result using list(filter())
+        from functools import reduce
+        reduce(function, sequence)                    # reduce list to one number using a function
+
+        # lambda functions
+        lambda variables: operations                  # return result of operation
+        square = lambda x: x**2                       # return square of x
+        maximum = lambda x, y: x if (x > y) else y
+
+        # list comprehension
+        squares = [num**2 for num in range(5)]        # produce a list of squares of 0 through 4
+        squares = [num**2 for num in range(5) if num % 2 == 0]            # return squares only for even numbers. condition for iterable
+        squares = [num**2 if num % 2 == 0 else 0 for num in range(5)]     # return square if number is even else 0. condition for iterator
+        pairs = [(num1, num2) for num1 in range(5) for num2 in range(5)]  # return a list of tuples
+
+        # dictionary comprehension
+        result = {number: number**2 for number in range(5)}
+
+        # set comprehension
+        result = {number for number in range(5)}
+
+        # error handling
+        def dummy():
             try:
-				root = root(-9)                                          # ValueError is raised, directly jump to except ValueError part
+                root = root(-9)                                          # ValueError is raised, directly jump to except ValueError part
                 return root
-			except TypeError as t:
-				print(t)
+            except TypeError as t:
+                print(t)
             except ValueError as v:
                 print(v)                                                 # print v, that is, "Enter a positive integer."
 
-		# iterators and iterables
-		iterator = iter(iterable)                     # iterable can be any sequence-lists, string, dictonaries etc.
-		next(iteration)                               # print the next item in iterable
+        def root(number):
+            if not isinstance(number, int):
+                raise TypeError("Enter an integer.")                     # function breaks here and returns TypeError
+            elif root < 0:
+                raise ValueError("Enter a positive integer.")            # function breaks here and returns ValueError
+            else:
+                return math.sqrt(number)
 
-		list(enumerate(sequence, start = 0))          # return a list of tuples with index and the item of sequence
-		list(zip(sequence1, sequence2, sequence3))    # return a list of tuples. each tuple has corresponding items from each sequence
+        # iterators and iterables
+        iterator = iter(iterable)                     # iterable can be any sequence-lists, string, dictonaries etc.
+        next(iteration)                               # print the next item in iterable
 
-		# load dataframe in chunks
-		for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
+        list(enumerate(sequence, start = 0))          # return a list of tuples with index and the item of sequence
+        list(zip(sequence1, sequence2, sequence3))    # return a list of tuples. each tuple has corresponding items from each sequence
 
-		# generators
-		generator = (num for num in range(10))        # generator can be iterated over. instead of returning a list at once it returns number as and when required.
-		def generator_function(n):
-			""" return numbers upto n """
-			i = 0
-			while i < n
-			yield i                                   # generates i and returns as the while loop runs
-			i += 1
+        # load dataframe in chunks
+        for df in pd.read_csv("", chunksize = n)      # load "n" rows in chunks. use next(df) to iterate over chunks
 
-	# importing data
+        # generators
+        generator = (num for num in range(10))        # generator can be iterated over. instead of returning a list at once it returns number as and when required.
+        def generator_function(n):
+            """ return numbers upto n """
+            i = 0
+            while i < n
+            yield i                                   # generates i and returns as the while loop runs
+            i += 1
 
-		# import text file
-		file = open("filename.txt", mode = "r")       # open file in read-only mode
-		fulltext = file.read()
-		firstline = file.readline()                   # read line iteratively
-		file.close()
-		print(file.closed)                            # check if file is closed
+        # importing data
 
-		OR
+            # import text file
+            file = open("filename.txt", mode = "r")       # open file in read-only mode
+            fulltext = file.read()
+            firstline = file.readline()                   # read line iteratively
+            file.close()
+            print(file.closed)                            # check if file is closed
 
-		with open("filename.txt", "r") as file:
-			print(file.readline())
+            OR
 
-		# import flat file using numpy
-		np.loadtxt("filename", delimiter = ",", skiprows = 1, usecols = [1:10], dtype = )
-		np.genfromtxt("filename", delimiter = ",", names = True, dtype = None)
-		np.recfromcsv("filename")                     # same as genfromtxt() with parameters shown above as default
+            with open("filename.txt", "r") as file:
+                print(file.readline())
 
-		# import flat file using pandas
-		df = pd.read_csv("filename", nrows = , header = , sep = "", names = ["column names"],
-						 comment = ["", ""], na_values = ["", ""], parse_dates = , index_col = )
+            # import flat file using numpy
+            np.loadtxt("filename", delimiter = ",", skiprows = 1, usecols = [1:10], dtype = )
+            np.genfromtxt("filename", delimiter = ",", names = True, dtype = None)
+            np.recfromcsv("filename")                     # same as genfromtxt() with parameters shown above as default
 
-		array = df.values                             # extract numpy array from dataframe
+            # import flat file using pandas
+            df = pd.read_csv("filename", nrows = , header = , sep = "", names = ["column names"],
+                             comment = ["", ""], na_values = ["", ""], parse_dates = , index_col = )
 
-		# pickled files - python specific
-		import pickle
+            array = df.values                             # extract numpy array from dataframe
 
-		with open("data.pkl", "rb") as file:          # rb - readonly binary
-    			  data = pickle.load(file)
-    	print(data)
+            # pickled files - python specific
+            import pickle
 
-		# import excel file
-		df = pd.ExcelFile("filename")
-		df.sheet_names()  # print sheet names
-		df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])        # extract sheet by specifying sheet name
-		df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
+            with open("data.pkl", "rb") as file:          # rb - readonly binary
+                      data = pickle.load(file)
+            print(data)
 
-==============================================================================================================================
-
-### numpy
-
-	import numpy as np
-
-		array = np.array([1, 2, 3, 4], dtype = )      # creates a numpy array
-		array.shape                                   # print shape of array
-		array.size                                    # number of elements
-		array.itemsize                                # size of each element in memory
-		array.dtype                                   # data type of array
-
-		np.zeros((5,3))
-		np.ones((5,3))
-		np.empty((5,3))
-
-		random.seed(4)                                # set seed for random number
-		random.rand()                                 # create random number in [0.0,1.0)
-		random.randint(low, high, (size))             # create array of given size with random numbers in [low, high)
-		random.random((3, 4))                         # create 3x4 array with random numbers in [0.0,1.0)
-		random.choice([0,1,2], size, replace, p)      # generate random numbers of size from array with probability p
-		random.shuffle(array)                         # modify a sequence in-place by shuffling its contents
-
-		np.arange(start, stop, step)                  # similar to seq() in R
-		np.linspace(start, stop, num, endpoint=True)  # generate "num" elements between [start, stop]
-
-		array.reshape((3, 4))                         # return an array of changed size
-		array.resize((3, 4))                          # changes the array in-place
-		array.transpose()                             # return transpose of matrix
-		array.sum(axis = 0/1)                         # 0 - column-wise, 1 - row-wise
-		array.cumsum(axis = 0/1)                      # cumulative sum across column/row
-
-		np.unique(array)
-		np.exp(array)                                 # array or pandas Series
-		np.sqrt(array)
-		np.max(array, axis)
-		np.min(array, axis)
-		np.mean(array)
-		np.median(array)
-		np.var(array)
-		np.std(array)
-		np.percentile(array, [10, 40, 90])            # similar to quartile() in R
-		np.cov(x, y)
-		np.corrcoef(x, y)                             # pearson correlation coefficient
-
-		column_stack((a, b))  						  # similar to cbind in R.
-		row_stack((a, b))                             # similar to rbind in R
-		vstack((a, b))                                # vertically stack array a and b.
-		hstack((a, b))         						  # horizontally stack array a and b
-		concatenate((a, b), axis = )                  # concatenate array a and b
-
-		a = array([1, 2, 3, 4])
-		b = a                 						  # not a copy. If "b" changes, "a" changes
-		c = a.copy()           						  # deep copy. If "c" changes, "a" remains unchanged
-
-		# indexing and slicing
-		array[start:end:jump, start:end:jump]         # for 2D array
-
-		# boolean operations
-		logical_and(array1, array2)                   # returns an array with boolean values
-		logical_or(array1, array2)
-		logical_not(array)
-
-		# distributions - google numpy distribution functions
-		np.random.normal(mean, std, size)
-		np.random.binomial(n, p, size)
-		np.random.poisson(n, size)
-		np.random.exponential(tau, size)
-
-		# linear regression in numpy
-		slope, intercept = np.polyfit(x, y, 1)        # degree of polynomial is 1 to specify linear regression
-
-		# print options
-		from numpy import set_printoptions
-		set_printoptions(precision=3)
+            # import excel file
+            df = pd.ExcelFile("filename")
+            df.sheet_names()  # print sheet names
+            df.parse("sheetname", parse_cols = 0, skiprows = 0:2, names = [""])        # extract sheet by specifying sheet name
+            df.parse(sheet_index, parse_cols = 0:2, skiprows = [0], names = ["", ""])  # extract sheet by specifying sheet index
 
 ==============================================================================================================================
 
-### pandas
+# numpy
 
-	import pandas as pd
+    import numpy as np
 
-		# print options
-		pd.set_option("display.max_columns", 20)    # set display limit to all columns
-		pd.get_options("display.max_rows")
-		pd.reset_options("display.max_columns")
+        array = np.array([1, 2, 3, 4], dtype = )      # creates a numpy array
+        array.shape                                   # print shape of array
+        array.size                                    # number of elements
+        array.itemsize                                # size of each element in memory
+        array.dtype                                   # data type of array
 
-		pd.set_option("max_colwidth", 20)
+        np.zeros((5,3))
+        np.ones((5,3))
+        np.empty((5,3))
 
-		# os module
-		import os
-		os.getcwd()
-		os.chdir(r"")
-		os.listdir(path)
-		os.mkdir(path)
+        random.seed(4)                                # set seed for random number
+        random.rand()                                 # create random number in [0.0,1.0)
+        random.randint(low, high, (size))             # create array of given size with random numbers in [low, high)
+        random.random((3, 4))                         # create 3x4 array with random numbers in [0.0,1.0)
+        random.choice([0,1,2], size, replace, p)      # generate random numbers of size from array with probability p
+        random.shuffle(array)                         # modify a sequence in-place by shuffling its contents
 
-		# importing files from current directory
-		import glob
-		files = glob.glob("*.csv")                         # return list of all csv file names from current working directory
+        np.arange(start, stop, step)                  # similar to seq() in R
+        np.linspace(start, stop, num, endpoint=True)  # generate "num" elements between [start, stop]
 
-		# read data
-		df = pd.read_csv(file_name,
-						 sep          =   ,                # character that seprates different values in the file
-						 names        = [],                # pass column names explicitly
-						 index_col    =   ,                # column index to use as index
-						 dtype        =   ,                # refer documentation
-						 na_values    =   ,                # list of values to be read as na
-						 parse_dates  =   ,                # refer documentation
-		)
+        array.reshape((3, 4))                         # return an array of changed size
+        array.resize((3, 4))                          # changes the array in-place
+        array.transpose()                             # return transpose of matrix
+        array.sum(axis = 0/1)                         # 0 - column-wise, 1 - row-wise
+        array.cumsum(axis = 0/1)                      # cumulative sum across column/row
 
-		df = pd.DataFrame(data        =   ,                # numpy ndarray or python dictionary
-						  index       = [],                # list of indices, defaults to arange(n)
-						  columns     = [],                # list of column names
-		)
+        np.unique(array)
+        np.exp(array)                                 # array or pandas Series
+        np.sqrt(array)
+        np.max(array, axis)
+        np.min(array, axis)
+        np.mean(array)
+        np.median(array)
+        np.var(array)
+        np.std(array)
+        np.percentile(array, [10, 40, 90])            # similar to quartile() in R
+        np.cov(x, y)
+        np.corrcoef(x, y)                             # pearson correlation coefficient
 
-		df.shape                                           # return shape as tuple
-		df.head(n)                                         # return first "n" rows of df
-		df.tail(n)                                         # return last "n" rows of df
-		df.dtypes                                          # return data type of each column
-		df.describe(percentiles  = None,                   # percentiles to display - range --> [0, 1]
-					include      = 'all',                  # data types to include
-					exclude      = None                    # data types to exclude
-		)
-		df.info()
+        column_stack((a, b))                          # similar to cbind in R.
+        row_stack((a, b))                             # similar to rbind in R
+        vstack((a, b))                                # vertically stack array a and b.
+        hstack((a, b))                                # horizontally stack array a and b
+        concatenate((a, b), axis = )                  # concatenate array a and b
 
-		# check missing values
-		df.isnull().any()                                  # return True if any of the values is missing
-		df.isnull().sum()                                  # check number of missing values
-		df.notnull().all()                                 # return True only if no missing values present
-		df.dropna(subset  = ["list of columns"],
-				  how     = "any/all",
-				  thresh  =
-		)
+        a = array([1, 2, 3, 4])
+        b = a                                         # not a copy. If "b" changes, "a" changes
+        c = a.copy()                                  # deep copy. If "c" changes, "a" remains unchanged
 
-		# visualise missing values
-		import missingno as msno
-		msno.matrix(df)                                # matrix of missing values
-		msno.bar(df)                                   # missing value bar chart
-		msno.heatmap(df)                               # correlation heatmap - 1 means both variables are missing together; -1 means not missing together even in a single observation
-		msno.dendrogram(df)                            # dendogram of variables
+        # indexing and slicing
+        array[start:end:jump, start:end:jump]         # for 2D array
 
-		# duplicate rows
-		df.duplicated()                                    # boolean ouput
-		df.duplicated().sum()                              # return number of duplicate entries
-		df.drop_duplicates(keep = "first", inplace = True) # keep first entry and delete rest of the duplicate entries
+        # boolean operations
+        logical_and(array1, array2)                   # returns an array with boolean values
+        logical_or(array1, array2)
+        logical_not(array)
 
-		# drop column
-		df.drop("column_name", axis = 1)
+        # distributions - google numpy distribution functions
+        np.random.normal(mean, std, size)
+        np.random.binomial(n, p, size)
+        np.random.poisson(n, size)
+        np.random.exponential(tau, size)
 
-		df.categorical_column.nunique()                    # return number of levels in a categorical variable
-		df.categorical_column.value_counts(dropna = False) # similar to table(df$category) in R
+        # linear regression in numpy
+        slope, intercept = np.polyfit(x, y, 1)        # degree of polynomial is 1 to specify linear regression
 
-		# statistics
-		df.corr(method="pearson")                          # return correlation matrix
-		df.skew()                                          # return skewness of numeric variables
-		df["column_name"].max()
-		df["column_name"].mean()
-		df["column_name"].mode()
-		df["column_name"].std()                            # standard deviation of column
-		df.column_name.quantile([0.1, 0.5])                # return quantile value
-		df.column_name.cumsum()                            # cumulative sum
-		df.column_name.cumprod()                           # cumulative product
+        # print options
+        from numpy import set_printoptions
+        set_printoptions(precision=3)
 
-		# sample rows or columns
-		df.sample(n             =   ,                      # number of rows/columns to sample
-				  frac          =   ,                      # either use 'n' or 'frac'
-				  replace       = False,                   # sample with ro without replacement
-				  random_state  =  4,                      # seed for reproducability
-				  axis          =   ,                      # sample either row or columns of dataframe
-		)
+==============================================================================================================================
 
-		# visualisations
-		df.hist()
-		df.plot(kind="bar", x = , y = )                    # refer documentation
-		df.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
-		df.plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
+# pandas
 
-		from pandas.tools.plotting import scatter_matrix
-		scatter_matrix(df)
+    import pandas as pd
 
-		# change columns types
-		pd.to_numeric(df.column, errors = "coerce")
+        # print options
+        pd.set_option("display.max_columns", 20)    # set display limit to all columns
+        pd.get_options("display.max_rows")
+        pd.reset_options("display.max_columns")
 
-		df.column.astype(str)
+        pd.set_option("max_colwidth", 20)
 
-		df.column.astype("category",
-						 categories = ['good', 'excellent'],
-						 ordered    = True)
+        # os module
+        import os
+        os.getcwd()
+        os.chdir(r"")
+        os.listdir(path)
+        os.mkdir(path)
+
+        # importing files from current directory
+        import glob
+        files = glob.glob("*.csv")                         # return list of all csv file names from current working directory
+
+        # read data
+        df = pd.read_csv(file_name,
+                         sep          =   ,                # character that seprates different values in the file
+                         names        = [],                # pass column names explicitly
+                         index_col    =   ,                # column index to use as index
+                         dtype        =   ,                # refer documentation
+                         na_values    =   ,                # list of values to be read as na
+                         parse_dates  =   ,                # refer documentation
+        )
+
+        df = pd.DataFrame(data        =   ,                # numpy ndarray or python dictionary
+                          index       = [],                # list of indices, defaults to arange(n)
+                          columns     = [],                # list of column names
+        )
+
+        df.shape                                           # return shape as tuple
+        df.head(n)                                         # return first "n" rows of df
+        df.tail(n)                                         # return last "n" rows of df
+        df.dtypes                                          # return data type of each column
+        df.describe(percentiles  = None,                   # percentiles to display - range --> [0, 1]
+                    include      = 'all',                  # data types to include
+                    exclude      = None                    # data types to exclude
+        )
+        df.info()
+
+        # check missing values
+        df.isnull().any()                                  # return True if any of the values is missing
+        df.isnull().sum()                                  # check number of missing values
+        df.notnull().all()                                 # return True only if no missing values present
+        df.dropna(subset  = ["list of columns"],
+                  how     = "any/all",
+                  thresh  =
+        )
+
+        # visualise missing values
+        import missingno as msno
+        msno.matrix(df)                                # matrix of missing values
+        msno.bar(df)                                   # missing value bar chart
+        msno.heatmap(df)                               # correlation heatmap - 1 means both variables are missing together; -1 means not missing together even in a single observation
+        msno.dendrogram(df)                            # dendogram of variables
+
+        # duplicate rows
+        df.duplicated()                                    # boolean ouput
+        df.duplicated().sum()                              # return number of duplicate entries
+        df.drop_duplicates(keep = "first", inplace = True) # keep first entry and delete rest of the duplicate entries
+
+        # drop column
+        df.drop("column_name", axis = 1)
+
+        df.categorical_column.nunique()                    # return number of levels in a categorical variable
+        df.categorical_column.value_counts(dropna = False) # similar to table(df$category) in R
+
+        # statistics
+        df.corr(method="pearson")                          # return correlation matrix
+        df.skew()                                          # return skewness of numeric variables
+        df["column_name"].max()
+        df["column_name"].mean()
+        df["column_name"].mode()
+        df["column_name"].std()                            # standard deviation of column
+        df.column_name.quantile([0.1, 0.5])                # return quantile value
+        df.column_name.cumsum()                            # cumulative sum
+        df.column_name.cumprod()                           # cumulative product
+
+        # sample rows or columns
+        df.sample(n             =   ,                      # number of rows/columns to sample
+                  frac          =   ,                      # either use 'n' or 'frac'
+                  replace       = False,                   # sample with ro without replacement
+                  random_state  =  4,                      # seed for reproducability
+                  axis          =   ,                      # sample either row or columns of dataframe
+        )
+
+        # visualisations
+        df.hist()
+        df.plot(kind="bar", x = , y = )                    # refer documentation
+        df.plot(kind='density', subplots=True, layout=(3,3), sharex=False)
+        df.plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
+
+        from pandas.tools.plotting import scatter_matrix
+        scatter_matrix(df)
+
+        # change columns types
+        pd.to_numeric(df.column, errors = "coerce")
+
+        df.column.astype(str)
+
+        df.column.astype("category",
+                         categories = ['good', 'excellent'],
+                         ordered    = True)
 
 
-		df.select_dtypes(include    = ["int64"],
-						 exclude    = ["float64"])
+        df.select_dtypes(include    = ["int64"],
+                         exclude    = ["float64"])
 
-		# index and column names
-		df.index = index_variable                          # index variable must be equal to the number of rows in the dataframe
-		df.index.name = "index name"
-		df.columns
-		df.columns.name
+        # index and column names
+        df.index = index_variable                          # index variable must be equal to the number of rows in the dataframe
+        df.index.name = "index name"
+        df.columns
+        df.columns.name
 
-		# hierarchical indexing
-		df.set_index(["school", "rollno"], inplace = True)
-		df.sort_index()
-		df.reset_index(drop=True)                          # drop stops the function to create a new 'index' column after reset
-		df.loc["dgv":"dav"]                                # outer indexing (on "school")
-		df.loc[1:10]  		                               # inner indexing (on "rollno")
-		df.loc[(["dgv", "dav"], slice(1, 10)), :]          # colon slicing not permitted inside tuple, instead use slice()
-		df.reindex()                                       # conform data frame to new index. arrange rows or add new rows
+        # hierarchical indexing
+        df.set_index(["school", "rollno"], inplace = True)
+        df.sort_index()
+        df.reset_index(drop=True)                          # drop stops the function to create a new 'index' column after reset
+        df.loc["dgv":"dav"]                                # outer indexing (on "school")
+        df.loc[1:10]                                       # inner indexing (on "rollno")
+        df.loc[(["dgv", "dav"], slice(1, 10)), :]          # colon slicing not permitted inside tuple, instead use slice()
+        df.reindex()                                       # conform data frame to new index. arrange rows or add new rows
 
-		# filtering
+        # filtering
 
-			# single condition
-			df[df.age > 10]
-			df[df.age == df.age.max()]
-			df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
+            # single condition
+            df[df.age > 10]
+            df[df.age == df.age.max()]
+            df[df.age.isin([13, 14, 15, 16, 17, 18, 19])]  # return teenagers
 
-			# multiple conditions
-			df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
-			df[(df.name == "Aman") | (df.name = "Arjun")]  # return Aman and Arjun both
+            # multiple conditions
+            df[(df.age < 13) & (df.age > 19)]              # return non-teenagers
+            df[(df.name == "Aman") | (df.name = "Arjun")]  # return Aman and Arjun both
 
-		df.all()                                           # return True if all the elements are True
-		df.any()                                           # return True if any of the elements is True
+        df.all()                                           # return True if all the elements are True
+        df.any()                                           # return True if any of the elements is True
 
-		# sort dataframe
-		df.sort_values(by = ["column_name", "column_name"], ascending = False)
+        # sort dataframe
+        df.sort_values(by = ["column_name", "column_name"], ascending = False)
 
-		# rename columns
-		df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
-		df.columns = ["column1", "column2"]                # rename all columns
+        # rename columns
+        df.rename(columns = {"old_column_name":"new_column_name"})  # rename specific columns
+        df.columns = ["column1", "column2"]                # rename all columns
 
-		# change columns order
-		ordered = ['col_3', 'col_1', 'col_2']
-		df = df[ordered]
+        # change columns order
+        ordered = ['col_3', 'col_1', 'col_2']
+        df = df[ordered]
 
-		# loc, iloc
-		df.loc[1:5,:]                                      # print row [1,5]. need to specify the row and column header names
-		df.loc[[1, 4, 7], ["column1", "column2"]]
-		df.loc[1:10, "column1":"column2"]
-		df.loc[age == df.age.max(), :]
-		df.iloc[1:10, 2:4]                                 # print row [1, 10). need to specify the row and column indices
+        # loc, iloc
+        df.loc[1:5,:]                                      # print row [1,5]. need to specify the row and column header names
+        df.loc[[1, 4, 7], ["column1", "column2"]]
+        df.loc[1:10, "column1":"column2"]
+        df.loc[age == df.age.max(), :]
+        df.iloc[1:10, 2:4]                                 # print row [1, 10). need to specify the row and column indices
 
-		# fill NAs
-		df.column_name.fillna(df.column_name.mean(),
-							  axis    = "index or columns",
-							  method  = "ffil/bfil",
-							  limit = 1
-		)
-		df.fillna(df.mean())
-		df.fillna({
-			"column_name": value,
-			"column_name": value
-		})
+        # fill NAs
+        df.column_name.fillna(df.column_name.mean(),
+                              axis    = "index or columns",
+                              method  = "ffil/bfil",
+                              limit = 1
+        )
+        df.fillna(df.mean())
+        df.fillna({
+            "column_name": value,
+            "column_name": value
+        })
 
-		df.interpolate(method = "linear")
+        df.interpolate(method = "linear")
 
-		# replace values
-		replace = {"gender":          {"male": 0, "female": 1},
+        # replace values
+        replace = {"gender":          {"male": 0, "female": 1},
                    "marital_status":  {"married": 0, "divorced": 1, "single": 2}
-		}
-		df.replace(replace, inplace = True)
-		df.replace({"old_value": "new_value", "old_value": "new_value"})   # mapping
-		df.replace(["old_value_list"], ["new_value_list"])                 # mapping
+        }
+        df.replace(replace, inplace = True)
+        df.replace({"old_value": "new_value", "old_value": "new_value"})   # mapping
+        df.replace(["old_value_list"], ["new_value_list"])                 # mapping
 
-		# apply functions to dataframe
-		df.apply(function, axis = 0/1)                     # iterate over columns/rows of dataframe
-		df.column_name.apply(lambda x: x**2)               # iterate over values of column
-		df.age.apply(np.argmax, axis = 1)                  # max to get max value, np.argmax to get row name with max value
+        # apply functions to dataframe
+        df.apply(function, axis = 0/1)                     # iterate over columns/rows of dataframe
+        df.column_name.apply(lambda x: x**2)               # iterate over values of column
+        df.age.apply(np.argmax, axis = 1)                  # max to get max value, np.argmax to get row name with max value
 
-		# group by
+        # group by
 
-			group = df.groupby("categorical_column")       # returns GroupBy object
-			group.function()                               # apply function to each group separately
+            group = df.groupby("categorical_column")       # returns GroupBy object
+            group.function()                               # apply function to each group separately
 
-		# group by and summarize
+        # group by and summarize
 
-			df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
-			df.groupby(["categorical_columns"]).agg({
-				"column": [max, min],
-				"column": [size, "count"]                  # size and "count" are same. "count" is a numpy function. see numpy functions
-			})
+            df.groupby("categorical_column").another_column.function_name()  # count(), min(), max(), sum(), mean()
+            df.groupby(["categorical_columns"]).agg({
+                "column": [max, min],
+                "column": [size, "count"]                  # size and "count" are same. "count" is a numpy function. see numpy functions
+            })
 
-			df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
+            df.groupby("categorical_column").another_column.transform(function_name)  # makes changes to the data inplace
 
-			df.groupby(["categorical_column", boolean_filter]).another_column.function_name()
+            df.groupby(["categorical_column", boolean_filter]).another_column.function_name()
 
-			# change GroupBy to DataFrame
-			df = pd.DataFrame(df.groupby())
-			df = df.add_suffix('_count').reset_index()     # or df.add_prefix()
+            # change GroupBy to DataFrame
+            df = pd.DataFrame(df.groupby())
+            df = df.add_suffix('_count').reset_index()     # or df.add_prefix()
 
-			# set column names after groupby
-			df.columns = ["_".join(colname) for colname in df.columns]
+            # set column names after groupby
+            df.columns = ["_".join(colname) for colname in df.columns]
 
-		# Melt: wide to long dataframe
-		pd.melt(df,
-				id_vars    = ["columns_to_keep"],
-				value_vars = ["columns to melt"],          # optional, if not provided, function will melt all vars except id_vars
-				var_name   = ,  					       # new categorical column name
-				value_name =                               # new numerical column name
-		)  										           # similar to gather in tidyr
+        # Melt: wide to long dataframe
+        pd.melt(df,
+                id_vars    = ["columns_to_keep"],
+                value_vars = ["columns to melt"],          # optional, if not provided, function will melt all vars except id_vars
+                var_name   = ,                             # new categorical column name
+                value_name =                               # new numerical column name
+        )                                                  # similar to gather in tidyr
 
-		# Unmelt: long to wide dataframe
-		df.pivot_table(index   = ,                         # name of columns not to unmelt
-					   columns = ,                         # columns to melt
-					   values  =                           # numerical column name
-		)  						                           # in case of duplicate values, use aggfunc to aggregate
+        # Unmelt: long to wide dataframe
+        df.pivot_table(index   = ,                         # name of columns not to unmelt
+                       columns = ,                         # columns to melt
+                       values  =                           # numerical column name
+        )                                                  # in case of duplicate values, use aggfunc to aggregate
 
-		# concatenate dataframes - column + column or row + row
-		pd.concat(objs         =  [df1, df2],              # make sure the columns names/index is same - reset indexx if needed
-				  axis         =  ,                        # 0-index+index, 1-column+column
-				  ignore_index = False                     # keep index names
-		)
+        # concatenate dataframes - column + column or row + row
+        pd.concat(objs         =  [df1, df2],              # make sure the columns names/index is same - reset indexx if needed
+                  axis         =  ,                        # 0-index+index, 1-column+column
+                  ignore_index = False                     # keep index names
+        )
 
-		# merge/join dataframe
-		df_1.merge(df2, df3, on = "common_column", how = "inner")
+        # merge/join dataframe
+        df_1.merge(df2, df3, on = "common_column", how = "inner")
 
-		# stacking and unstacking
-		df.stack()
-		df.stack.unstack()
+        # stacking and unstacking
+        df.stack()
+        df.stack.unstack()
 
-		# crosstabs
+        # crosstabs
 
-			# table(category1, catedory2)
-			pd.crosstab(df.categorical_column1,
-						df.categorical_column2,            # could pass column lists as well
-						margins   = True,
-						normalize = {0, 1}                 # or {"all", "index", "columns"}. Similar to prop.table() in R
-			)
+            # table(category1, catedory2)
+            pd.crosstab(df.categorical_column1,
+                        df.categorical_column2,            # could pass column lists as well
+                        margins   = True,
+                        normalize = {0, 1}                 # or {"all", "index", "columns"}. Similar to prop.table() in R
+            )
 
-			# group by and summarize
-			pd.crosstab(df.categorical_column1,
-						df.categorical_column2
-						values  = df.numerical_column,
-						aggfunc = np.average
-			)
+            # group by and summarize
+            pd.crosstab(df.categorical_column1,
+                        df.categorical_column2
+                        values  = df.numerical_column,
+                        aggfunc = np.average
+            )
 
-		# one-hot encoding
-		df_dummy = pd.get_dummies(df,
-								  columns = categorical_columns,     # encodes all object or category type columns
-								  prefix  =
-		)
+        # one-hot encoding
+        df_dummy = pd.get_dummies(df,
+                                  columns = categorical_columns,     # encodes all object or category type columns
+                                  prefix  =
+        )
 
-		# subset dataframe based on column names
-		pattern = r"column name pattern"
-		column_names_bool = list(df.columns.map(lambda x: bool(re.search(pattern, x))))
-		column_names = list(df.columns[column_names_bool])
-		new_df = df.loc[:, column_names]
+        # subset dataframe based on column names
+        pattern = r"column name pattern"
+        column_names_bool = list(df.columns.map(lambda x: bool(re.search(pattern, x))))
+        column_names = list(df.columns[column_names_bool])
+        new_df = df.loc[:, column_names]
 
-		OR
+        OR
 
-		df.filter(regex='^id.*', axis=1)                   # subset dataframe on column or index names according to given pattern
+        df.filter(regex='^id.*', axis=1)                   # subset dataframe on column or index names according to given pattern
 
-		# write csv
-		df.to_csv("filename.csv", sep = , index = False)
+        # write csv
+        df.to_csv("filename.csv", sep = , index = False)
 
-		# remove constant columns
-		def drop_constant_columns(dataframe):
-		    """
-		    Drops constant value columns of pandas dataframe.
-		    """
-		    keep_columns = [column for column in dataframe.columns if len(dataframe[column].unique()) > 1]
-		    return dataframe[keep_columns].copy()
+        # remove constant columns
+        def drop_constant_columns(dataframe):
+            """
+            Drops constant value columns of pandas dataframe.
+            """
+            keep_columns = [column for column in dataframe.columns if len(dataframe[column].unique()) > 1]
+            return dataframe[keep_columns].copy()
 
-		df = drop_constant_columns(df)
-
-==============================================================================================================================
-
-### matplotlib
-
-	import matplotlib.pyplot as plt
-
-		# line plot
-		plt.plot(x, y, marker = "", linestyle = "")
-
-		# histogram
-		plt.hist(x, bins = 30, rwidth = 0.9)           # or pass a list of bin cutoff points
-
-		# scatter plot
-		plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
-
-		# boxplot
-		plt.boxplot(x)
-
-		# plotting images
-		image = plt.imread("image.jpg")
-		plt.imshow(image, extent = , aspect = )
-		plt.axis("off")
-		plt.show()
-
-		collapsed = image.mean(axis=2)                 # average out all pixel intensities to get one channel color instead of three
-		plt.set_cmap("gray")                           # change printing color to black and white
-		plt.imshow(collapsed, cmap="gray")
-		plt.axis("off")
-		plt.show()
-
-		# customization
-		plt.xlabel("x")                                # use of latex equations possible
-		plt.ylabel("y")
-		plt.title("title")
-		plt.xticks(arange(2), ("male", "female"))      # customize x-axis ticks
-		plt.yticks(rotation = "")                      # customize y-axis ticks
-		plt.tick_params()
-
-		# transformation
-		plt.xscale("log")                              # transform x-axis to log scale
-		plt.yscale("log")                              # transform y-axis to log scale
-
-		plt.show()                                     # display plot
-		plt.clf()                                      # clear plot
-
-		# multiple plots using axes()
-		plt.axes([x_lo, y_lo, width, height])          # all parameters between 0 and 1
-		plt.plot(x, y, color = "red")
-		plt.axes([x_lo, y_lo, width, height])
-		plt.plot(a, b, color = "blue")
-		plt.show()
-
-		# multiple plots using subplot()
-		plt.subplot(nrows, ncols, nsubplot)            # all parameters indexed from 1
-		plt.plot(x, y, color = "red")
-		plt.subplot(nrows, ncols, nsubplot)            # activate nth subplot
-		plt.plot(a, b, color = "blue")
-		plt.tight_layout()                             # pad space between two plots
-		plt.show()
-
-		# zooming and axis
-		plt.xlim([xmin, xmax])  	                   # zoom in
-		plt.ylim([ymin, ymax])
-		plt.axis([xmin, xmax, ymin, ymax])
-		plt.axis("off/equal/square/tight")
-		plt.figure(figsize=(10,10))                    # change it before plotting
-
-		# legends
-		plt.scatter(x, y, color = "green", label = "male")
-		plt.scatter(x, y, color = "red", label = "female")
-		plt.legend(loc = "upper right")                # "upper/lower/center left/right"
-		plt.show()
-
-		# text and arrows
-		plt.annotate("text",
-					 xy = (10, 10),                    # text coordinates
-					 xytext = (15, 15),		           # arrow pointer coordinates
-					 arrowprops = {"color": "green"}   # arrow properties
-		)
-
-		OR
-
-		plt.text(x, y, s = "show this text at (x,y)")  # display text on x,y point
-		plt.grid(True)                                 # to enable the text
-
-		# themes and styles
-		plt.style.available
-		plt.style.use("ggplot")
+        df = drop_constant_columns(df)
 
 ==============================================================================================================================
 
-### seaborn
+# matplotlib
 
-		import seaborn as sns
+    import matplotlib.pyplot as plt
 
-		# colors - for categorical plots
-		mycolors = sns.color_palette(["list_of_colors"])         # colors are applied to hue else for category present on x/y axis
+        # line plot
+        plt.plot(x, y, marker = "", linestyle = "")
 
-		# histogram
-		sns.distplot(a            =  df.numeric_column,
-					 bins         =  30,
-					 hist_kws     =  {"rwidth": 0.9},            # padding between bins
-					 color        =  ""
-		)
+        # histogram
+        plt.hist(x, bins = 30, rwidth = 0.9)           # or pass a list of bin cutoff points
 
-		# count plot
-		sns.countplot(x/y         =  "categorical_column",       # x-vertical plot, y-horizontal plot
-					  hue         =  "categorical_column",
-					  data        =  df,
-					  order       =  [],                         # order of variable to plot or list(df.categorical_column.value_counts().index)
-					  hue_order   =  [],                         # order of hue variable - google
-					  color       =  "",                         # single color for whole plot
-					  palette     =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
-					  saturation  =  1.0,                        # saturation of the plot
-					  dodge       =  True                        # dodge or stack
-		)
-		for patch in ax.patches:
-		    x=patch.get_bbox().get_points()[:,0]
-    		y=patch.get_bbox().get_points()[1,1]
-    		ax.annotate("{}%".format(round(100*y/len(df), 1)), xy = (x.mean(), y), ha = "center", va = "bottom")
+        # scatter plot
+        plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
 
-		# bar plot
-		sns.barplot(x             =  "categorical_column",
-					y             =  "numeric_column",           # switch x and y to change plot orientation
-					hue           =  "categorical_column",
-					data          =  df,                         # to sort barplot, use df.sort_values['categorical_column']
-					order         =  ,                           # order of variable to plot - google or plot using pd.DataFrame(groupby("categorical_column").numeric_column.function()) for ascending/descending ordered plot
-					hue_order     =  ,                           # order of hue variable     - google
-					ci            =  "sd",                       # confidence interval for error bar
-					color         =  "",                         # single color for whole plot
-					palette       =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
-					saturation    =  1.0,                        # saturation of the plot
-					errcolor      =  "",                         # color of error bar
-					errwidth      =  1.5,                        # width of error bar
-					capsize       =  0.1,                        # size of caps of error bar
-					dodge         =  True,                       # dodge or stack
-		)
+        # boxplot
+        plt.boxplot(x)
 
-		# violin plot
-		sns.violinplot(x          = "categorical_column",        # optional
-					   y          = "numeric_column",            # switch x and y to change plot orientation
-					   hue        = "categorical_column",
-					   data       =  df,
-					   order      =  ,                           # order of variable to plot - google
-					   hue_order  =  ,                           # order of hue variable     - google
-					   inner      =  "quartile",
-					   dodge      =  True,                       # dodge or stack
-					   color      =  "",                         # single color for whole plot
-					   palette    =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
-					   saturation =  1.0,                        # saturation of the plot
-		)
+        # plotting images
+        image = plt.imread("image.jpg")
+        plt.imshow(image, extent = , aspect = )
+        plt.axis("off")
+        plt.show()
 
-		# box plot
-		sns.boxplot(x             = "categorical_column",        # optional
-					y             = "numeric_column",            # switch x and y to change plot orientation
-					hue           = "categorical_column",
-					data          = df,
-					order         =  ,                           # order of variable to plot - google
-					hue_order     =  ,                           # order of hue variable     - google
-					color         =  "",                         # single color for whole plot
-					palette       = mycolors,                    # or pass dic for x - {"value": "g", "value": "color"}
-					saturation    = 1.0,                         # saturation of the plot
-					width         = 0.8,                         # width of each box - [0.0, 1.0]
-					dodge         = True,                        # dodge or stack
-					linewidth     = 2,                           # width of outer line of box plot
-					whis          = 1.5                          # points outside of 1.5*IQR from median are outliers
-		)
+        collapsed = image.mean(axis=2)                 # average out all pixel intensities to get one channel color instead of three
+        plt.set_cmap("gray")                           # change printing color to black and white
+        plt.imshow(collapsed, cmap="gray")
+        plt.axis("off")
+        plt.show()
 
-		# scatter plot
-		sns.regplot(x             =  "numeric_column",
-					y             =  "numeric_column",
-					data          =  df,
-					fit_reg       =  True,                       # single color for whole plot
-					order         =  1,                          # order of fit
-					x_jitter      =  0,                          # add random noise to x variable
-					y_jitter      =  0,                          # add random noise to y variable
-					color         =  ""                          # color for points
-		)
+        # customization
+        plt.xlabel("x")                                # use of latex equations possible
+        plt.ylabel("y")
+        plt.title("title")
+        plt.xticks(arange(2), ("male", "female"))      # customize x-axis ticks
+        plt.yticks(rotation = "")                      # customize y-axis ticks
+        plt.tick_params()
 
-		# density plot
-		sns.kdeplot(data          =  ,                           # 1d plot
-					data2         =  ,                           # 2d plot
-					shade         =  True,                       # add color to show varying density
-					vertical      =  False,                      # 1d - change orientation, 2d - no effect
-					gridsize      =  20,                         # number of discrete points in the evaluation grid
-					legend        =  True,                       # 1d - show legend because label not shown on axis, 2d - no effect
-					cumulative    =  False,                      # 1d - cumulative plot, 2d - can't pass this argument
-					cbar          =  False                       # 2d - add color bar
-		)
+        # transformation
+        plt.xscale("log")                              # transform x-axis to log scale
+        plt.yscale("log")                              # transform y-axis to log scale
 
-		# heatmap
-		mycmap = sns.light_palette(color, reverse=False, as_cmap=True)  # sequential palette from light to color
-		mycmap = sns.dark_palette(color, reverse=False, as_cmap=True)   # sequential palette from dark to color
-		mycmap = sns.diverging_palette(h_neg=, h_pos=, s=, l=, center="light/dark", as_cmap=True)  # h_neg to light/dark to h_pos
+        plt.show()                                     # display plot
+        plt.clf()                                      # clear plot
 
-		sns.heatmap(data          =  df.corr(),                  # 2d array data such as a pivot table
-					cmap          =  mycmap,                     # colors of the heatmap
-					center        =  None,                       # value at which to center diverging data
-					annot         =  None,                       # write values in each cell. bool or 2d array
-					fmt           =  ".2f",                      # string formatting for annotations
-					linewidths    =  0.0,                        # line width between cells
-					linecolor     =  "",                         # line color
-					cbar          =  True,                       # display color bar
-					square        =  False,                      # for square sized cells
-					xticklabels   =  "auto",                     # "auto", bool, list-like, or int. See documentation.
-					yticklabels   =  "auto"                      # "auto", bool, list-like, or int. See documentation.
-		)
+        # multiple plots using axes()
+        plt.axes([x_lo, y_lo, width, height])          # all parameters between 0 and 1
+        plt.plot(x, y, color = "red")
+        plt.axes([x_lo, y_lo, width, height])
+        plt.plot(a, b, color = "blue")
+        plt.show()
 
-		# pair plot
-		g = sns.PairGrid(data, hue = "categorical_column", palette = , vars = [], dropna = True)
-		g.map_diag(sns.kdeplot)
-		g.map_offdiag(plt.scatter)
-		g.add_legend()
+        # multiple plots using subplot()
+        plt.subplot(nrows, ncols, nsubplot)            # all parameters indexed from 1
+        plt.plot(x, y, color = "red")
+        plt.subplot(nrows, ncols, nsubplot)            # activate nth subplot
+        plt.plot(a, b, color = "blue")
+        plt.tight_layout()                             # pad space between two plots
+        plt.show()
 
-		# facet plot - bar, count, box and violin plot
-		sns.factorplot(x          =  "categorical_column",
-					   y          =  "numeric_column",
-					   hue        =  "categorical_column",
-					   data       =  df,
-					   row        =  "categorical_column",
-					   col        =  "categorical_column",
-					   kind       =  "bar/count/box/violin",
-					   color      =  "",
-					   palette    =  mycolors
-		)
+        # zooming and axis
+        plt.xlim([xmin, xmax])                         # zoom in
+        plt.ylim([ymin, ymax])
+        plt.axis([xmin, xmax, ymin, ymax])
+        plt.axis("off/equal/square/tight")
+        plt.figure(figsize=(10,10))                    # change it before plotting
 
-		# facet plot - histogram and scatter plot
-		g = sns.FacetGrid(data, row = "categorical_column", col = "categorical_column", hue = "categorical_column", palette = )
-		g.map(plt.hist, "numeric_column")
-		g.map(plt.scatter, "numeric_column", "numeric_column")
+        # legends
+        plt.scatter(x, y, color = "green", label = "male")
+        plt.scatter(x, y, color = "red", label = "female")
+        plt.legend(loc = "upper right")                # "upper/lower/center left/right"
+        plt.show()
+
+        # text and arrows
+        plt.annotate("text",
+                     xy = (10, 10),                    # text coordinates
+                     xytext = (15, 15),                # arrow pointer coordinates
+                     arrowprops = {"color": "green"}   # arrow properties
+        )
+
+        OR
+
+        plt.text(x, y, s = "show this text at (x,y)")  # display text on x,y point
+        plt.grid(True)                                 # to enable the text
+
+        # themes and styles
+        plt.style.available
+        plt.style.use("ggplot")
 
 ==============================================================================================================================
 
-### bokeh
+# seaborn
 
-		from bokeh.io import output_notebook, show
-		from bokeh.plotting import figure
+        import seaborn as sns
 
-		# glyphs - shapes like markers, lines, wedges and patches. google bokeh glyphs
-		plot = figure(plot_width = 400, tools = "pan, box_zoom")  # initialize empty plot
-		plot.circle(x = [1,2,3,4,5],			# sequences, numpy arrays, pandas dataframes supported (df.column_name)
-					y = [8,6,5,2,3],			# sequences, numpy arrays, pandas dataframes supported (df.column_name)
-					x_axis_label = "",
-					y_axis_label = ""
-					color = ,
-					size = ,
-					alpha = ,
-					legend = ,					# label to display on legend when plotting multiple plots on same figure
-					source = 				    # in case you are passing source only mention column names in x and y
-		)  # draw on plot
-		output_file("circle.html")  # plot to be output in a web browser. Use if output_file is imported.
-		show(plot)  # display the plot
+        # colors - for categorical plots
+        mycolors = sns.color_palette(["list_of_colors"])         # colors are applied to hue else for category present on x/y axis
 
-		# glyphs accept python sequences for every parameter. If single value is provided instead of a sequence, it is used throughout.
-		plot.circle([1,2,3,4,5], [8,6,5,2,3], size = [1,2,3,4,5])  # different size for each circle
+        # histogram
+        sns.distplot(a            =  df.numeric_column,
+                     bins         =  30,
+                     hist_kws     =  {"rwidth": 0.9},            # padding between bins
+                     color        =  ""
+        )
 
-		# add multiple markers over each other
-		plot.x()
-		plot.circle()
-		plot.triangle()
-		show(plot)
+        # count plot
+        sns.countplot(x/y         =  "categorical_column",       # x-vertical plot, y-horizontal plot
+                      hue         =  "categorical_column",
+                      data        =  df,
+                      order       =  [],                         # order of variable to plot or list(df.categorical_column.value_counts().index)
+                      hue_order   =  [],                         # order of hue variable - google
+                      color       =  "",                         # single color for whole plot
+                      palette     =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
+                      saturation  =  1.0,                        # saturation of the plot
+                      dodge       =  True                        # dodge or stack
+        )
+        for patch in ax.patches:
+            x=patch.get_bbox().get_points()[:,0]
+            y=patch.get_bbox().get_points()[1,1]
+            ax.annotate("{}%".format(round(100*y/len(df), 1)), xy = (x.mean(), y), ha = "center", va = "bottom")
 
-		# lines
-		plot.line(x = , y = , line_width = )
+        # bar plot
+        sns.barplot(x             =  "categorical_column",
+                    y             =  "numeric_column",           # switch x and y to change plot orientation
+                    hue           =  "categorical_column",
+                    data          =  df,                         # to sort barplot, use df.sort_values['categorical_column']
+                    order         =  ,                           # order of variable to plot - google or plot using pd.DataFrame(groupby("categorical_column").numeric_column.function()) for ascending/descending ordered plot
+                    hue_order     =  ,                           # order of hue variable     - google
+                    ci            =  "sd",                       # confidence interval for error bar
+                    color         =  "",                         # single color for whole plot
+                    palette       =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
+                    saturation    =  1.0,                        # saturation of the plot
+                    errcolor      =  "",                         # color of error bar
+                    errwidth      =  1.5,                        # width of error bar
+                    capsize       =  0.1,                        # size of caps of error bar
+                    dodge         =  True,                       # dodge or stack
+        )
 
-		# patches - useful to draw geographic regions
-		plot.patches(x = [[1,2,3,4], [1,2], [1,2,3]],
-					 y = [[7,5,3,6], [5,1], [8,3,6]],
-					 color = ["red","blue","green"],
-					 line_color = "white"
-		)
+        # violin plot
+        sns.violinplot(x          = "categorical_column",        # optional
+                       y          = "numeric_column",            # switch x and y to change plot orientation
+                       hue        = "categorical_column",
+                       data       =  df,
+                       order      =  ,                           # order of variable to plot - google
+                       hue_order  =  ,                           # order of hue variable     - google
+                       inner      =  "quartile",
+                       dodge      =  True,                       # dodge or stack
+                       color      =  "",                         # single color for whole plot
+                       palette    =  mycolors,                   # or pass dic for hue - {"value": "color", "value": "color"}
+                       saturation =  1.0,                        # saturation of the plot
+        )
 
-		# ColumnDataSource - main data frame central to bokeh
-		from bokeh.plotting import ColumnDataSource
+        # box plot
+        sns.boxplot(x             = "categorical_column",        # optional
+                    y             = "numeric_column",            # switch x and y to change plot orientation
+                    hue           = "categorical_column",
+                    data          = df,
+                    order         =  ,                           # order of variable to plot - google
+                    hue_order     =  ,                           # order of hue variable     - google
+                    color         =  "",                         # single color for whole plot
+                    palette       = mycolors,                    # or pass dic for x - {"value": "g", "value": "color"}
+                    saturation    = 1.0,                         # saturation of the plot
+                    width         = 0.8,                         # width of each box - [0.0, 1.0]
+                    dodge         = True,                        # dodge or stack
+                    linewidth     = 2,                           # width of outer line of box plot
+                    whis          = 1.5                          # points outside of 1.5*IQR from median are outliers
+        )
 
-		cds = ColumnDataSource(df)
-		plot.circle(x = "column_name", y = "column_name", source = cds)
+        # scatter plot
+        sns.regplot(x             =  "numeric_column",
+                    y             =  "numeric_column",
+                    data          =  df,
+                    fit_reg       =  True,                       # single color for whole plot
+                    order         =  1,                          # order of fit
+                    x_jitter      =  0,                          # add random noise to x variable
+                    y_jitter      =  0,                          # add random noise to y variable
+                    color         =  ""                          # color for points
+        )
 
-	## animations
+        # density plot
+        sns.kdeplot(data          =  ,                           # 1d plot
+                    data2         =  ,                           # 2d plot
+                    shade         =  True,                       # add color to show varying density
+                    vertical      =  False,                      # 1d - change orientation, 2d - no effect
+                    gridsize      =  20,                         # number of discrete points in the evaluation grid
+                    legend        =  True,                       # 1d - show legend because label not shown on axis, 2d - no effect
+                    cumulative    =  False,                      # 1d - cumulative plot, 2d - can't pass this argument
+                    cbar          =  False                       # 2d - add color bar
+        )
 
-		# selection appearance
-		plot = figure(tools = "box_select, lasso_select")
-		plot.circle(x = ,
-					y = ,
-					selection_color = "red",
-					nonselection_fill_alpha = ,
-					nonselection_fill_color =
-		)
+        # heatmap
+        mycmap = sns.light_palette(color, reverse=False, as_cmap=True)  # sequential palette from light to color
+        mycmap = sns.dark_palette(color, reverse=False, as_cmap=True)   # sequential palette from dark to color
+        mycmap = sns.diverging_palette(h_neg=, h_pos=, s=, l=, center="light/dark", as_cmap=True)  # h_neg to light/dark to h_pos
 
-		# hover appearence
-		from bokeh.models import HoverTool
+        sns.heatmap(data          =  df.corr(),                  # 2d array data such as a pivot table
+                    cmap          =  mycmap,                     # colors of the heatmap
+                    center        =  None,                       # value at which to center diverging data
+                    annot         =  None,                       # write values in each cell. bool or 2d array
+                    fmt           =  ".2f",                      # string formatting for annotations
+                    linewidths    =  0.0,                        # line width between cells
+                    linecolor     =  "",                         # line color
+                    cbar          =  True,                       # display color bar
+                    square        =  False,                      # for square sized cells
+                    xticklabels   =  "auto",                     # "auto", bool, list-like, or int. See documentation.
+                    yticklabels   =  "auto"                      # "auto", bool, list-like, or int. See documentation.
+        )
 
-		hover = HoverTool(tooltips = None, mode = "hline")
-		plot = figure(tools = [hover, "crosshair"])
-		plot.circle(x = ,
-					y = ,
-					hover_color = "red"
-		)
+        # pair plot
+        g = sns.PairGrid(data, hue = "categorical_column", palette = , vars = [], dropna = True)
+        g.map_diag(sns.kdeplot)
+        g.map_offdiag(plt.scatter)
+        g.add_legend()
 
-		# color mapping
-		from bokeh.models import CategoricalColorMapper
+        # facet plot - bar, count, box and violin plot
+        sns.factorplot(x          =  "categorical_column",
+                       y          =  "numeric_column",
+                       hue        =  "categorical_column",
+                       data       =  df,
+                       row        =  "categorical_column",
+                       col        =  "categorical_column",
+                       kind       =  "bar/count/box/violin",
+                       color      =  "",
+                       palette    =  mycolors
+        )
 
-		mapper = CategoricalColorMapper(factors = ["male", "female"], palette = ["red", "green"])
-		plot.circle(x = "column_name",
-					y = "column_name",
-					source = cds,
-					color = {"field": "gender",
-							 "transform: mapper"
-					}
-		)
-
-	## layouts
-
-		# row/column layout
-		from bokeh.layouts import row, column
-		layout = row(p1, p2, p3)     # arrange in row
-		layout = column(p1, p2, p3)  # arrange in column
-		output_file("layout.html")
-		show(layout)
-
-		# nested row/column layout
-		column_layout = column(p1, p2)
-		nested_layout = row(column_layout, p3, sizing_mode='scale_width')
-
-		# grid layout
-		from bokeh.layouts import  gridplot
-		layout = gridplot([p1, p2], [p3, None], toolbar_location = None)  # same output as the nested row-column shown above
-
-		# tabbed layout
-		from bokeh.models.widgets import Tabs, Panel
-
-		first = Panel(child = row(p1, p2), title = "first")
-		second = Panel(child = row(p3), title = "second")
-
-		tabs = Tabs(tabs = [first, second])
-		show(tabs)
-
-		# linking plots
-
-	## annotations and guide
-
-		# legend locatiion
-		plot = plot.circle()
-		plot.legend.location = "top_left"
-		plot.legend.background_fill_color = 'lightgray'      # google more legend properties
-
-		# hover tooltips
-		from bokeh.models import HoverTool
-
-		hover = HoverTool(tooltips = [
-				("label", "@column_name"),                   # ("length of petal", "@petal_length")
-				("label", "@column_name"),
-				("label", "@column_name")
-				])
-
-		plot = figure(tools = [hover, "pan", "wheel_zoom"])  # or plot.add_tools(hover)
-		show(plot)
-
-	## charts
-
-		# histogram
-		from bokeh.charts import Histogram  # google bokeh charts
-		plot = Histogram(df, "column_name", bins = , color = "categorical_column", title = )
-		p.xaxis.axis_label = ""
-		p.xaxis.axis_label = ""
-		show(plot)
-
-		# boxplot
-		from bokeh.charts import BoxPlot
-		plot = BoxPlot(df, values = "column_name", label = "categorical_column", color = "categorical_column", title = "")
-
-		# scatter plot
-		from bokeh.charts import Scatter
-		plot = Scatter(df, x = "column_name", y = "column_name", color/marker = "categorical_column", title = "")
+        # facet plot - histogram and scatter plot
+        g = sns.FacetGrid(data, row = "categorical_column", col = "categorical_column", hue = "categorical_column", palette = )
+        g.map(plt.hist, "numeric_column")
+        g.map(plt.scatter, "numeric_column", "numeric_column")
 
 ==============================================================================================================================
 
-### regular expressions
+# bokeh
 
-		# strings
-		string = ""
-		string.lower(); string.upper()
-		string.strip(); string.lstrip(); string.rstrip()   # strip whitespace
-		split_result = string.split(".")                   # return list of substrings separated by "."
-		".".join(split_result)                             # join list items using "."
+        from bokeh.io import output_notebook, show
+        from bokeh.plotting import figure
 
-		"amandeep" + " rathee" == "amandeep rathee"        # concatenate strings
-		"yo"*3                                             # return "yoyoyo"
+        # glyphs - shapes like markers, lines, wedges and patches. google bokeh glyphs
+        plot = figure(plot_width = 400, tools = "pan, box_zoom")  # initialize empty plot
+        plot.circle(x = [1,2,3,4,5],            # sequences, numpy arrays, pandas dataframes supported (df.column_name)
+                    y = [8,6,5,2,3],            # sequences, numpy arrays, pandas dataframes supported (df.column_name)
+                    x_axis_label = "",
+                    y_axis_label = ""
+                    color = ,
+                    size = ,
+                    alpha = ,
+                    legend = ,                  # label to display on legend when plotting multiple plots on same figure
+                    source =                    # in case you are passing source only mention column names in x and y
+        )  # draw on plot
+        output_file("circle.html")  # plot to be output in a web browser. Use if output_file is imported.
+        show(plot)  # display the plot
 
-		# quote preference - ' ' < " " < ''' ''' < """ """
-		print('What\'s up?') # escaping ' using \'
-		print("What's up?")  # ' ' < " "
-		print('''What's up "Jim"?''')  # " " < ''' '''
-		print("""What'''s''' up?""")  # ''' ''' < """ """
+        # glyphs accept python sequences for every parameter. If single value is provided instead of a sequence, it is used throughout.
+        plot.circle([1,2,3,4,5], [8,6,5,2,3], size = [1,2,3,4,5])  # different size for each circle
 
-		# regular expressions
-		import re
-		pattern = r""
+        # add multiple markers over each other
+        plot.x()
+        plot.circle()
+        plot.triangle()
+        show(plot)
 
-		# split
-		re.split(pattern, string)                          # split the string at given pattern
+        # lines
+        plot.line(x = , y = , line_width = )
 
-		# substitute
-		re.sub(pattern, replacement, string)               # replace first occurence of pattern by repl in the string
+        # patches - useful to draw geographic regions
+        plot.patches(x = [[1,2,3,4], [1,2], [1,2,3]],
+                     y = [[7,5,3,6], [5,1], [8,3,6]],
+                     color = ["red","blue","green"],
+                     line_color = "white"
+        )
 
-		# match
-		result = re.match(pattern, string)                 # return None is pattern not found at the very start of string
-		result.group()                                     # return match result
-		result.start()                                     # return start index of the string where pattern was found
-		result.end()                                       # return end index of the string where pattern was found
+        # ColumnDataSource - main data frame central to bokeh
+        from bokeh.plotting import ColumnDataSource
 
-		# search
-		result = re.search(pattern, string)                # look for the pattern in the whole string and returns the first occurence
-		result.group()
+        cds = ColumnDataSource(df)
+        plot.circle(x = "column_name", y = "column_name", source = cds)
 
-		# findall
-		result = re.findall(pattern, string)               # return list all the occurences of patterns present in the string
-		result[0:3]
+    # animations
 
-		# finditer
-		for match in re.finditer(pattern, string):         # similar to findall but gives freedom to tinker with each match unlike findall
-			# do something with the match object found
-			print(match.group(0))
-			result.append(match.group())
+        # selection appearance
+        plot = figure(tools = "box_select, lasso_select")
+        plot.circle(x = ,
+                    y = ,
+                    selection_color = "red",
+                    nonselection_fill_alpha = ,
+                    nonselection_fill_color =
+        )
 
-		# extract groups
-		# to extract groups, put parenthesis around the part of the pattern that you want to extract
-		# group matching can be used with re.match(), re.search() and re.finditer() but not with re.findall()
-		result = re.search("([a-zA-Z.0-9]+)(@)([a-zA-Z.]+)", "user.name123@gmail.com")
-		result.group(0)                                    # return full match   - equivalent to result.group()
-		result.group(1)                                    # return first group  - "user.name123"
-		result.group(2)                                    # return second group - "@"
-		result.group(3)                                    # return third group  - "gmail.com"
+        # hover appearence
+        from bokeh.models import HoverTool
 
-		# working with compile object
-		pattern = re.compile(r"")                          # create compile object
-		result = pattern.search(string)                    # no need to pass the pattern parameter
-		result = pattern.sub(replacement, string)
+        hover = HoverTool(tooltips = None, mode = "hline")
+        plot = figure(tools = [hover, "crosshair"])
+        plot.circle(x = ,
+                    y = ,
+                    hover_color = "red"
+        )
 
+        # color mapping
+        from bokeh.models import CategoricalColorMapper
 
-		# pandas string methods
-		s = pd.Series(['a_b_c', 'B', 'C', 'Aaba', ' Baca ', np.nan, 'CABA', 'dog', 'cat'])
+        mapper = CategoricalColorMapper(factors = ["male", "female"], palette = ["red", "green"])
+        plot.circle(x = "column_name",
+                    y = "column_name",
+                    source = cds,
+                    color = {"field": "gender",
+                             "transform: mapper"
+                    }
+        )
 
-		s.str.get(0)                                  # get first element from each string
-		s.str[0]                                      # get first element from each string
+    # layouts
 
-		s.str.lower()
-		s.str.upper()
+        # row/column layout
+        from bokeh.layouts import row, column
+        layout = row(p1, p2, p3)     # arrange in row
+        layout = column(p1, p2, p3)  # arrange in column
+        output_file("layout.html")
+        show(layout)
 
-		s.str.len()
+        # nested row/column layout
+        column_layout = column(p1, p2)
+        nested_layout = row(column_layout, p3, sizing_mode='scale_width')
 
-		s.str.strip()
-		s.str.lstrip()
-		s.str.rstrip()
+        # grid layout
+        from bokeh.layouts import  gridplot
+        layout = gridplot([p1, p2], [p3, None], toolbar_location = None)  # same output as the nested row-column shown above
 
-		s.str.split("_", expand=False)                # split "a_b_c" to [a, b, c]. Refer documentation for more functionality.
-		s.str.rsplit("_")                             # same as split but works in reverse direction i.e. from end to start of a string
+        # tabbed layout
+        from bokeh.models.widgets import Tabs, Panel
 
-		s.str.join("_")                               # join on whitespaces using "_"
+        first = Panel(child = row(p1, p2), title = "first")
+        second = Panel(child = row(p3), title = "second")
 
-		s.str.replace(pattern, "custom_string")       # replace pattern with "custom_string"
+        tabs = Tabs(tabs = [first, second])
+        show(tabs)
 
-		pattern = r'[0-9][a-z]'
-		s.str.match(pattern, na=False)                # return True if the string is "2N" i.e. exact match
-		s.str.contains(pattern, na=False)             # return True if string is "12N4" because "2N" is inside "12N4"
-		s.str.find(pattern, start=0, end=None)        # return lowest index where the substring is fully contained between [start:end]
+        # linking plots
 
-		# recommended: use re inside lambda functions while doing complicated regex tasks
-		df.amount.apply(lambda x: x.find(patter))
-		df.amount.apply(lambda x: re.findall(pattern, x)[0])  # if [0] is not used result will be [result] instead of `result`
+    # annotations and guide
+
+        # legend locatiion
+        plot = plot.circle()
+        plot.legend.location = "top_left"
+        plot.legend.background_fill_color = 'lightgray'      # google more legend properties
+
+        # hover tooltips
+        from bokeh.models import HoverTool
+
+        hover = HoverTool(tooltips = [
+                ("label", "@column_name"),                   # ("length of petal", "@petal_length")
+                ("label", "@column_name"),
+                ("label", "@column_name")
+                ])
+
+        plot = figure(tools = [hover, "pan", "wheel_zoom"])  # or plot.add_tools(hover)
+        show(plot)
+
+    # charts
+
+        # histogram
+        from bokeh.charts import Histogram  # google bokeh charts
+        plot = Histogram(df, "column_name", bins = , color = "categorical_column", title = )
+        p.xaxis.axis_label = ""
+        p.xaxis.axis_label = ""
+        show(plot)
+
+        # boxplot
+        from bokeh.charts import BoxPlot
+        plot = BoxPlot(df, values = "column_name", label = "categorical_column", color = "categorical_column", title = "")
+
+        # scatter plot
+        from bokeh.charts import Scatter
+        plot = Scatter(df, x = "column_name", y = "column_name", color/marker = "categorical_column", title = "")
 
 ==============================================================================================================================
 
-### web scraping
+# regular expressions
 
-		from urllib.request import urlretrieve
-		urlretrieve("url", "filename.csv")            # save url file to csv
+        # strings
+        string = ""
+        string.lower(); string.upper()
+        string.strip(); string.lstrip(); string.rstrip()   # strip whitespace
+        split_result = string.split(".")                   # return list of substrings separated by "."
+        ".".join(split_result)                             # join list items using "."
 
-		pd.read_csv("url", sep = )
-		pd.read_excel("url", sheetname = None)        # read all sheets of excel file from url as a dictionary with sheet names as keys
+        "amandeep" + " rathee" == "amandeep rathee"        # concatenate strings
+        "yo"*3                                             # return "yoyoyo"
+
+        # quote preference - ' ' < " " < ''' ''' < """ """
+        print('What\'s up?') # escaping ' using \'
+        print("What's up?")  # ' ' < " "
+        print('''What's up "Jim"?''')  # " " < ''' '''
+        print("""What'''s''' up?""")  # ''' ''' < """ """
+
+        # regular expressions
+        import re
+        pattern = r""
+
+        # split
+        re.split(pattern, string)                          # split the string at given pattern
+
+        # substitute
+        re.sub(pattern, replacement, string)               # replace first occurence of pattern by repl in the string
+
+        # match
+        result = re.match(pattern, string)                 # return None is pattern not found at the very start of string
+        result.group()                                     # return match result
+        result.start()                                     # return start index of the string where pattern was found
+        result.end()                                       # return end index of the string where pattern was found
+
+        # search
+        result = re.search(pattern, string)                # look for the pattern in the whole string and returns the first occurence
+        result.group()
+
+        # findall
+        result = re.findall(pattern, string)               # return list all the occurences of patterns present in the string
+        result[0:3]
+
+        # finditer
+        for match in re.finditer(pattern, string):         # similar to findall but gives freedom to tinker with each match unlike findall
+            # do something with the match object found
+            print(match.group(0))
+            result.append(match.group())
+
+        # extract groups
+        # to extract groups, put parenthesis around the part of the pattern that you want to extract
+        # group matching can be used with re.match(), re.search() and re.finditer() but not with re.findall()
+        result = re.search("([a-zA-Z.0-9]+)(@)([a-zA-Z.]+)", "user.name123@gmail.com")
+        result.group(0)                                    # return full match   - equivalent to result.group()
+        result.group(1)                                    # return first group  - "user.name123"
+        result.group(2)                                    # return second group - "@"
+        result.group(3)                                    # return third group  - "gmail.com"
+
+        # working with compile object
+        pattern = re.compile(r"")                          # create compile object
+        result = pattern.search(string)                    # no need to pass the pattern parameter
+        result = pattern.sub(replacement, string)
+
+
+        # pandas string methods
+        s = pd.Series(['a_b_c', 'B', 'C', 'Aaba', ' Baca ', np.nan, 'CABA', 'dog', 'cat'])
+
+        s.str.get(0)                                  # get first element from each string
+        s.str[0]                                      # get first element from each string
+
+        s.str.lower()
+        s.str.upper()
+
+        s.str.len()
+
+        s.str.strip()
+        s.str.lstrip()
+        s.str.rstrip()
+
+        s.str.split("_", expand=False)                # split "a_b_c" to [a, b, c]. Refer documentation for more functionality.
+        s.str.rsplit("_")                             # same as split but works in reverse direction i.e. from end to start of a string
+
+        s.str.join("_")                               # join on whitespaces using "_"
+
+        s.str.replace(pattern, "custom_string")       # replace pattern with "custom_string"
+
+        pattern = r'[0-9][a-z]'
+        s.str.match(pattern, na=False)                # return True if the string is "2N" i.e. exact match
+        s.str.contains(pattern, na=False)             # return True if string is "12N4" because "2N" is inside "12N4"
+        s.str.find(pattern, start=0, end=None)        # return lowest index where the substring is fully contained between [start:end]
+
+        # recommended: use re inside lambda functions while doing complicated regex tasks
+        df.amount.apply(lambda x: x.find(patter))
+        df.amount.apply(lambda x: re.findall(pattern, x)[0])  # if [0] is not used result will be [result] instead of `result`
 
 ==============================================================================================================================
 
-### time series with pandas
+# web scraping
 
-		# resampling - change (increase - upsampling or decrease - downsampling) frequency of timeseries data
-		# frequencies - T(minute), H(hour), D(day), B(business day), W(week), M(month), Q(quarter), A(year)
+        from urllib.request import urlretrieve
+        urlretrieve("url", "filename.csv")            # save url file to csv
 
-		frequency = "2Q"                         # change frequency to half yearly - upsample
-		df.resample(frequency).function()        # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
+        pd.read_csv("url", sep = )
+        pd.read_excel("url", sheetname = None)        # read all sheets of excel file from url as a dictionary with sheet names as keys
 
-		# convert variable to date
-		df.date_columns = pd.to_datetime(df.date_columns, format = '%m/%d/%Y')
-		OR
-		df[date_columns] = df[date_columns].apply(lambda date_column: pd.to_datetime(date_column, format = '%m/%d/%Y'), axis=0)
+==============================================================================================================================
 
-		# date methods
-		df.date_column.dt.hour                   # extract hour
-		df.date_column.dt.dayofweek              # extract dayofweek
-		df.date_column.dt.dayofyear              # extract dayofyear
-		df.date_column.dt.weekofyear             # extract weekofyear
-		df.date_column.dt.month                  # extract month
-		df.date_column.dt.year                   # extract year
+# time series with pandas
 
-		# shift command
-		df.shifted = df.date.shift(periods  = ,  # time steps to shift
-								   axis     = 0  # 0-rows, 1-columns
-		)
-		# visualize time series
-		df.column.plot(style = "k.-")      # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
+        # resampling - change (increase - upsampling or decrease - downsampling) frequency of timeseries data
+        # frequencies - T(minute), H(hour), D(day), B(business day), W(week), M(month), Q(quarter), A(year)
+
+        frequency = "2Q"                         # change frequency to half yearly - upsample
+        df.resample(frequency).function()        # statistical methods - mean(), sum(), count(), to fill NaN - interpolate()
+
+        # convert variable to date
+        df.date_columns = pd.to_datetime(df.date_columns, format = '%m/%d/%Y')
+        OR
+        df[date_columns] = df[date_columns].apply(lambda date_column: pd.to_datetime(date_column, format = '%m/%d/%Y'), axis=0)
+
+        # date methods
+        df.date_column.dt.hour                   # extract hour
+        df.date_column.dt.dayofweek              # extract dayofweek
+        df.date_column.dt.dayofyear              # extract dayofyear
+        df.date_column.dt.weekofyear             # extract weekofyear
+        df.date_column.dt.month                  # extract month
+        df.date_column.dt.year                   # extract year
+
+        # shift command
+        df.shifted = df.date.shift(periods  = ,  # time steps to shift
+                                   axis     = 0  # 0-rows, 1-columns
+        )
+        # visualize time series
+        df.column.plot(style = "k.-")      # google styling in matplotlib plot. color(k:black), marker(.:dot), line type(-:solid)
 
 ==============================================================================================================================
