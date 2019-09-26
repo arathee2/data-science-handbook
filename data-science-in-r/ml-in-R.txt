@@ -277,87 +277,97 @@
 
 ### Linear Regression
 
-	# check r-squared value. It has to be maximized for it be a good model. also check significance of variables. Remove
-	# insignificant variables. Two tied insignificant vars can be removed by checking pr(>|t|) value. remove
-	# insignificant vars with high pr(>|t|) value. check sign of estimate values of independent vars in summary(model)
-	# and see if that makes sense. check for multicollinearity among independent vars(>0.7) and remove accordingly one of the two.
-
 	# model
-		library(Metrics)
 
 		linear.model <- lm(target ~ ., data = train)
-		linear.predict <- predict(linear.model, cv)
+		linear.predictions <- predict(linear.model, cv)
 
-	# calc RMSE and R-squared
+    # model assessment
 
-		rmse <- function(predicted, actual)
-		{
-    		sum.of.squared.error <- sum((predicted - actual)^2)
-    		root.mean.squared.error <- sqrt(sum.of.squared.error/length(actual))
-    		return(root.mean.squared.error)
-		}
+        # normality check
+        qqnorm(variable)          # check whether all X and y that are used in modelling have normal distribution
+        
+        # check linearity between X and y, and independence, normality and homoscedasticity of residuals
+        plot(residuals(model))    # plot should look like a perfect random noise
+        abline(0,0)
 
-		rsquared <- function(predicted, cv.label, train.label)
-		{
-    		sse <- sum((predicted - cv.label)^2)
-			sst <- sum((mean(train.label) - cv.label)^2)
-			r.squared <- 1-(sse/sst)
-			return(r.squared)
-		}
+    	# outlier check
 
+	# model evaluation
+
+        library(Metrics)
 		error <- rmse(cv$target, linear.predict)
 
-	# ROCR and AUC (Area Under Curve)
+	# variable selection
 
-		library(ROCR)
+		# interpret coefficients:
+			# intercept: mean value of y when all numeric predictors are zero (or average value in case if they are centered) and all categorical predictors are set to default category
+			# numeric predictors: unit increase in x increases y by coefficient units
+			# categorical predictors: default category is absorbed in the intercept. y changes by coefficient unit if you use that particular level instead of default category
+		# look at confidence intervals of coefficents
+		# look at f-score of the model
+		# remove variables one by one using p-value and vif
+		# use anova test to see two models are same
 
-		linear.predict <- predict(linear.model, cv)
-		linear.ROCR <- prediction(linear.predict, cv$target)
-		linear.auc <- as.numeric(performance(linear.ROCR,"auc")@y.values)
+		# tools for variable selection
+		
+			# model summary
+			summary(linear.model)
 
-	# step model
+			# CI for beta values
+			confint.default(linear.model)  # asymptotic
+			confint(linear.model)          # based on the profile-likelihood
 
-		step.model <- step(linear.model)
+			# test whether two models are the same
+			anova(model.1, model.2)
 
-	## Variable Selection
+			# automatic variable selection
+			step.model <- step(linear.model, direction = c("both"))
 
-		# 1. Select the best model with all the important variables using stepAIC()
-		linear.model <- stepAIC(linear.model, direction = "both/backward/forward")
-
-		# 2. Remove the variable which has high vif (more than 2, 3 or 4) and high p-value (more than 0.01, 0.05 or 0.1)
-		vif(linear.model)        # check vif values - note down the variable with highest vif
-		summary(linear.model)    # check p-values   - remove the noted variable if p-value is also less than threhsold
-
-		# 3. Rebuild model after removing one variable at a time, using the above step
-		linear.model <- lm(formula = , data = train)
-
-		# Step 2 and 3 are repeated until all the variables have a required vif (say, less than 3), and a required p-value (say, less than 0.01)
+			# vif: tells whether a predictor is a linear combination of another predictor
+			vif(linear.model)              # vif <=5 is ok, 5 < vif < 10 is moderately correlated, vif > 10 is highly correlated
 
 ==============================================================================================================================
 
 ### Logistic Regression
 
-	## Binomial
+	# binary classification
 
-		glm.model <- glm(target ~ ., data = train, family = "binomial", control = list(maxit = 50))  # OR family = multinomial()
-		glm.predict <- predict(glm.model, cv, type = "response")
-		table(cv$target, glm.predict>0.5)
-		error <- ce(cv$target, glm.predict)
+		glm.model <- glm(target ~ ., data = train, family = binomial(link=logit), control = list(maxit = 50))  # OR family = multinomial()
+		glm.predictions <- predict(glm.model, cv, type = "response")
 
-	## Multinomial
+	# model assessment
 
-		library ("nnet")
+		# normality check
+		qqnorm(variable)          # check whether all X that are used in modelling have normal distribution
 
-		multinom.model <- multinom(target ~ ., data = train)
-		summary(multinom.model)
-		multinom.predict <- predict(multinom.model, cv, "probs")
+		# residual check: homoscedasticity and normality of residuals is not an assumption for logistic regression
+		library(arm)
+		binnedplot(y=glm.predictions, x=residuals(glm.model, "resp"),
+				   xlab="Predicted probabilities", col.int="red4",
+				   ylab="Average residuals",
+				   main="Binned residual plot", col.pts="navy")
+		# binnedplot:
+			# 1. Order observations by predicted probabilities
+			# 2. Create bins with equal observations. default: square root of number of observations
+			# 3. Computer average residual in each bin
+			# 4. Plot average residual vs predicted probabilities in each bin
+			# note: can be used to check whether there is inverse logit association among the y and X: binnedplot(y=target, x=predictor)
 
-	## ROCR and AUC(area under curve)
+	# model evaluation
 
 		library(ROCR)
 		library(pROC)
+		library(e1071)
+		library(Metrics)
 
-		# roc curve
+		# confusion matrix
+		confusionMatrix(ifelse(predictions >= 0.5, 1, 0), positive = "1")
+		
+		# classification error
+		error <- ce(cv$target, glm.predict)
+				
+		# roc
 		roc_curve <- roc(cv$target, algo.predict, plot=TRUE, auc=TRUE, grid=TRUE, col="blue")
 		plot(roc_curve)
 		lines(roc_curve2)  # add roc_curve2 to roc_curve plot
@@ -372,17 +382,29 @@
 		roc <- performance(rocr, "tpr", "fpr")
 		plot(roc)
 
-	## Lift chart
-
+		# lift chart
 		rocr <- prediction(abs(predict), cv$target)
 		lift.chart <- performance(rocr, "lift", "rpp")  # google ROCR performance functions for more charts
 		plot(lift.chart)
+
+	# variable selection
+
+		# all the linear regression techniques are applicable here except f-score test. A few things that are different from linear regression:
+		# coefficients tell us about log-odds. 
+			# numeric predictors: unit increase in x increases log-odds by coefficient
+			# categorical predictors: change in log-odds by coefficient units had you used that particular category instead of the default category
+		# exponents of coefficients tell us about odds. 
+			# numeric predictors: unit increase in x multiplies odds by exp(coefficient)
+			# categorical predictors: odds multiplied by exp(coefficient) if you use that particular category instead of the default category
+
+		# f-score test becomes change in deviance test
+		anova(model.1, model.2, test= "Chisq")
 
 ==============================================================================================================================
 
 ### K-Nearest Neighbor
 
-		library("class")
+		library(class)
 
 		predictors <- names(train)[names(train) != "target"]
 		knn.trainX <- train[, predictors]
