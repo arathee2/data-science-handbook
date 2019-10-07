@@ -86,8 +86,16 @@ scale_fill_brewer()
 
 		library(ggthemes)
 
+		# basic themes
+		theme_linedraw()
+		theme_minimal()
+		theme_light()
+		theme_classic()
+		theme_void()
 		theme_grey()
 		theme_bw()
+
+		# themes from other softwares
 		theme_excel() + scale_fill_economist()
 		theme_few() + scale_fill_few()
 		theme_solarized() + scale_fill_solarized()

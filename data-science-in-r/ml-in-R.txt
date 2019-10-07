@@ -275,12 +275,19 @@
 
 ==============================================================================================================================
 
-### Linear Regression
+### linear regression
 
-	# model
+	# fit model
+        formula <- "y ~ x1 + x2 + x1:x2 + I(x3^2) + x4*x5"
+		linear.model <- lm(response ~ predictors, data = train)
+    
 
-		linear.model <- lm(target ~ ., data = train)
-		linear.predictions <- predict(linear.model, cv)
+    # make predictions
+
+		linear.predictions <- predict(linear.model, cv)                          # predict numeric values
+        linear.predictions <- predict(linear.model, cv, interval='confidence')   # get CI of predictor value
+        linear.predictions <- predict(linear.model, cv, interval='prediction')   # get CI of predicted response
+
 
     # model assessment
 
@@ -288,15 +295,17 @@
         qqnorm(variable)          # check whether all X and y that are used in modelling have normal distribution
         
         # check linearity between X and y, and independence, normality and homoscedasticity of residuals
-        plot(residuals(model))    # plot should look like a perfect random noise
+        plot(residuals(model))    # plot residuals against response; should look like a perfect random noise
         abline(0,0)
 
     	# outlier check
+
 
 	# model evaluation
 
         library(Metrics)
 		error <- rmse(cv$target, linear.predict)
+
 
 	# variable selection
 
@@ -306,18 +315,21 @@
 			# categorical predictors: default category is absorbed in the intercept. y changes by coefficient unit if you use that particular level instead of default category
 		# look at confidence intervals of coefficents
 		# look at f-score of the model
-		# remove variables one by one using p-value and vif
 		# use anova test to see two models are same
-
+        # remove variables one by one using anova test and vif
+		
 		# tools for variable selection
 		
 			# model summary
 			summary(linear.model)
 
-			# CI for beta values
-			confint.default(linear.model)  # asymptotic
-			confint(linear.model)          # based on the profile-likelihood
+            # coefficients
+            coef(linear.model)
 
+			# CI of coefficients
+			confint(linear.model)          # based on the profile-likelihood
+            confint.default(linear.model)  # asymptotic
+			
 			# test whether two models are the same
 			anova(model.1, model.2)
 
@@ -325,80 +337,126 @@
 			step.model <- step(linear.model, direction = c("both"))
 
 			# vif: tells whether a predictor is a linear combination of another predictor
-			vif(linear.model)              # vif <=5 is ok, 5 < vif < 10 is moderately correlated, vif > 10 is highly correlated
+			library(car)
+            vif(linear.model)              # vif <=5 is ok, 5 < vif < 10 is moderately correlated, vif > 10 is highly correlated
 
 ==============================================================================================================================
 
-### Logistic Regression
+### logistic regression
 
 	# binary classification
 
-		glm.model <- glm(target ~ ., data = train, family = binomial(link=logit), control = list(maxit = 50))  # OR family = multinomial()
-		glm.predictions <- predict(glm.model, cv, type = "response")
+        # fit model
 
-	# model assessment
+    		glm.model <- glm(response ~ predictors, data = train, family = binomial(link=logit), control = list(maxit = 50))  # OR family = multinomial()
 
-		# normality check
-		qqnorm(variable)          # check whether all X that are used in modelling have normal distribution
 
-		# residual check: homoscedasticity and normality of residuals is not an assumption for logistic regression
-		library(arm)
-		binnedplot(y=glm.predictions, x=residuals(glm.model, "resp"),
-				   xlab="Predicted probabilities", col.int="red4",
-				   ylab="Average residuals",
-				   main="Binned residual plot", col.pts="navy")
-		# binnedplot:
-			# 1. Order observations by predicted probabilities
-			# 2. Create bins with equal observations. default: square root of number of observations
-			# 3. Computer average residual in each bin
-			# 4. Plot average residual vs predicted probabilities in each bin
-			# note: can be used to check whether there is inverse logit association among the y and X: binnedplot(y=target, x=predictor)
+        # make predictions
+        
+            glm.predictions <- predict(glm.model, cv, type = "response")
+    	
 
-	# model evaluation
+        # model assessment
 
-		library(ROCR)
-		library(pROC)
-		library(e1071)
-		library(Metrics)
+    		# normality check
+    		qqnorm(variable)          # check whether all X that are used in modelling have normal distribution
 
-		# confusion matrix
-		confusionMatrix(ifelse(predictions >= 0.5, 1, 0), positive = "1")
-		
-		# classification error
-		error <- ce(cv$target, glm.predict)
-				
-		# roc
-		roc_curve <- roc(cv$target, algo.predict, plot=TRUE, auc=TRUE, grid=TRUE, col="blue")
-		plot(roc_curve)
-		lines(roc_curve2)  # add roc_curve2 to roc_curve plot
+    		# residual check: homoscedasticity and normality of residuals is not an assumption for logistic regression
+    		library(arm)
+    		binnedplot(y=glm.predictions, x=residuals(glm.model, "resp"),
+    				   xlab="Predicted probabilities", col.int="red4",
+    				   ylab="Average residuals",
+    				   main="Binned residual plot", col.pts="navy")
+    		# binnedplot:
+    			# 1. Order observations by predicted probabilities
+    			# 2. Create bins with equal observations. default: square root of number of observations
+    			# 3. Computer average residual in each bin
+    			# 4. Plot average residual vs predicted probabilities in each bin
+    			# note: can be used to check whether there is inverse logit association among the y and X: binnedplot(y=target, x=predictor)
 
-		# auc
-		predict <- predict(model, cv)
-		rocr <- prediction(predict, cv$target)
-		auc <- as.numeric(performance(rocr, "auc")@y.values)
 
-		# roc curve
-		rocr <- prediction(abs(predict), cv$target)
-		roc <- performance(rocr, "tpr", "fpr")
-		plot(roc)
+    	# model evaluation
 
-		# lift chart
-		rocr <- prediction(abs(predict), cv$target)
-		lift.chart <- performance(rocr, "lift", "rpp")  # google ROCR performance functions for more charts
-		plot(lift.chart)
+    		library(ROCR)
+    		library(pROC)
+    		library(e1071)
+    		library(Metrics)
 
-	# variable selection
+    		# confusion matrix
+    		discrete.predictions <- factor(ifelse(predictions >= 0.5, 1, 0))
+    		confusionMatrix(discrete.predictions, data_frame$target, positive = "1")
+    		
+    		# classification error
+    		error <- ce(cv$target, glm.predict)
+    				
+    		# roc
+    		roc_curve <- roc(cv$target, algo.predict, plot=TRUE, print.thres="best", legacy.axes=TRUE, print.auc =TRUE, grid=TRUE, col="blue")
+    		plot(roc_curve)
+    		lines(roc_curve2)  # add roc_curve2 to roc_curve plot
 
-		# all the linear regression techniques are applicable here except f-score test. A few things that are different from linear regression:
-		# coefficients tell us about log-odds. 
-			# numeric predictors: unit increase in x increases log-odds by coefficient
-			# categorical predictors: change in log-odds by coefficient units had you used that particular category instead of the default category
-		# exponents of coefficients tell us about odds. 
-			# numeric predictors: unit increase in x multiplies odds by exp(coefficient)
-			# categorical predictors: odds multiplied by exp(coefficient) if you use that particular category instead of the default category
+    		# auc
+    		predict <- predict(model, cv)
+    		rocr <- prediction(predict, cv$target)
+    		auc <- as.numeric(performance(rocr, "auc")@y.values)
 
-		# f-score test becomes change in deviance test
-		anova(model.1, model.2, test= "Chisq")
+    		# roc curve
+    		rocr <- prediction(abs(predict), cv$target)
+    		roc <- performance(rocr, "tpr", "fpr")
+    		plot(roc)
+
+    		# lift chart
+    		rocr <- prediction(abs(predict), cv$target)
+    		lift.chart <- performance(rocr, "lift", "rpp")  # google ROCR performance functions for more charts
+    		plot(lift.chart)
+
+
+    	# variable selection
+
+    		# all the linear regression techniques are applicable here except f-score test. A few things that are different from linear regression:
+    		# coefficients tell us about log-odds. 
+    			# numeric predictors: unit increase in x increases log-odds by coefficient
+    			# categorical predictors: change in log-odds by coefficient units had you used that particular category instead of the default category
+    		# exponents of coefficients tell us about odds. 
+    			# numeric predictors: unit increase in x multiplies odds by exp(coefficient)
+    			# categorical predictors: odds multiplied by exp(coefficient) if you use that particular category instead of the default category
+
+            # model summary
+            summary(glm.model)
+
+            # coefficients
+            coef(glm.model)
+            exp(coef(glm.model))
+
+            # CI of coefficients
+            confint(glm.model)          # based on the profile-likelihood
+            confint.default(glm.model)  # asymptotic
+
+            # f-score test becomes change in deviance test
+    		anova(model.1, model.2, test= "Chisq")
+
+            # automatic variable selection
+            step.model <- step(glm.model, direction = c("both"))
+
+            # vif
+            library(car)
+            vif(glm.model)              # vif <=5 is ok, 5 < vif < 10 is moderately correlated, vif > 10 is highly correlated
+
+
+    # multinomial classification
+
+        library(nnet)
+
+        # fit model
+
+            multinom.model <- multinom(response ~ predictors, data = train)
+            
+            
+        # tools for model selection
+
+            summary(multinom.model)
+            exp(coef(multinom.model))
+            confint(multinom.model)
+            exp(confint(multinom.model))
 
 ==============================================================================================================================
 
