@@ -528,13 +528,13 @@
 		tree.model <- rpart(target ~ ., data = train, method = "class/anova", parms = list(split = "gini/information"),
 							control = rpart.control(cp = , minsplit = , minbucket = ))
 		prp(tree.model)
-		tree.predict <- predict(tree.model, cv, type = "class") # no need to specify "class" for regression
+		tree.predict <- predict(tree.model, cv, type = "class")  # classification: "class" for binary, "prob" for probabilities; regression: don't pass
 		table(cv$target, tree.predict)
 
 	# ROCR and AUC(area under curve)
 
-		tree.predict <- predict(tree.model, cv) # type = "class" not to be included here
-		tree.ROCR <- prediction(tree.predict[,2], cv$target)
+		tree.predict <- predict(tree.model, cv, type="prob")
+		tree.ROCR <- prediction(tree.predict[, 2], cv$target)
 		tree.auc <- as.numeric(performance(tree.ROCR,"auc")@y.values)
 
 ==============================================================================================================================
@@ -554,7 +554,7 @@
 								 na.action = na.omit
 								)
 		varImpPlot(rf.model)
-		rf.predict <- predict(rf.model, cv)
+		rf.predict <- predict(rf.model, cv, type="response")  # classification: "response" for binary, "prob" for probabilities; regression: don't pass
 		table(cv$target, rf.predict)
 
 	# party-cforest

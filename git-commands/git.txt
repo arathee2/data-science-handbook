@@ -1,0 +1,28 @@
+# add files to staging area
+git add filename
+
+
+# check status of staged and unstaged files
+git status
+
+
+# commit
+git commit -m 'information about commit'
+git commit --ammend -m 'new message for same commit'
+
+
+# push
+
+
+# log - see commit history - reverse chronological order
+git log [optional filename or directoryname]
+
+
+# difference
+git diff                        # look at differences in repository
+git diff filename               # look at differences in a file
+git diff directoryname          # look at differences in a folder
+git diff -r HEAD                # look at differences between current version and last commit
+git diff -r HEAD filename
+git diff -r HEAD directoryname
+
