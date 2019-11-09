@@ -1,6 +1,20 @@
-# add files to staging area
-git add filename
+# create repository
+git init                                    # make parent directory a git repository
+git init <existing-directory-name>          # make specified directory a git repository
+git init <new-repository-name>              # create a new repository
 
+# clone existing repository
+git clone <URL/path>
+
+# remote
+git remote [-v]                             # list remotes
+git remote add <remote-name> <URL/path>     # add remote
+git remote rm <remote-name>                 # remove remote
+
+
+# stage files
+git add <file-name>                         # add files to dtaging area
+git rm <file-name>                          # remove files from repository and add this change to staging area
 
 # check status of staged and unstaged files
 git status
@@ -10,19 +24,118 @@ git status
 git commit -m 'information about commit'
 git commit --ammend -m 'new message for same commit'
 
+# pull
+	
+	# note: commit all work before pulling to avoid overwriting local changes
+
+	# pull from master in origin into local master
+	git pull origin master
+	
+	# pull from branch in remote into local branch
+	git pull <remote-name> <branch-name>
+
 
 # push
+git push <remote-name> <branch-name>
 
 
 # log - see commit history - reverse chronological order
-git log [optional filename or directoryname]
+git log [optional file-name or directory-name]
+git log -3 <file-name>                      # look at latest 3 changes in a file
 
 
 # difference
-git diff                        # look at differences in repository
-git diff filename               # look at differences in a file
-git diff directoryname          # look at differences in a folder
-git diff -r HEAD                # look at differences between current version and last commit
-git diff -r HEAD filename
-git diff -r HEAD directoryname
+git diff                                    # look at differences in repository
+git diff <file-name>                        # look at differences in a file
+git diff <directory-name>                   # look at differences in a folder
+git diff -r HEAD                            # look at differences between current version and last commit
+git diff -r HEAD <file-name>
+git diff -r HEAD <directory-name>
+
+git diff <commit-reference-1>..<commit-reference-2>
+git diff <branch-1>..<branch-2>
+
+
+# look at changes of a particular commit -- displays both git log and git diff outputs pertaining to that commit
+git show "commit-reference"
+
+
+# referring commits
+	
+	# absolute reference
+	"122795ac7c534a1053266a15f03013f61d85d189"
+
+	# relative reference
+	HEAD                                    # refer most recent commit
+	HEAD~2                                  # refer to the commit that is two commits before HEAD
+
+
+# who changed what changes and when -- outputs commit hash, author, commit time, line number tampered with and contents changed in the line
+git annotate <file-name>
+
+
+# ignore files and directories -- create a ".gitignore" file in the root of the repository
+temp                                        # ignore any file or directory called temp (and, if it's a directory, anything inside it)
+*.pdf                                       # ignore all pdf files in the root of the repository
+./bin/*.py                                  # ignore all .py files in the bin folder
+
+
+# clean git repository
+git clean -n                                # get untracked files
+git clean -f                                # remove untracked files
+
+
+# configure git
+git config --list                           # has 3 additional arguments "--system", "--global", "--local". the right one takes precedence over left one.
+git config --global <field> <value>         # change setting, for example, git congif --global user.name "Amandeep Rathee"
+
+
+# undo changes
+
+	# unstage a file
+	git reset HEAD <file-name>
+
+	# revert changes of an unstaged file or all files in a directory
+	git checkout -- <file-name/directory-name>
+
+	# revert back to a particular commit history
+	git checkout <commit-reference> <file-name>
+
+# branching
+	
+	# list all branches
+	git branch
+
+	# create branch
+	git branch <branch-name>
+
+	# switch branch
+	git checkout <branch-name>
+
+	# create and switch branch
+	git checkout -b <branch-name>
+
+# merge
+git merge <source-branch-name> <destination-branch-name>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

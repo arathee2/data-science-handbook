@@ -295,8 +295,14 @@
         qqnorm(variable)          # check whether all X and y that are used in modelling have normal distribution
         
         # check linearity between X and y, and independence, normality and homoscedasticity of residuals
-        plot(residuals(model))    # plot residuals against response; should look like a perfect random noise
-        abline(0,0)
+            
+            # plot residuals against response; should look like a perfect random noise
+            plot(residuals(model)); abline(0,0)
+            
+            # plot residuals against predictors
+            plot(linear.model$residual ~ df$numeric_variable, xlab = "", ylab = "Residual"); abline(0,0)
+            boxplot(linear.model$residual ~ df$categorical_variable, xlab = "", ylab = "Residual")
+
 
     	# outlier check
 
@@ -966,24 +972,75 @@
 	# To be run only on variables having missing value. For convinience run on every variable except for dependent variable.
 
 		# check missing values
-		colSums(is.na(data_frame))*100/nrow(data_frame)
+        library(VIM)
+        library(lattice)
+        aggr(df, col=c("lightblue3","darkred"), numbers=TRUE, sortVars=TRUE, labels=names(nhanes2), 
+             cex.axis=.7, gap=3, ylab=c("Proportion missing","Missingness pattern"))
+		marginplot(df[,c("var1","var2")], col=c("lightblue3","darkred"), cex.numbers=1.2, pch=19)
+
+        colSums(is.na(data_frame))*100/nrow(data_frame)
 		sapply(data_frame, function(x) sum(is.na(x))*100/length(x))
 
-		library("Hmisc")
-		df_imputed <- aregImpute(~ x1 + x2 + x3, data = data_frame, n.impute = 5)
-		df_imputed
-		df_imputed$imputed$x1
 
-		library("missForest")
-		df_imputed <- missForest(data_frame)
-		df_imputed$ximp
+		# mice
+        library(mice)
+		
+            # documentation of methods available in mice
+            ?methods
+            methods(mice)
 
-		library("mice")
-		md.pattern(data_frame)
+            # visualize missing data pattern
+            md.pattern(data_frame)
 
-		set.seed(10)
-		imputed <- complete(mice(data_frame))
-		data_frame$var <- imputed$var
+            # make imputations
+    		set.seed(10)
+            imputation <- mice(data_frame, m=10, defaultMethod=c("norm/pmm","logreg","polyreg","polr"), print=FALSE)
+    		
+            # visualize imputed data
+            stripplot(imputation, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
+            stripplot(imputation, var1~.imp|var2, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
+            stripplot(imputation, var1~var2|.imp, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
+            densityplot(imputation)
+
+            # look at what variables are used to predict what variables while imputing; rows: responses, columns: predictors
+            imputation$predictorMatrix
+            
+            # want to change that a particular x should not predict a particular y? put a 0 in the predictorMatrix and then use mice
+            pred <- imputation$predictorMatrix
+            pred["x","y"] <- 0
+            imputation <- mice(data_frame, m=10, defaultMethod=c("norm/pmm","logreg","polyreg","polr"), print=FALSE, predictorMatrix=pred)
+
+            # modeling using imputed data
+            
+                # create model
+                imputed.model <- with(data=imputation, lm(y ~ X))
+                
+                # check individual model summary
+                imputed.model[[4]][[1]]   #  results for first imputed dataset
+                imputed.model[[4]][[6]]   #  results for sixth imputed dataset
+                
+                # combine results of all models
+                combined.imputed.model <- pool(imputed.model)
+                summary(combined.imputed.model)
+
+                # nested f-test
+                pool.compare(with(data=imputation, lm(y ~ x1+x2)), with(data=imputation, lm(y ~ x1)))#[c(9:12,18)]
+
+
+            # complete data using a particular imputation
+            imputed <- complete(imputation, 3)  # complete data frame using third imputed data
+    		data_frame$var <- imputed$var
+
+
+        # miscellaneous libraries
+        library(Hmisc)
+        df_imputed <- aregImpute(~ x1 + x2 + x3, data = data_frame, n.impute = 5)
+        df_imputed
+        df_imputed$imputed$x1
+
+        library(missForest)
+        df_imputed <- missForest(data_frame)
+        df_imputed$ximp
 
 		library(DMwR)
 		inputData <- knnImputation(inputData)
