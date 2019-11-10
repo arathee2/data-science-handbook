@@ -997,9 +997,10 @@
             imputation <- mice(data_frame, m=10, defaultMethod=c("norm/pmm","logreg","polyreg","polr"), print=FALSE)
     		
             # visualize imputed data
+            xyplot(imputation, imputed_variable ~ var | .imp, pch=c(1,20), cex = 1.4, col=c("<observed_value_color>","<imputed_value_color>"))
             stripplot(imputation, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
-            stripplot(imputation, var1~.imp|var2, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
-            stripplot(imputation, var1~var2|.imp, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
+            stripplot(imputation, imputed_variable ~ .imp | var, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
+            stripplot(imputation, imputed_variable ~ var | .imp, col=c("<observed_value_color>","<imputed_value_color>"), pch=c(1,20))
             densityplot(imputation)
 
             # look at what variables are used to predict what variables while imputing; rows: responses, columns: predictors
