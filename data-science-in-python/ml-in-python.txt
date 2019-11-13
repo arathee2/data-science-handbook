@@ -451,20 +451,211 @@
 
 		## classification
 
-			from sklearn.metrics import accuracy_score
+# confusion matrix
+def print_confusion_matrix(y_true, y_pred):
+    """
+    Input:
+        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+    Output:
+        confusion matrix
+    """
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    
+    # rates
+    tpr = tp/(tp+fn)
+    fpr = fp/(fp+tn)
+    fnr = fn/(tp+fn)
+    tnr = tn/(fp+tn)
+    
+    # PPV and NPV
+    ppv = tp/(tp+fp)
+    npv = tn/(tn+fn)
+    
+    # accuracy
+    accuracy = (tp+tn)/(tn+fp+fn+tp)
+    
+    # f-1 score
+    f1_score = 2*(ppv*tpr)/(ppv+tpr)
+    
+    # print results
+    margin_length = 40
+    print("Sensitivity: {:.4f}\n".format(tpr), "="*margin_length)
+    print("Specificity: {:.4f}\n".format(tnr), "="*margin_length)
+    print("Positive Predicted Value: {:.4f}\n".format(ppv), "="*margin_length)
+    print("Negative Predicted Value: {:.4f}\n".format(npv), "="*margin_length)
+    print("Accuracy: {:.4f}\n".format(accuracy), "="*margin_length)
+    
+    return confusion_matrix(y_true, y_pred)
+
+
+# plot roc curve
+def plot_roc_curve(y_true, y_pred_probs, model_name="Model"):
+    """
+    Input:
+        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+    Output:
+        ROC and AUC curve
+    """
+    # generate zero probabilities
+    zero_probs = [0 for _ in range(len(y_true))]
+
+    # calculate scores
+    zero_probs_auc = roc_auc_score(y_true, zero_probs)
+    y_pred_probs_auc = roc_auc_score(y_true, y_pred_probs)
+
+    # summarize scores
+    print('No Skill: ROC AUC=%.3f' % (zero_probs_auc))
+    print('Logistic: ROC AUC=%.3f' % (y_pred_probs_auc))
+
+    # calculate roc curves
+    base_fpr, base_tpr, _ = roc_curve(y_true, zero_probs)
+    model_fpr, model_tpr, _ = roc_curve(y_true, y_pred_probs)
+
+    # plot the roc curve for the model
+    plt.plot(base_fpr, base_tpr, linestyle='--', label='No Skill')
+    plt.plot(model_fpr, model_tpr, marker='.', label=model_name)
+
+    # axis labels
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+
+    # show the legend
+    plt.legend()
+
+    # show the plot
+    plt.show()
+
+
+# get best threshold
+def optimize_roc_threshold(y_true, y_pred_probs, method="tpr_tnr_balance", cost=[], min_threshold=0, max_threshold=1, step=0.01, verbose = 0):
+    """
+    Input:
+        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+        method        : "tpr_tnr_balance" returns threshold where tnr and FPR are closest.
+                        "min_cost" returns threshold with least cost
+        cost          : list containing cost of false positive and false negatives, respectively. Eg: [20, 60]
+        min_threshold : a float describing minimum value of threshold to try
+        max_thrshold  : a float describing maximum value of threshold to try
+        step          : a float describing the jumps between minimum and maximum threshold.
+        verbose       : 0 for no output, 1 for modest output, 2 for all output.
+        
+    Output:
+        optimized_value : best_cost or min_difference
+        best_threshold 
+    """
+    
+    thresholds = np.arange(min_threshold, max_threshold, step).tolist()
+    
+    if method == "min_cost":
+        if len(cost) == 2:
+            fp_cost = cost[0]
+            fn_cost = cost[1]
+        elif len(cost) == 0:
+            raise ValueError("Missing parameter: {''}".format("cost"))
+        else:
+            raise ValueError("Cost requires two parameters. Passed cost has {} parameters".format(len(cost)))
+
+        # initialize best_cost
+        best_threshold = 1
+        y_pred_bin = [1 if prob >= best_threshold else 0 for prob in y_pred_probs]
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+        best_cost = fp*fp_cost + fn*fn_cost
+
+
+        # calculate cost at all possible thresholds
+        for index, threshold in enumerate(thresholds):
+            y_pred_bin = [1 if prob >= threshold else 0 for prob in y_pred_probs]
+
+            # confusion matrix
+            tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+
+            # cost
+            cost = fp*fp_cost + fn*fn_cost
+
+            # compare costs
+            if cost < best_cost:
+                best_cost=cost
+                best_threshold=threshold
+
+            # print threshold and cost
+            if verbose == 1:
+                if index % (((max_threshold-min_threshold)/step)/5) == 0:
+                    print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(cost, 2)))
+                    
+            elif verbose == 2:
+                print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(cost, 2)))
+
+        # print result 
+        print("Optimum cost: {:.4f}".format(best_cost))
+        print("Optimum threshold: {:.4f}".format(best_threshold))
+    
+    
+    elif method == "tpr_tnr_balance":
+        
+        # initialize min_difference
+        best_threshold = 1
+        y_pred_bin = [1 if prob >= best_threshold else 0 for prob in y_pred_probs]
+        
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+    
+        # sensitivity
+        tpr = tp/(tp+fn)
+
+        # specificity
+        tnr = tn/(tn+fp)
+        
+        # difference
+        min_difference = abs(tpr-tnr)
+
+
+        # calculate difference at all possible thresholds
+        for index, threshold in enumerate(thresholds):
+            y_pred_bin = [1 if prob >= threshold else 0 for prob in y_pred_probs]
+
+            # confusion matrix
+            tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+    
+            # sensitivity
+            tpr = tp/(tp+fn)
+
+            # specificity
+            tnr = tn/(tn+fp)
+
+            # difference
+            difference = abs(tpr-tnr)
+
+            # compare differences
+            if difference < min_difference:
+                min_difference=difference
+                best_threshold=threshold
+
+            # print threshold and difference
+            if verbose == 1:
+                if index % (((max_threshold-min_threshold)/step)/5) == 0:
+                    print("Threshold: {:.4f} \t ABS(TPR-TNR): {:.4f}".format(threshold, difference))
+                    
+            elif verbose == 2:
+                print("Threshold: {:.4f} \t ABS(TPR-TNR): {:.4f}".format(threshold, difference))
+        
+        # print result
+        print("Minimum absolute (TPR-TNR) difference: {:.4f}".format(min_difference))
+        print("Optimum threshold: {:.4f}".format(best_threshold))
+        
+        
+    else:
+        raise ValueError("Enter a valid method!. Possible methods are: [{}, {}]. Method passed: {}".format("min_cost", "tnr_fnr_balance", method))
+
+
+
+        	# other metrics
+    		from sklearn.metrics import accuracy_score
 			accuracy_score(y_test, y_pred)
 
 			from sklearn.metrics import confusion_matrix
 			cm = confusion_matrix(y_test, y_pred)
-			def print_accuracy(cm):
-				tn = cm[0][0]
-				fp = cm[0][1]
-				fn = cm[1][0]
-				tp = cm[1][1]
-				sensitivity = tp/(tp+fn)
-				specificity = tn/(tn+fp)
-				accuracy = (tp+tn)/(tn+fp+fn+tp)
-				print(pd.DataFrame({"Accuracy": [accuracy], "Sensitivity": [sensitivity], "Specificity": [specificity]}))
 
 			from sklearn.metrics import classification_report
 			classification_report(y_test, y_pred)
