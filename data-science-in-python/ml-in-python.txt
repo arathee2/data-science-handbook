@@ -456,7 +456,7 @@ def print_confusion_matrix(y_true, y_pred):
     """
     Input:
         y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
-        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+        y_pred_probs  : array of predicted binary labels. Eg: [0, 1, 0, 1, 1].
     Output:
         confusion matrix
     """

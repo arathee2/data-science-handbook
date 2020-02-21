@@ -13,14 +13,25 @@
         %matplotlib inline
 
         # keep track of time
-        # run cell code one time - use on top of the cell
-        % % time
-        # run a single line of code - use before a line
-        %time
-        # run cell code seven times and return mean time - use on top of the cell
-        % % timeit
-        # run cell code seven times and return mean time - use before a line
-        %time
+            
+            # time module
+            import time
+            start = time.time()
+            ...
+            end = time.time()
+            elapsed = end - start
+
+            # run cell code one time - use on top of the cell
+            %%time
+            
+            # run a single line of code - use before a line
+            %time
+        
+            # run cell code seven times and return mean time - use on top of the cell
+            %%timeit
+
+            # run cell code seven times and return mean time - use before a line
+            %time
 
         # run different kernel
         %R
@@ -736,7 +747,7 @@
                     y             =  "numeric_column",           # switch x and y to change plot orientation
                     hue           =  "categorical_column",
                     data          =  df,                         # to sort barplot, use df.sort_values['categorical_column']
-                    order         =  ,                           # order of variable to plot - google or plot using pd.DataFrame(groupby("categorical_column").numeric_column.function()) for ascending/descending ordered plot
+                    order         =  ,                           # order of variables as list. example: df.sort_values(by=["categorical_variable"], ascending=False).numeric_variable.tolist()
                     hue_order     =  ,                           # order of hue variable     - google
                     ci            =  "sd",                       # confidence interval for error bar
                     color         =  "",                         # single color for whole plot
