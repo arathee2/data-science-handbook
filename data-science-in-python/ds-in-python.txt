@@ -626,9 +626,11 @@
 # matplotlib
 
     import matplotlib.pyplot as plt
+    
+    ## plots
 
-        # line plot
-        plt.plot(x, y, marker = "", linestyle = "")
+    	# line plot
+        plt.plot(x, y, color="", marker = "", linestyle = "")
 
         # histogram
         plt.hist(x, bins = 30, rwidth = 0.9)           # or pass a list of bin cutoff points
@@ -643,28 +645,49 @@
         image = plt.imread("image.jpg")
         plt.imshow(image, extent = , aspect = )
         plt.axis("off")
-        plt.show()
 
         collapsed = image.mean(axis=2)                 # average out all pixel intensities to get one channel color instead of three
         plt.set_cmap("gray")                           # change printing color to black and white
         plt.imshow(collapsed, cmap="gray")
         plt.axis("off")
-        plt.show()
 
-        # customization
-        plt.xlabel("x")                                # use of latex equations possible
+        plt.show()                                     # display plot
+		plt.clf()                                      # clear plot
+
+    ## customization
+
+    	# themes and styles
+        plt.style.available
+        plt.style.use("ggplot")
+
+    	# figure size
+        plt.figure(figsize=(5, 5))                     # change it before plotting
+        
+        # labels
+        plt.xlabel("x", fontsize=10)                   # see other parameters: https://matplotlib.org/3.1.1/api/text_api.html#matplotlib.text.Text
         plt.ylabel("y")
         plt.title("title")
+        plt.suptitle("super title")
+        
         plt.xticks(arange(2), ("male", "female"))      # customize x-axis ticks
         plt.yticks(rotation = "")                      # customize y-axis ticks
-        plt.tick_params()
+        plt.tick_params()                              # change appearance of ticks, tick labels and gridlines
+        plt.tight_layout()                             # pad space between two plots
+
+        # legend
+        plt.plot(x, y, color = "blue", label = "male")
+        plt.plot(x, y, color = "red", label = "female")
+        plt.legend(loc = "upper right")                # "upper/lower/center left/right"
+
+        # zooming and axis
+        plt.xlim([xmin, xmax])                         # zoom in
+        plt.ylim([ymin, ymax])
+        plt.axis([xmin, xmax, ymin, ymax], 
+        		 option = "off/equal/square/tight")
 
         # transformation
         plt.xscale("log")                              # transform x-axis to log scale
         plt.yscale("log")                              # transform y-axis to log scale
-
-        plt.show()                                     # display plot
-        plt.clf()                                      # clear plot
 
         # multiple plots using axes()
         plt.axes([x_lo, y_lo, width, height])          # all parameters between 0 and 1
@@ -681,34 +704,16 @@
         plt.tight_layout()                             # pad space between two plots
         plt.show()
 
-        # zooming and axis
-        plt.xlim([xmin, xmax])                         # zoom in
-        plt.ylim([ymin, ymax])
-        plt.axis([xmin, xmax, ymin, ymax])
-        plt.axis("off/equal/square/tight")
-        plt.figure(figsize=(10,10))                    # change it before plotting
-
-        # legends
-        plt.scatter(x, y, color = "green", label = "male")
-        plt.scatter(x, y, color = "red", label = "female")
-        plt.legend(loc = "upper right")                # "upper/lower/center left/right"
-        plt.show()
-
         # text and arrows
         plt.annotate("text",
                      xy = (10, 10),                    # text coordinates
                      xytext = (15, 15),                # arrow pointer coordinates
-                     arrowprops = {"color": "green"}   # arrow properties
-        )
+                     arrowprops = {"color": "green"})  # arrow properties
 
         OR
 
         plt.text(x, y, s = "show this text at (x,y)")  # display text on x,y point
         plt.grid(True)                                 # to enable the text
-
-        # themes and styles
-        plt.style.available
-        plt.style.use("ggplot")
 
 ==============================================================================================================================
 

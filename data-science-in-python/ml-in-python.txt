@@ -113,7 +113,7 @@
 
 	### train
 
-		## train and validation	
+		## train and validation	split
 
 			# split data
 			from sklearn.model_selection import train_test_split
@@ -127,6 +127,7 @@
 
 			# evaluate
 			y_val_hat = model.predict(X_val)
+
 
 		## cross-validation
 
@@ -429,6 +430,39 @@ def optimize_roc_threshold(y_true, y_pred_probs, method="tpr_fnr_balance", cost=
         
     else:
         raise ValueError("Enter a valid method!. Possible methods are: [{}, {}]. Method passed: {}".format("min_cost", "tpr_fnr_balance", method))
+
+
+def plot_decision_boundary(X, y, model):
+    ''' Plots decision boundary of a model. Plots the first two features by default. '''
+    
+    # initialize plot
+    fig, ax = plt.subplots()
+    
+    # set plot boundaries
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    
+    # create meshgrid
+    step   = 0.02
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, step), np.arange(y_min, y_max, step))
+    Z      = np.array(model.predict(np.c_[xx.ravel(), yy.ravel()])).reshape(xx.shape)
+
+    # color meshgrid
+    cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA', '#AAAAFF'])    
+    ax.pcolormesh(xx, yy, Z, cmap=cmap_light)
+    
+    # display scatterplot
+    ax.scatter(X[np.where(y==0), 0], X[np.where(y==0), 1], label="0")
+    ax.scatter(X[np.where(y==1), 0], X[np.where(y==1), 1], label="1")
+    legend = ax.legend(title="Classes")
+    
+    # aesthetics
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
+    ax.set_title('Decision Boundary')
+    ax.set_xlim(xx.min(), xx.max())
+    ax.set_ylim(yy.min(), yy.max())
+    pass
 
 ==============================================================================================================================
 
