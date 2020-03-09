@@ -1,21 +1,58 @@
 
-#### machine learning with scikit-learn
+#### supervised learning with scikit-learn
 
-	### supervised learning
+	### preprocessing
 
 		## get X and y
-
-			# make artificial dataset
-			from sklearn.datasets import make_classification
-			X, y = make_classification(n_samples = , n_features = ,
-									   n_informative = , n_redundant = ,
-									   n_repeated = , random_state = ,
-									   weights = [0.5, 0.5]
-				   )
 
 			# divide data into X and y
 			X = df.drop("target_column", axis = 1).values
 			y = df.target_column.values
+			
+			# split data into train and test
+			from sklearn.model_selection import train_test_split
+			X, X_test, y, y_test = train_test_split(X, y, test_size = 0.20, random_state = 4, stratify = y)
+
+		## preprocessing using sklearn pipeline
+
+			from sklearn.pipeline import Pipeline
+			from sklearn.pipeline import FeatureUnion
+			from sklearn.base import BaseEstimator, TransformerMixin
+			from sklearn.preprocessing import OneHotEncoder
+			from category_encoders import OrdinalEncoder
+
+			class DataFrameSelector(BaseEstimator, TransformerMixin):
+				def __init__(self, attribute_names):
+					self.attribute_names = attribute_names
+				def fit(self, X, y=None):
+					return self
+				def transform(self, X):
+					return X[self.attribute_names]
+
+			# preprocess X
+			num_attributes = []
+			cat_attributes = []
+
+			num_pipeline = Pipeline([
+							('selector', DataFrameSelector(num_attributes)),
+							('imputer', Imputer()),
+							('scaler', StandardScaler())
+						])
+ 
+			cat_pipeline = Pipeline([
+							('selector', DataFrameSelector(cat_attributes)),
+							('imputer', CustomImputer(strategy='mode')),
+							('label_encoder', OrdinalEncoder()),
+							('one_hot_encoder', OneHotEncoder())  # avoid this step if too much categories in a column
+						])
+
+			full_pipeline = FeatureUnion(transformer_list=[
+								("num_pipeline", num_pipeline),
+								("cat_pipeline", cat_pipeline)
+						])
+
+			full_pipeline.fit(X)
+			X = full_pipeline.transform(X)
 			
 			# encode class values as integers
 			from sklearn.preprocessing import LabelEncoder
@@ -25,11 +62,12 @@
 			encoded_y = encoder.transform(y)
 			y = encoder.inverse_transform(encoded_y)
 
-		## preprocess: sklearn-pandas pipeline
+			# X_test and y_test go through the same steps as X and y. Transformations to X_test and y_test are done using X and y models.
+			X_test = full_pipeline.transform(X_test)
+			y_test = encoder.fit(y_test)
 
-			# divide dataframe into predictors and target
-			X = df.drop("target_column", axis = 1)
-			y = df.target_column
+
+		## preprocessing using sklearn-pandas pipeline
 
 			# drop na observations if possible
 
@@ -58,11 +96,13 @@
 			one_hot_encode.fit(X)
 			X = one_hot_encode.transform(X)
 
-			# preprocess y
+			# encode class values as integers
 			from sklearn.preprocessing import LabelEncoder
 			encoder = LabelEncoder()
 			encoder.fit(y)
-			y = encoder.transform(y)
+			encoder.classes_
+			encoded_y = encoder.transform(y)
+			y = encoder.inverse_transform(encoded_y)
 
 			# when you get the test data in the future, just transform it using the basic and advance processing steps
 			test_predictors = preprocess.transform(test_predictors)
@@ -70,64 +110,325 @@
 			test_predictors = one_hot_encode.transform(test_predictors)
 			test_target = encoder.fit(test_target)
 
-		## preprocess: sklearn pipeline
 
-			from sklearn.pipeline import Pipeline
-			from sklearn.pipeline import FeatureUnion
-			from sklearn.base import BaseEstimator, TransformerMixin
-			from sklearn.preprocessing import OneHotEncoder
-			from category_encoders import OrdinalEncoder
+	### train
 
-			class DataFrameSelector(BaseEstimator, TransformerMixin):
-				def __init__(self, attribute_names):
-					self.attribute_names = attribute_names
-				def fit(self, X, y=None):
-					return self
-				def transform(self, X):
-					return X[self.attribute_names]
+		## train and validation	
 
-			# divide dataframe into predictors and target
-			X = df.drop("target_column", axis = 1)
-			y = df.target_column
-
-			# preprocess X
-			num_attributes = []
-			cat_attributes = []
-
-			num_pipeline = Pipeline([
-							('selector', DataFrameSelector(num_attributes)),
-							('imputer', Imputer()),
-							('scaler', StandardScaler())
-						])
- 
-			cat_pipeline = Pipeline([
-							('selector', DataFrameSelector(cat_attributes)),
-							('imputer', CustomImputer(strategy='mode')),
-							('label_encoder', OrdinalEncoder()),
-							('one_hot_encoder', OneHotEncoder())  # avoid this step if too much categories in a column
-						])
-
-			full_pipeline = FeatureUnion(transformer_list=[
-								("num_pipeline", num_pipeline),
-								("cat_pipeline", cat_pipeline)
-						])
-
-			full_pipeline.fit(X)
-			X = full_pipeline.transform(X)
-			
-			# preprocess y
-			from sklearn.preprocessing import LabelEncoder
-			encoder = LabelEncoder()
-			encoder.fit(y)
-			y = encoder.transform(y)
-
-			# when you get the test data in the future, just transform it using the pipeline
-			test_predictors = full_pipeline.transform(test)
-			test_target = encoder.fit(test_target)
-
-			# split data into train and test
+			# split data
 			from sklearn.model_selection import train_test_split
-			X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 4, stratify = y)
+			X_train, X_val, y_train, y_val = train_test_split(X, y, test_size = 0.20, random_state = 4, stratify = y)
+
+			# create model
+			model = set_classifier()
+			
+			# train model
+			model.fit(X_train, y_train)
+
+			# evaluate
+			y_val_hat = model.predict(X_val)
+
+		## cross-validation
+
+			# get estimate of model performance using cross validation
+			from sklearn.model_selection import cross_validate
+			scoring = ['accuracy', 'roc_auc', 'precision', 'recall']
+			scores = cross_validate(model, X, y, cv=5, scoring=scoring)
+			sorted(scores.keys())
+
+			# k-fold cross validation
+			from sklearn.model_selection import StratifiedKFold
+			skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=4)
+			for train_index, val_index in skf.split(X, y):
+				X_train, X_val = X[train_index], X[val_index]
+				y_train, y_val = y[train_index], y[val_index]
+				
+				# train on train set
+
+				# evaluate on validation set
+		
+
+		## hyperparameter tuning
+
+			from sklearn.model_selection import GridSearchCV
+			from sklearn.model_selection import RandomizedSearchCV
+			param_grid = [{'param_name': [list_of_parameters_to_try], 'param_name': []}
+						  {'C': [1, 10, 100, 1000], 'kernel': ['linear']},
+						  {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001], 'kernel': ['rbf']}]
+			scoring = ['accuracy', 'roc_auc', 'precision', 'recall']
+			
+			# exhaustive search
+			search = GridSearchCV(model, param_grid, scoring, cv=5, refit=True, n_jobs=-1)
+			
+			# sample the search space to save resources
+			search = RandomizedSearchCV(model, param_grid, scoring, cv=5, refit=True, n_jobs=-1, random_state=4)
+
+			# results
+			search.cv_results_
+			score.best_score_
+			score.best_params_
+
+==============================================================================================================================
+
+	### model evaluation
+
+		from sklearn import metrics
+
+		# return default metric
+		model.score(X_test, y_test)                     # return accuracy/r-squared
+			
+		# regression
+		from sklearn.metrics import r2_score
+		metrics.r2_score(y_test, y_pred)
+
+		from sklearn.metrics import mean_squared_error
+		metrics.mean_squared_error(y_test, y_pred)
+
+		# classification
+
+def print_confusion_matrix(y_true, y_pred):
+    """
+    Input:
+        y_true : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred : array of predicted probabilities. Eg: [0.05, 0.55, 0.2, 0.8, 0.95].
+    
+    Output:
+        confusion matrix
+    """
+    
+    tn, fp, fn, tp = metrics.confusion_matrix(y_true, y_pred).ravel()
+    
+    # rates
+    tpr = tp/(tp+fn)  # sensitivity, recall
+    fpr = fp/(fp+tn)
+    fnr = fn/(tp+fn)
+    tnr = tn/(fp+tn)  # specificity
+    
+    # PPV and NPV
+    ppv = tp/(tp+fp)  # precision
+    npv = tn/(tn+fn)
+    
+    # accuracy
+    accuracy = (tp+tn)/(tn+fp+fn+tp)
+    
+    # f1 score
+    f1_score = 2*(ppv*tpr)/(ppv+tpr)
+    
+    # print results
+    margin_length = 50
+    print(metrics.confusion_matrix(y_true, y_pred, labels=[1, 0]), "\n", "-"*margin_length)
+    print("TPR: {:.4f}".format(tpr), "\n", "-"*margin_length)
+    print("TNR: {:.4f}".format(tnr), "\n", "-"*margin_length)
+    print("PPV: {:.4f}".format(ppv), "\n", "-"*margin_length)
+    print("NPV: {:.4f}".format(npv), "\n", "-"*margin_length)
+    print("Accuracy: {:.4f}".format(accuracy), "\n", "-"*margin_length)
+    pass
+
+def plot_roc_curve(y_true, y_pred):
+    """
+    Input:
+        y_true  : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+    Output:
+        ROC curve
+    """
+    
+    plt.figure(figsize=(5, 5))
+    
+    # no skill: predict majority class
+    major_class = np.argmax(np.bincount(y))
+    pred        = [major_class for _ in range(len(y_true))]
+    auc         = metrics.roc_auc_score(y_true, pred)
+    fpr, tpr, _ = metrics.roc_curve(y_true, pred)
+    plt.plot(fpr, tpr, '--', color='black', label='No skill (AUC = {:.1f})'.format(auc))
+    
+    # chance: predict randomly weighted by class distribution
+    pred        = np.random.choice(a       = [0, 1], 
+                                   size    = len(y_true), 
+                                   replace = True, 
+                                   p       = np.bincount(y)/len(y))
+    
+    auc         = metrics.roc_auc_score(y_true, pred)
+    fpr, tpr, _ = metrics.roc_curve(y_true, pred)
+    plt.plot(fpr, tpr, '--', color='grey', label='Chance (AUC = {:.3f})'.format(auc))
+    
+    # model
+    auc         = metrics.roc_auc_score(y_true, y_pred)
+    fpr, tpr, _ = metrics.roc_curve(y_true, y_pred)
+    plt.plot(fpr, tpr, color='red', label='Model (AUC = {:.3f})'.format(auc))
+
+    # axis labels
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.grid('on')
+    plt.axis('square')
+    plt.legend()
+    plt.tight_layout()
+    plt.title('ROC Curve', fontsize=10)
+    pass
+
+def plot_pr_curve(y_true, y_pred):
+    """
+    Input:
+        y_true  : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+    Output:
+        Precision-recall curve
+    """
+
+    plt.figure(figsize=(8, 8))
+
+    # no skill: predict majority class
+    major_class = np.argmax(np.bincount(y))
+    pred        = [major_class for _ in range(len(y_true))]
+    p, r, _     = metrics.precision_recall_curve(y_true, pred, pos_label=1)
+    plt.plot(p, r, '--', color='grey', label='No skill')
+
+    # chance: predict randomly weighted by class distribution
+    pred = np.random.choice(a       = [0, 1], 
+                            size    = len(y_true), 
+                            replace = True, 
+                            p       = np.bincount(y)/len(y))
+    
+    p, r, _ = metrics.precision_recall_curve(y_true, pred, pos_label=1)
+    plt.plot(p, r, '--', color='black', label='Chance')
+
+    # model
+    p, r, _ = metrics.precision_recall_curve(y_true, y_pred, pos_label=1)
+    plt.plot(p, r, color='red', label='Model')
+
+    # plot aesthetics
+    plt.xlim([0, 1])
+    plt.legend()
+    plt.xlabel('Precision')
+    plt.ylabel('Recall')
+    plt.grid('on')
+    plt.tight_layout()
+    plt.title('Precision-Recall Curve', fontsize=10)
+    pass
+
+def optimize_roc_threshold(y_true, y_pred_probs, method="tpr_fnr_balance", cost=[], min_threshold=0, max_threshold=1, step=0.01, verbose = 0):
+    """
+    Input:
+        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
+        method        : "tpr_fpr_balance" returns threshold where TPR and FPR are closest.
+                        "min_cost" returns threshold with least cost
+        cost          : list containing cost of false positive and false negatives, respectively. Eg: [20, 60]
+        min_threshold : a float describing minimum value of threshold to try
+        max_threshold : a float describing maximum value of threshold to try
+        step          : a float describing the jumps between minimum and maximum threshold.
+        verbose       : 0 for no output, 1 for modest output, 2 for all output.
+        
+    Output:
+        optimized_value : best_cost or min_difference
+        best_threshold 
+    """
+    
+    thresholds = np.arange(min_threshold, max_threshold, step).tolist()
+    
+    if method == "min_cost":
+        if len(cost) == 2:
+            fp_cost = cost[0]
+            fn_cost = cost[1]
+        elif len(cost) == 0:
+            raise ValueError("Missing parameter: {''}".format("cost"))
+        else:
+            raise ValueError("Cost requires two parameters. Passed cost has {} parameters".format(len(cost)))
+
+        # initialize best_cost
+        best_threshold = 1
+        y_pred_bin = [1 if prob >= best_threshold else 0 for prob in y_pred_probs]
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+        best_cost = fp*fp_cost + fn*fn_cost
+
+
+        # calculate cost at all possible thresholds
+        for index, threshold in enumerate(thresholds):
+            y_pred_bin = [1 if prob >= threshold else 0 for prob in y_pred_probs]
+
+            # confusion matrix
+            tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+
+            # cost
+            cost = fp*fp_cost + fn*fn_cost
+
+            # compare costs
+            if cost < best_cost:
+                best_cost=cost
+                best_threshold=threshold
+
+            # print threshold and cost
+            if verbose == 1:
+                if index % (((max_threshold-min_threshold)/step)/5) == 0:
+                    print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(cost, 2)))
+                    
+            elif verbose == 2:
+                print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(cost, 2)))
+
+        # print result 
+        print("Optimum cost: {}".format(round(best_cost, 4)))
+        print("Optimum threshold: {}".format(round(best_threshold, 4)))
+
+        return best_threshold
+    
+        
+    elif method == "tpr_fnr_balance":
+        
+        # initialize min_difference
+        best_threshold = 1
+        y_pred_bin = [1 if prob >= best_threshold else 0 for prob in y_pred_probs]
+        
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+    
+        # sensitivity
+        tpr = tp/(tp+fn)
+
+        # specificity
+        fnr = fn/(tp+fn)
+        
+        # difference
+        min_difference = abs(tpr-fnr)
+
+
+        # calculate difference at all possible thresholds
+        for index, threshold in enumerate(thresholds):
+            y_pred_bin = [1 if prob >= threshold else 0 for prob in y_pred_probs]
+
+            # confusion matrix
+            tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
+    
+            # sensitivity
+            tpr = tp/(tp+fn)
+
+            # specificity
+            fnr = fn/(tp+fn)
+            
+            # difference
+            difference = abs(tpr-fnr)
+
+            # compare differences
+            if difference < min_difference:
+                min_difference=difference
+                best_threshold=threshold
+
+            # print threshold and difference
+            if verbose == 1:
+                if index % (((max_threshold-min_threshold)/step)/5) == 0:
+                    print("Threshold: {:.2f} \t (TPR-FNR): {:.2f}".format(round(threshold, 2), round(difference, 2)))
+                    
+            elif verbose == 2:
+                print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(difference, 2)))
+        
+        # print result
+        print("Minimum absolute (TPR-FNR) difference: {}".format(round(min_difference, 4)))
+        print("Optimum threshold: {}".format(round(best_threshold, 4)))
+        
+        return best_threshold
+        
+        
+    else:
+        raise ValueError("Enter a valid method!. Possible methods are: [{}, {}]. Method passed: {}".format("min_cost", "tpr_fnr_balance", method))
 
 ==============================================================================================================================
 
@@ -433,224 +734,6 @@
 	        
 	        from sklearn.externals.joblib import load
 	        model = load("filename.sav")
-
-==============================================================================================================================
-
-	### model evaluation
-
-		## return default metric
-			model.score(X_test, y_test)                     # return accuracy/r-squared
-			
-		## regression
-
-			from sklearn.metrics import r2_score
-			r2_score(y_test, y_pred)
-
-			from sklearn.metrics import mean_squared_error
-			mean_squared_error(y_test, y_pred)
-
-		## classification
-
-# confusion matrix
-def print_confusion_matrix(y_true, y_pred):
-    """
-    Input:
-        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
-        y_pred_probs  : array of predicted binary labels. Eg: [0, 1, 0, 1, 1].
-    Output:
-        confusion matrix
-    """
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    
-    # rates
-    tpr = tp/(tp+fn)
-    fpr = fp/(fp+tn)
-    fnr = fn/(tp+fn)
-    tnr = tn/(fp+tn)
-    
-    # PPV and NPV
-    ppv = tp/(tp+fp)
-    npv = tn/(tn+fn)
-    
-    # accuracy
-    accuracy = (tp+tn)/(tn+fp+fn+tp)
-    
-    # f-1 score
-    f1_score = 2*(ppv*tpr)/(ppv+tpr)
-    
-    # print results
-    margin_length = 40
-    print("Sensitivity: {:.4f}\n".format(tpr), "="*margin_length)
-    print("Specificity: {:.4f}\n".format(tnr), "="*margin_length)
-    print("Positive Predicted Value: {:.4f}\n".format(ppv), "="*margin_length)
-    print("Negative Predicted Value: {:.4f}\n".format(npv), "="*margin_length)
-    print("Accuracy: {:.4f}\n".format(accuracy), "="*margin_length)
-    
-    return confusion_matrix(y_true, y_pred)
-
-
-# plot roc curve
-def plot_roc_curve(y_true, y_pred_probs, model_name="Model"):
-    """
-    Input:
-        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
-        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
-    Output:
-        ROC and AUC curve
-    """
-    # generate zero probabilities
-    zero_probs = [0 for _ in range(len(y_true))]
-
-    # calculate scores
-    zero_probs_auc = roc_auc_score(y_true, zero_probs)
-    y_pred_probs_auc = roc_auc_score(y_true, y_pred_probs)
-
-    # summarize scores
-    print('No Skill: ROC AUC=%.3f' % (zero_probs_auc))
-    print('Logistic: ROC AUC=%.3f' % (y_pred_probs_auc))
-
-    # calculate roc curves
-    base_fpr, base_tpr, _ = roc_curve(y_true, zero_probs)
-    model_fpr, model_tpr, _ = roc_curve(y_true, y_pred_probs)
-
-    # plot the roc curve for the model
-    plt.plot(base_fpr, base_tpr, linestyle='--', label='No Skill')
-    plt.plot(model_fpr, model_tpr, marker='.', label=model_name)
-
-    # axis labels
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-
-    # show the legend
-    plt.legend()
-
-    # show the plot
-    plt.show()
-
-
-# get best threshold
-def optimize_roc_threshold(y_true, y_pred_probs, method="tpr_fnr_balance", cost=[], min_threshold=0, max_threshold=1, step=0.01, verbose = 0):
-    """
-    Input:
-        y_true        : array of true binary labels. Eg: [0, 1, 0, 0, 1].
-        y_pred_probs  : array of probability scores. Eg: [0.12, 0.43, 0.26, 0.67, 0.49].
-        method        : "tpr_fpr_balance" returns threshold where TPR and FPR are closest.
-                        "min_cost" returns threshold with least cost
-        cost          : list containing cost of false positive and false negatives, respectively. Eg: [20, 60]
-        min_threshold : a float describing minimum value of threshold to try
-        max_thrshold  : a float describing maximum value of threshold to try
-        step          : a float describing the jumps between minimum and maximum threshold.
-        verbose       : 0 for no output, 1 for modest output, 2 for all output.
-        
-    Output:
-        optimized_value : best_cost or min_difference
-        best_threshold 
-    """
-    
-    thresholds = np.arange(min_threshold, max_threshold, step).tolist()
-    
-    if method == "min_cost":
-        if len(cost) == 2:
-            fp_cost = cost[0]
-            fn_cost = cost[1]
-        elif len(cost) == 0:
-            raise ValueError("Missing parameter: {''}".format("cost"))
-        else:
-            raise ValueError("Cost requires two parameters. Passed cost has {} parameters".format(len(cost)))
-
-        # initialize best_cost
-        best_threshold = 1
-        y_pred_bin = [1 if prob >= best_threshold else 0 for prob in y_pred_probs]
-        tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
-        best_cost = fp*fp_cost + fn*fn_cost
-
-
-        # calculate cost at all possible thresholds
-        for index, threshold in enumerate(thresholds):
-            y_pred_bin = [1 if prob >= threshold else 0 for prob in y_pred_probs]
-
-            # confusion matrix
-            tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
-
-            # cost
-            cost = fp*fp_cost + fn*fn_cost
-
-            # compare costs
-            if cost < best_cost:
-                best_cost=cost
-                best_threshold=threshold
-
-            # print threshold and cost
-            if verbose == 1:
-                if index % (((max_threshold-min_threshold)/step)/5) == 0:
-                    print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(cost, 2)))
-                    
-            elif verbose == 2:
-                print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(cost, 2)))
-
-        # print result 
-        print("Optimum cost: {}".format(round(best_cost, 4)))
-        print("Optimum threshold: {}".format(round(best_threshold, 4)))
-
-        return best_threshold
-    
-        
-    elif method == "tpr_fnr_balance":
-        
-        # initialize min_difference
-        best_threshold = 1
-        y_pred_bin = [1 if prob >= best_threshold else 0 for prob in y_pred_probs]
-        
-        tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
-    
-        # sensitivity
-        tpr = tp/(tp+fn)
-
-        # specificity
-        fnr = fn/(tp+fn)
-        
-        # difference
-        min_difference = abs(tpr-fnr)
-
-
-        # calculate difference at all possible thresholds
-        for index, threshold in enumerate(thresholds):
-            y_pred_bin = [1 if prob >= threshold else 0 for prob in y_pred_probs]
-
-            # confusion matrix
-            tn, fp, fn, tp = confusion_matrix(y_true, y_pred_bin).ravel()
-    
-            # sensitivity
-            tpr = tp/(tp+fn)
-
-            # specificity
-            fnr = fn/(tp+fn)
-            
-            # difference
-            difference = abs(tpr-fnr)
-
-            # compare differences
-            if difference < min_difference:
-                min_difference=difference
-                best_threshold=threshold
-
-            # print threshold and difference
-            if verbose == 1:
-                if index % (((max_threshold-min_threshold)/step)/5) == 0:
-                    print("Threshold: {:.2f} \t (TPR-FNR): {:.2f}".format(round(threshold, 2), round(difference, 2)))
-                    
-            elif verbose == 2:
-                print("Threshold: {:.2f} \t Cost: {:.2f}".format(round(threshold, 2), round(difference, 2)))
-        
-        # print result
-        print("Minimum absolute (TPR-FNR) difference: {}".format(round(min_difference, 4)))
-        print("Optimum threshold: {}".format(round(best_threshold, 4)))
-        
-        return best_threshold
-        
-        
-    else:
-        raise ValueError("Enter a valid method!. Possible methods are: [{}, {}]. Method passed: {}".format("min_cost", "tpr_fnr_balance", method))
 
 
 ==============================================================================================================================

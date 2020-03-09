@@ -115,6 +115,10 @@ git config --global <field> <value>         # change setting, for example, git c
 	# create and switch branch
 	git checkout -b <branch-name>
 
+	# delete branch
+	git branch -d <branch-name>                    # deletes local branch
+	git push <remote-name> --delete <branch-name>  # deletes remote branch
+
 # merge
 git merge <source-branch-name> <destination-branch-name>
 

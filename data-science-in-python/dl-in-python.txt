@@ -683,7 +683,7 @@
 			from keras.callbacks import ReduceLROnPlateau
 			reduce_lr = ReduceLROnPlateau(monitor     =  'val_loss',
 										  factor      =  0.1,                # reduce lr by this factor
-										  patience    =  10,                 # lr is reduced if htere is no improvement in monitor metric for 10 epochs
+										  patience    =  10,                 # lr is reduced if there is no improvement in monitor metric for 10 epochs
 										  verbose     =  0/1,                # verbosity
 										  mode        =  'auto',             # maximise or minimise the monitoring quantity before saving
 										  min_delta   =  0.0001,             # improvement in score less than min_delta will not be considered as an improvement 

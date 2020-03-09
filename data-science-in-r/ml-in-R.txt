@@ -1116,44 +1116,81 @@
 
 	# cleaning data
 
-		bag <- Corpus(VectorSource(data_frame$textVariable))
+        # tm
 
-		bag <- tm_map(bag, tolower)
+    		bag <- Corpus(VectorSource(data_frame$textVariable))
 
-		bag <- tm_map(bag, PlainTextDocument)
+    		bag <- tm_map(bag, tolower)
 
-		bag <- tm_map(bag, removePunctuation)
+    		bag <- tm_map(bag, PlainTextDocument)
 
-		bag <- tm_map(bag, removeWords, c("your custom words", stopwords("english")))
+            bag <- tm_map(bag, content_transformer(removeNumbers))
 
-		bag <- tm_map(bag, stripWhitespace)
+    		bag <- tm_map(bag, removePunctuation)
 
-		bag <- tm_map(bag, stemDocument)
+    		bag <- tm_map(bag, removeWords, c("your custom words", stopwords("english")))
 
-	# converting to data frame
+    		bag <- tm_map(bag, stripWhitespace)
 
-		frequencies <- DocumentTermMatrix(bag)
+    		bag <- tm_map(bag, stemDocument)
 
-		findFreqTerms(frequencies, lowfreq = 20) # to words that appear atleast 20 times
+        # tidytext
 
-		sparseWords <- removeSparseTerms(frequencies, 0.995) # words that appear in 99.5 percent tweets
 
-		sparseWords <- as.data.frame(as.matrix(sparseWords)) # converting the matrix of sparse words to data frame
 
-		colnames(sparseWords) <- make.names(colnames(sparseWords))
+	# convert to document term matrix
+
+        # tm
+
+    		frequencies <- DocumentTermMatrix(bag)
+
+    		findFreqTerms(frequencies, lowfreq = 20) # to words that appear atleast 20 times
+
+    		sparseWords <- removeSparseTerms(frequencies, 0.995) # words that appear in 99.5 percent tweets
+
+    		sparseWords <- as.data.frame(as.matrix(sparseWords)) # converting the matrix of sparse words to data frame
+
+    		colnames(sparseWords) <- make.names(colnames(sparseWords))
+
+        # tidytext
+
+
 
 	# wordcloud
 
-		bag <- TermDocumentMatrix(bag)
-		bag <- as.matrix(bag)
-		bag <- sort(rowSums(bag), decreasing = T)
-		bag.df <- data.frame(word = names(bag), freq = bag)
+        # tm
 
-		set.seed(154)
+    		bag <- TermDocumentMatrix(bag)
+    		bag <- as.matrix(bag)
+    		bag <- sort(rowSums(bag), decreasing = T)
+    		bag.df <- data.frame(word = names(bag), freq = bag)
 
-		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
-	    			max.words=1500, random.order=FALSE, rot.per=0.35,
-        			colors=brewer.pal(8, "Dark2"), scale = c(5,0.5))
+    		set.seed(154)
+
+    		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
+    	    			max.words=1500, random.order=FALSE, rot.per=0.35,
+            			colors=brewer.pal(8, "Dark2"), scale = c(5,0.5))
+
+    # topic modeling
+
+        library(tidytext)
+        library(topicmodels)
+        topic_model <- LDA(documents, k=num_topics, control=list(seed=4))
+        topics <- tidy(topic_model, matrix = "beta")
+
+        top_terms <- topics %>% 
+                     group_by(topic) %>% 
+                     top_n(10, beta) %>%
+                     ungroup() %>%
+                     arrange(topic, -beta)
+
+
+        top_terms %>% mutate(term = reorder(term, beta)) %>%
+                      ggplot(aes(term, beta, fill = factor(topic))) +
+                      geom_col(show.legend = FALSE) +
+                      facet_wrap(~ topic, scales = "free") +
+                      coord_flip()
+
 
 ==============================================================================================================================
 
