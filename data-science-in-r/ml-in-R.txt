@@ -958,7 +958,7 @@
 
 ==============================================================================================================================
 
-### one-hot Encoding
+### one-hot encoding
 
 		library(caret)
 
@@ -1113,12 +1113,15 @@
 		library(SnowballC)
 		library(wordcloud)
 		library(RColorBrewer)
+        library(rtweet)
+        library(RSelenium)
+        library(tidytext)
 
 	# cleaning data
 
         # tm
 
-    		bag <- Corpus(VectorSource(data_frame$textVariable))
+    		bag <- Corpus(VectorSource(df$text))
 
     		bag <- tm_map(bag, tolower)
 
@@ -1134,26 +1137,86 @@
 
     		bag <- tm_map(bag, stemDocument)
 
-        # tidytext
+            # document term matrix
+            frequencies <- DocumentTermMatrix(bag)
 
+            findFreqTerms(frequencies, lowfreq = 20)              # to words that appear atleast 20 times
 
+            sparseWords <- removeSparseTerms(frequencies, 0.995)  # only retain words that appear in 99.5 percent tweets
 
-	# convert to document term matrix
+            sparseWords <- as.data.frame(as.matrix(sparseWords))  # converting the matrix of sparse words to data frame
 
-        # tm
+            colnames(sparseWords) <- make.names(colnames(sparseWords))
 
-    		frequencies <- DocumentTermMatrix(bag)
-
-    		findFreqTerms(frequencies, lowfreq = 20) # to words that appear atleast 20 times
-
-    		sparseWords <- removeSparseTerms(frequencies, 0.995) # words that appear in 99.5 percent tweets
-
-    		sparseWords <- as.data.frame(as.matrix(sparseWords)) # converting the matrix of sparse words to data frame
-
-    		colnames(sparseWords) <- make.names(colnames(sparseWords))
 
         # tidytext
 
+            # tokenize
+            tidy_text <- text %>% 
+                         select(id, text) %>%          # id is similar to a primary key
+                         unnest_tokens("word", text)
+
+            # remove stopwords
+            data("stop_words")
+            tidy_text <- tidy_text %>%
+                         anti_join(stop_words)
+
+            # remove numbers
+            tidy_text <- tidy_text[-grep("\\b\\d+\\b", tidy_text$word), ]
+
+            # remove whitespace
+            tidy_text$word <- gsub("\\s+", "", tidy_text$word)
+
+            # stemming
+            tidy_text <- tidy_text %>%
+                         mutate_at("word", funs(wordStem((.), language="en")))
+
+            # document term matrix
+            tidy_text_dtm <- tidy_text %>% 
+                             count(id, word) %>% 
+                             cast_dtm(id, word, n)
+
+            # tf-idf
+            tidy_text <- tidy_text %>%
+                         count(word, id) %>%
+                         bind_tf_idf(word, id, n)
+
+    # sentiment analysis
+    tidy_text_sentiment <- tidy_text %>% inner_join(get_sentiments("bing")) %>% count(id, sentiment)
+
+
+    # topic modeling
+
+            # LDA
+            library(topicmodels)
+            topic_model <- LDA(tidy_text_dtm, k=10, control = list(seed = 4))
+            topics <- tidy(topic_model, matrix = "beta")
+
+            top_terms <- topics %>%
+                         group_by(topic) %>%
+                         top_n(10, beta) %>%
+                         ungroup() %>%
+                         arrange(topic, -beta) %>%
+                         mutate(term = reorder(term, beta)) %>%
+                         ggplot(aes(term, beta, fill = factor(topic))) +
+                         geom_col(show.legend = FALSE) +
+                         facet_wrap(~ topic, scales = "free") +
+                         coord_flip()
+
+            # structured topic model
+            library(stm)
+            processed <- textProcessor(df$documents, metadata = df)
+            out <- prepDocuments(processed$documents, processed$vocab, processed$meta)
+            stm <- stm(documents = out$documents, vocab = out$vocab, 
+                       K = 10, prevalence =~ rating + s(day), 
+                       max.em.its = 75, data = out$meta,
+                       init.type = "Spectral", verbose = FALSE)
+
+            plot(stm)
+            findThoughts(stm, texts = df$documents, n=2, topics=3)
+
+            # search k
+            findingk <- searchK(out$documents, out$vocab, K = c(10:30), prevalence =~ rating + s(day), data = meta, verbose=FALSE)
 
 
 	# wordcloud
@@ -1170,26 +1233,6 @@
     		wordcloud(words = bag.df$word, freq = bag.df$freq, min.freq = 30,
     	    			max.words=1500, random.order=FALSE, rot.per=0.35,
             			colors=brewer.pal(8, "Dark2"), scale = c(5,0.5))
-
-    # topic modeling
-
-        library(tidytext)
-        library(topicmodels)
-        topic_model <- LDA(documents, k=num_topics, control=list(seed=4))
-        topics <- tidy(topic_model, matrix = "beta")
-
-        top_terms <- topics %>% 
-                     group_by(topic) %>% 
-                     top_n(10, beta) %>%
-                     ungroup() %>%
-                     arrange(topic, -beta)
-
-
-        top_terms %>% mutate(term = reorder(term, beta)) %>%
-                      ggplot(aes(term, beta, fill = factor(topic))) +
-                      geom_col(show.legend = FALSE) +
-                      facet_wrap(~ topic, scales = "free") +
-                      coord_flip()
 
 
 ==============================================================================================================================

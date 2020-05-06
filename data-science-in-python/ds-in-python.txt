@@ -627,13 +627,16 @@
 
     import matplotlib.pyplot as plt
     
-    ## plots
+    ## plot types
 
     	# line plot
-        plt.plot(x, y, color="", marker = "", linestyle = "")
+        plt.plot(x, y, color='', marker = '', linestyle = '', alpha=0.7)
 
         # histogram
         plt.hist(x, bins = 30, rwidth = 0.9)           # or pass a list of bin cutoff points
+
+        # bar plot
+        plt.bar(x, y)
 
         # scatter plot
         plt.scatter(x, y, s = "size_variable", c = "color_variable", alpha = )
@@ -641,31 +644,51 @@
         # boxplot
         plt.boxplot(x)
 
-        # plotting images
-        image = plt.imread("image.jpg")
-        plt.imshow(image, extent = , aspect = )
-        plt.axis("off")
-
-        collapsed = image.mean(axis=2)                 # average out all pixel intensities to get one channel color instead of three
-        plt.set_cmap("gray")                           # change printing color to black and white
-        plt.imshow(collapsed, cmap="gray")
-        plt.axis("off")
-
         plt.show()                                     # display plot
 		plt.clf()                                      # clear plot
+
+
+    ## object-oriented plotting
+
+        # single plot
+        fig  = plt.figure(figsize=(5, 5))
+        axes = fig.add_axes([left, bottom, width, height])  # [0.0, 0.0, 1.0, 1.0]
+        axes.plot(x, y)
+        axes.set_xlabel('', fontsize=10)
+        axes.set_ylabel('')
+        axes.set_title('')
+
+        # multiple plots
+        fig = plt.figure()
+        big = fig.add_axes([0, 0, 1, 1])
+        big.plot(x, y)
+
+        small = fig.add_axes([0.5, 0.5, 0.3, 0.3])
+        small.scatter(x, y)
+
+        # subplots
+        fig, axes = subplots(n_row, n_col, figsize=()) # index starts from 1
+
+        axes[(row, col)].plot((x, y))                  # index starts from 0
+        axes[(row, col)].plot((x, y))                  # index starts from 0
+        axes[(row, col)].plot((x, y))                  # index starts from 0
+        axes[(row, col)].set_title('')
+        axes[(row, col)].set_suptitle('')
+
+        axes.tight_layout()
+
 
     ## customization
 
     	# themes and styles
-        plt.style.available
-        plt.style.use("ggplot")
-
+        plt.style.use("ggplot")                        # run plt.style.available to check avialble plots
+        
     	# figure size
-        plt.figure(figsize=(5, 5))                     # change it before plotting
+        plt.figure(figsize=(width, height))            # change it before plotting
         
         # labels
         plt.xlabel("x", fontsize=10)                   # see other parameters: https://matplotlib.org/3.1.1/api/text_api.html#matplotlib.text.Text
-        plt.ylabel("y")
+        plt.ylabel("y")                                # or axes.set_ylabel()
         plt.title("title")
         plt.suptitle("super title")
         
@@ -677,32 +700,21 @@
         # legend
         plt.plot(x, y, color = "blue", label = "male")
         plt.plot(x, y, color = "red", label = "female")
-        plt.legend(loc = "upper right")                # "upper/lower/center left/right"
-
-        # zooming and axis
-        plt.xlim([xmin, xmax])                         # zoom in
-        plt.ylim([ymin, ymax])
-        plt.axis([xmin, xmax, ymin, ymax], 
-        		 option = "off/equal/square/tight")
-
-        # transformation
-        plt.xscale("log")                              # transform x-axis to log scale
-        plt.yscale("log")                              # transform y-axis to log scale
-
-        # multiple plots using axes()
-        plt.axes([x_lo, y_lo, width, height])          # all parameters between 0 and 1
-        plt.plot(x, y, color = "red")
-        plt.axes([x_lo, y_lo, width, height])
-        plt.plot(a, b, color = "blue")
-        plt.show()
+        plt.legend(loc = "upper right")                # or axes.legend()
 
         # multiple plots using subplot()
-        plt.subplot(nrows, ncols, nsubplot)            # all parameters indexed from 1
+        plt.subplot(nrows, ncols, nsubplot)            # all parameters indexed from 1   
         plt.plot(x, y, color = "red")
+        plt.title()                                    # each plot can have its own labels and title
+
         plt.subplot(nrows, ncols, nsubplot)            # activate nth subplot
         plt.plot(a, b, color = "blue")
+            
         plt.tight_layout()                             # pad space between two plots
-        plt.show()
+
+        # zooming and axis
+        plt.xlim([xmin, xmax])                         # or axes.set_xlim()
+        plt.ylim([ymin, ymax])
 
         # text and arrows
         plt.annotate("text",
@@ -714,6 +726,18 @@
 
         plt.text(x, y, s = "show this text at (x,y)")  # display text on x,y point
         plt.grid(True)                                 # to enable the text
+
+
+    ## images
+
+        image = plt.imread("image.jpg")
+        plt.imshow(image, extent = , aspect = )
+        plt.axis("off")
+
+        collapsed = image.mean(axis=2)                 # average out all pixel intensities to get one channel color instead of three
+        plt.set_cmap("gray")                           # change printing color to black and white
+        plt.imshow(collapsed, cmap="gray")
+        plt.axis("off")
 
 ==============================================================================================================================
 

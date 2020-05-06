@@ -225,6 +225,42 @@ def print_confusion_matrix(y_true, y_pred):
     print("Accuracy: {:.4f}".format(accuracy), "\n", "-"*margin_length)
     pass
 
+
+def plot_confusion_matrix(y_true, y_pred, normalize=False):
+    """
+    Input:
+        y_true    : array of true binary labels. Eg: [0, 1, 0, 0, 1].
+        y_pred    : array of predicted probabilities. Eg: [0.05, 0.55, 0.2, 0.8, 0.95].
+        normalize : whether to show counts of proportion in a cell
+    
+    Output:
+        confusion matrix
+    """
+    cm = metrics.confusion_matrix(y_true, y_pred_classes)
+    
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title('Confusion Matrix')
+    plt.colorbar()
+    classes = np.unique(y_true)
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    if(normalize):
+        precision=4
+        cm = np.round(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], precision)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+
 def plot_roc_curve(y_true, y_pred):
     """
     Input:
@@ -237,7 +273,7 @@ def plot_roc_curve(y_true, y_pred):
     plt.figure(figsize=(5, 5))
     
     # no skill: predict majority class
-    major_class = np.argmax(np.bincount(y))
+    major_class = np.argmax(np.bincount(y_true))
     pred        = [major_class for _ in range(len(y_true))]
     auc         = metrics.roc_auc_score(y_true, pred)
     fpr, tpr, _ = metrics.roc_curve(y_true, pred)
@@ -247,7 +283,7 @@ def plot_roc_curve(y_true, y_pred):
     pred        = np.random.choice(a       = [0, 1], 
                                    size    = len(y_true), 
                                    replace = True, 
-                                   p       = np.bincount(y)/len(y))
+                                   p       = np.bincount(y_true)/len(y_true))
     
     auc         = metrics.roc_auc_score(y_true, pred)
     fpr, tpr, _ = metrics.roc_curve(y_true, pred)
@@ -280,7 +316,7 @@ def plot_pr_curve(y_true, y_pred):
     plt.figure(figsize=(8, 8))
 
     # no skill: predict majority class
-    major_class = np.argmax(np.bincount(y))
+    major_class = np.argmax(np.bincount(y_true))
     pred        = [major_class for _ in range(len(y_true))]
     p, r, _     = metrics.precision_recall_curve(y_true, pred, pos_label=1)
     plt.plot(p, r, '--', color='grey', label='No skill')
@@ -289,20 +325,20 @@ def plot_pr_curve(y_true, y_pred):
     pred = np.random.choice(a       = [0, 1], 
                             size    = len(y_true), 
                             replace = True, 
-                            p       = np.bincount(y)/len(y))
+                            p       = np.bincount(y_true)/len(y_true))
     
     p, r, _ = metrics.precision_recall_curve(y_true, pred, pos_label=1)
-    plt.plot(p, r, '--', color='black', label='Chance')
+    plt.plot(r, p, '--', color='black', label='Chance')
 
     # model
     p, r, _ = metrics.precision_recall_curve(y_true, y_pred, pos_label=1)
-    plt.plot(p, r, color='red', label='Model')
+    plt.plot(r, p, color='red', label='Model')
 
     # plot aesthetics
     plt.xlim([0, 1])
     plt.legend()
-    plt.xlabel('Precision')
-    plt.ylabel('Recall')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
     plt.grid('on')
     plt.tight_layout()
     plt.title('Precision-Recall Curve', fontsize=10)
@@ -433,7 +469,10 @@ def optimize_roc_threshold(y_true, y_pred_probs, method="tpr_fnr_balance", cost=
 
 
 def plot_decision_boundary(X, y, model):
-    ''' Plots decision boundary of a model. Plots the first two features by default. '''
+    ''' 
+    Plots decision boundary of a model. Plots the first two features by default. 
+    Another great resource to plot decision boundary is the yellowbrick package: https://www.scikit-yb.org/en/latest/api/index.html
+    '''
     
     # initialize plot
     fig, ax = plt.subplots()
