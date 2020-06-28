@@ -1,146 +1,169 @@
 ==============================================================================================================================
-# histogram
-ggplot(aes(x=numeric_variable, fill = categorical_variable), color = "boundary_color") +
-geom_histogram(binwidth = , color = , fill = )
+# continuous
 
-# count plot
-ggplot(aes(x = categorical_variable)) +
-geom_bar(position = , color = )  # displays category counts
+	# 1D
 
-# bar plot
-ggplot(aes(x = reorder(categorical_variable, numeric_variable), y = )) +
-geom_col()
-OR
-geom_bar(stat = "identity")  # category vs corresponding num (example: country vs population)
+		# histogram
+		ggplot(df, aes(x=numeric_variable)) + 
+		geom_histogram()
 
-# scatter plot
-ggplot(df, aes(x=numeric_variable, y=numeric_variable, color=categorical_variable, size=numeric_variable)) +
-geom_point(alpha = 0.5) +
-geom_smooth(method = "lm")
+		# density plot
+		ggplot(df, aes(numeric_variable)) +
+		geom_density()
 
-# line plot
-ggplot(df, aes(x=numeric_variable, y=numeric_variable, color=categorical_variable)) +
-geom_line()
+		# boxplot
+		ggplot(df, aes(x=numeric_variable)) + 
+		geom_boxplot()
 
-# boxplot
-ggplot(df, aes(x=categorical_variable, y=numeric_variable)) +
-geom_boxplot(aes(color = categorical_variable), alpha = 0.1) # category vs num
+	# 2D
 
-# heatmap
-ggplot(df, aes(x = categorical_variable, y = categorical_variable, fill = numeric_variable)) +
-geom_tile()
+		# scatterplot
+		ggplot(df, aes(x=numeric_variable, 
+					   y=numeric_variable)) +
+		geom_point(alpha=0.5) +
+		geom_smooth(method="lm")
 
-==============================================================================================================================
-# frequency plot
-geom_freqpoly() # 1D
+		# line plot
+		ggplot(df, aes(x=numeric_variable, 
+					   y=numeric_variable)) +
+		geom_line()
 
-# density plot
-geom_density(stat = "identity") + ggplot(aes(color = categorical_variable)) # 1D
+# categorical
 
-stat_summary(fun.y=sum, geom="bar", position="stack" or "dodge" or "fill")
+	# 1D
 
-# line plots
-geom_line(stat = "summary", fun.y = function, fun.args = list(probs = 0.9), linetype = 1, aes(color = categorical_variable))
-geom_segment(aes(x = , xend = , y = , yend = ), color = "#ffffff") # to draw a line
+		# count plot
+		ggplot(data=df, aes(x=categorical_variable)) +
+  		geom_bar()
 
-==============================================================================================================================
-# add more variables
-facet_wrap(~categorical_variable)
 
-facet_grid(vertical_categorical_variable~horizontal_categorical_variable)
+	# 2D
 
-==============================================================================================================================
+  		# contingency table - group by two categorical vars and compute count
+  		ggplot(df, aes(x=categorical_variable, 
+  					   y=categorical_variable)) +
+  		geom_tile(aes(fill=count_var)
 
-coord_cartesian(xlim = c(), ylim = c()) # doesn't remove data, only zooms-in or zooms=out the graph.
+# mixed
 
-coord_trans(x = log, y = sqrt, limx = c(), limy = c()) # Used to transform the coordinate axis.
+		# barplot - group by categorical var, aggregate by numeric var
+		ggplot(data=df, aes(x=categorical_variable, 
+							y=numeric_variable)) +
+  		geom_bar(stat="identity")
 
-coord_flip()
+  		# boxplot
+  		ggplot(df, aes(x=categorical_variable, 
+  					   y=numeric_variable)) +
+		geom_boxplot()
 
-coord_polar()  # can be used with bar plot to create pie charts.
-
-coord_map()
-
-==============================================================================================================================
-# manipulate graph
-scale_x_continuous(breaks = seq(), limits = c(), labels = c())
-
-scale_color_gradient(low = "green", high = "red")
-
-# convert x and y axis to log scale
-scale_x_log10()
-scale_y_log10()
-
-# set display limits in graph to each element in aes() such as axis and colors
-expand_limits(x=c(start_point, end_point), y=c(start_point, end_point))
-
-scale_size_area()
-
-scale_color_brewer()
-
-scale_fill_brewer()
+		# heatmap
+		ggplot(df, aes(x=categorical_variable, 
+					   y=categorical_variable, 
+					   fill=numeric_variable)) +
+		geom_tile()
 
 ==============================================================================================================================
+# customization
 
-## themes
+	# labels
+	labs(title="", 
+		 subtitle="", 
+		 x="", 
+		 y="")
 
-		library(ggthemes)
+	# text annotations
 
-		# basic themes
-		theme_linedraw()
-		theme_minimal()
-		theme_light()
-		theme_classic()
-		theme_void()
-		theme_grey()
-		theme_bw()
+		# text variable
+		geom_text(aes(label=text_var))  # no box around text
+		geom_label(aes(label=text_var))  # rounded box around text
 
-		# themes from other softwares
-		theme_excel() + scale_fill_economist()
-		theme_few() + scale_fill_few()
-		theme_solarized() + scale_fill_solarized()
-		theme_stata() + scale_fill_stata()
-		theme_tufte() + scale_fill_tableau()
-		theme_gdocs() + scale_fill_gdocs()
-		theme_wsj() + scale_fill_wsj(palette = "black_green")
+		# write text on graph
+		annotate("text", 
+				 label="custom.text", 
+				 x=x.postition, 
+				 y=y.position, 
+				 size=, 
+				 colour="text.color")
 
-scale_fill/color_manual/continuous/discrete(guide = guide_legend("legend.title"),
-                                            labels = c("legend.names"),
-                                            values = c("legend.colors"))
+	# coord
+	coord_cartesian(xlim = c(), ylim = c()) # doesn't remove data, only zooms-in or zooms-out.
 
-theme(axis.line, axis.text.x = element_text(angle = 45, hjust = 1, face="bold", color="#993333", size=14),
-	  axis.ticks, axis.title.x, legend.position = "none/bottom")
+	coord_trans(x = log, y = sqrt, limx = c(), limy = c()) # transforms the variables.
 
-geom_text(aes(label = var), vjust = +/- 1) # text on top of graphs.
+	coord_flip()
 
-annotate("text", label = "custom.text",x = x.postition, y = y.position, size = , colour = "text.color")
+	coord_polar()  # can be used with bar plot to create pie charts.
 
-==============================================================================================================================
+	coord_map()
 
-## labels
+	# axis
+	scale_x_continuous(breaks=seq(), 
+					   limits=c(), 
+					   labels=c())
 
-		library(ggrepel)
-		geom_text_repel(aes(label = variable), size = 3)
-		xlab("x axis label name")
-		ylab("y axis label name")
-		ggtitle("graph title")
-		labs(title = "title", x = "x label", y = "y label")
+	scale_color_gradient(low="green", 
+						 high="red")
 
-==============================================================================================================================
+	scale_{fill,color}_{manual,continuous,discrete}(guide = guide_legend("legend.title"),
+													labels = c("legend.names"),
+													values = c("legend.colors"))
 
-## GGally
-
-		library(GGally)
-		ggpairs(data_frame[, numeric_vars])
+	# set display limits in graph to each element in aes() such as axis and colors
+	expand_limits(x=c(start_point, end_point), 
+				  y=c(start_point, end_point))
 
 ==============================================================================================================================
+# themes
 
-## gridExtra
+library(ggthemes)
 
-		library(gridExtra)
-		p1 <- ggplot()
-		p2 <- ggplot()
-		grid.arrange(p1,p2, ncol/nrow = )
+	# classic
+	theme_minimal()
+	theme_void()
+	theme_linedraw()
+	theme_light()
+	theme_classic()
+	theme_grey()
+	theme_bw()
+
+	# other software themes
+	theme_excel() + scale_fill_economist()
+	theme_few() + scale_fill_few()
+	theme_solarized() + scale_fill_solarized()
+	theme_stata() + scale_fill_stata()
+	theme_tufte() + scale_fill_tableau()
+	theme_gdocs() + scale_fill_gdocs()
+	theme_wsj() + scale_fill_wsj(palette = "black_green")
+
+	theme(axis.line, 
+		  axis.text.x=element_text(angle=45, 
+		  						   hjust=1,
+		  						   face="bold",
+		  						   color="#993333", 
+		  						   size=14),
+		  axis.ticks,
+		  axis.title.x, 
+		  legend.position="none/bottom")
+
+==============================================================================================================================
+# multiple plots
+
+	# subplots
+	library(gridExtra)
+	p1 <- ggplot()
+	p2 <- ggplot()
+	grid.arrange(p1,p2, 
+				 ncol=,
+				 nrow=)
+
+	# facet - add more variables
+	facet_wrap(~ categorical_variable)
+
+	facet_grid(vertical_categorical_variable ~ horizontal_categorical_variable)
+
+	# pair plot
+	library(GGally)
+	ggpairs(data_frame[, numeric_vars])
 
 ==============================================================================================================================
 
