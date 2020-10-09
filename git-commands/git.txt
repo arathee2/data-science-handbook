@@ -104,7 +104,7 @@ git config --global <field> <value>         # change setting, for example, git c
 # branching
 	
 	# list all branches
-	git branch
+	git branch -a
 
 	# create branch
 	git branch <branch-name>
@@ -115,6 +115,9 @@ git config --global <field> <value>         # change setting, for example, git c
 	# create and switch branch
 	git checkout -b <branch-name>
 
+	# push branch to server after creating
+	git push -u <remote-name> <branch-name>
+	
 	# delete branch
 	git branch -d <branch-name>                    # deletes local branch
 	git push <remote-name> --delete <branch-name>  # deletes remote branch
