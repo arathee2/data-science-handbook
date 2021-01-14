@@ -263,63 +263,211 @@
 # numpy
 
     import numpy as np
-
-        array = np.array([1, 2, 3, 4], dtype = )      # creates a numpy array
-        array.shape                                   # print shape of array
-        array.size                                    # number of elements
-        array.itemsize                                # size of each element in memory
-        array.dtype                                   # data type of array
-
-        np.zeros((5,3))
+    
+    # creating arrays
+        array = np.array([1, 2, 3, 4], dtype = )      # creates a numpy array. for dtype refer this: https://ibb.co/dgP01dv
+	np.arange(start, stop, step)                  # similar to seq() in R
+        np.linspace(start, stop, num, endpoint=True)  # generate `num` elements between [start, stop]
+	np.zeros((5,3))
         np.ones((5,3))
         np.empty((5,3))
+	np.full((5,3), num)                           # create a 3x5 array filled with `num`
+	np.eye(5)                                     # create a 5x5 identity matrix
+	
+    # array attributes
+    	array.ndim                                    # number of dimensions
+        array.shape                                   # shape of array
+        array.size                                    # total number of elements in array
+        array.itemsize                                # size of each element in memory
+	array.nbytes                                  # total size of array in memory (= size times itemsize)
+        array.dtype                                   # data type of array
 
-        random.seed(4)                                # set seed for random number
-        random.rand()                                 # create random number in [0.0,1.0)
-        random.randint(low, high, (size))             # create array of given size with random numbers in [low, high)
-        random.random((3, 4))                         # create 3x4 array with random numbers in [0.0,1.0)
-        random.choice([0,1,2], size, replace, p)      # generate random numbers of size from array with probability p
-        random.shuffle(array)                         # modify a sequence in-place by shuffling its contents
+    # indexing and slicing
+    
+        # indexing
+        array1D[0]                                    # returns first element
+        array2D[0, -1]                                # returns first row's last element
+        array5D[0]                                    # returns first (4D) array
+        array5D[0, 1]                                 # returns (3D) array
+        array5D[0, 1, 2]                              # returns (2D) array
+        array5D[0, 1, 2, 3]                           # returns (1D) array
+        array5D[0, 1, 2, 3, 4]                        # returns an element
+    
+        # slicing
+        array1D[start:end:step]                       # negative `step` reverses `start` and `end` argument
+        array1D[start:end]                            # omitting step equates to using the default (step=0)
+        array1D[start:]                               # omitting end equates to using the default (end = number of elements in the dimension)
+	array1D[:end]                                 # omitting start equates to using the default (start=0)
+	array1D[:]                                    # omitting all arguments equates to using default start, end and step
+	
+	# combining indexing and slicing operations
+	array2D[start:end:step, index]                # slice and index
+	array5D[2:5:2, 2, 2:5:-2, 5]                  # slice and index multidimensional array
+	
+	# fancy indexing (indexing with list)
+	ind = [1, 3, 5]
+	array1D[ind]                                  # return copy of array1D with selected indices
+	
+	ind = np.array([[0, 1], [2,3]])               # index of size 2x2
+	array1D[ind]                                  # result always has the shape of the fancy index (2x2 in this case) rather than the array being indexed
+	
+	row = np.array(0, 1, 2)
+	col = np.array(0, 1, 2)
+	array2D[row, col]                             # broadcast row and col first and then apply indexing using this broadcasted index
+	
+	ind = [0, 2]
+	array2D[2, ind]                               # combinign simple and fancy indexing
+	array2D[2:, ind]                              # combining fancy indexing and slicing
+	array2D[boolean_mask, ind]                    # combining fancy indexing and boolean masks (see boolean arrays below)
+	
+    # views vs copy
+        y = array[2:5]                                # return view - changing y will change array
+	z = np.copy(array[2:5])                       # return copy - changing z will not effect array
+	
+    # reshaping arrays
+        array = np.zeros((4, 10))
+        array.reshape((20, 2))                        # return a copy of the array (copy has the new shape)
+	array.reshape((1, 4, 10))                     # create new dimension (= `array[np.newaxis, :, :]`)
+	array.reshape((4, 1, 10))                     # create new dimension (= `array[:, np.newaxis, :]`)
+	array.reshape((4, 10, 1))                     # create new dimension (= `array[:, :, np.newaxis]`)
+        array.resize((20, 2))                         # change the array in-place
+	np.tranpose(array)
+	
+    # concatenate arrays
+        np.concatenate((a, b, c), axis=0)             # concatenate array a, b and c along an axis
+	np.vstack((a, b, c))                          # vertically stack array a, b and c (= `np.concatenate((a, b, c), axis=0)`)
+        np.hstack((a, b, c))                          # horizontally stack array a, b and c (= `np.concatenate((a, b, c), axis=1)`)
+	np.dstack((a, b, c))                          # depthwise stack array a, b and c (= `np.concatenate((a, b, c), axis=2)`)
+	np.column_stack((a, b))                       # similar to cbind in R
+        np.row_stack((a, b))                          # similar to rbind in R
+	
+    # split arrays
+	a, b, c = np.split(array, [3, 5], axis=0)     # split `array` at index 3 and 5
+	upper, lower = np.vsplit(array, [3])          # split `array` vertically at index 3 (= `np.split(array, [3], axis=0)`)
+	left, right = np.hsplit(array, [3])           # split `array` horizontally at index 3 (= `np.split(array, [3], axis=1)`)
+	closer, further = np.dsplit(array, [3])       # split `array` depthwise at index 3 (= `np.split(array, [3], axis=3)`)
 
-        np.arange(start, stop, step)                  # similar to seq() in R
-        np.linspace(start, stop, num, endpoint=True)  # generate "num" elements between [start, stop]
+    # vectorization
+	array * 7                                     # or np.multiply(array, 7). Supports +, -, /, //, ** and %
+	array1 * array2                               # or np.multiply(array1, array2). Supports +, -, /, //, ** and %
+    
+    # broadcasting rules (refer this image to know what is broadcasting: https://ibb.co/cgQFwcG)
+	Rule 1: If the two arrays differ in their number of dimensions, the shape of the one with fewer dimensions is padded with ones on its leading (left) side.
+	Rule 2: If the shape of the two arrays does not match in any dimension, the array with shape equal to 1 in that dimension is stretched to match the other shape.
+	Rule 3: If in any dimension the sizes disagree and neither is equal to 1, an error is raised.
+	
+	# example 1
+	    # initial shapes
+	    a = (2,3)
+	    b = (3)
+	    
+	    # apply rule 1 to b
+	    a = (2,3)
+	    b = (1,3)
+	    
+	    # apply rule 2 to b
+	    a = (2,3)
+	    b = (2,3)
+	
+	# example 2
+	    # initial shapes
+	    a = (3,1)
+	    b = (3)
+	    
+	    # apply rule 1 to b
+	    a = (3,1)
+	    b = (1,3)
+	    
+	    # apply rule 2 to a and b
+	    a = (3,3)
+	    b = (3,3)
+	    
+	# example 3
+	    # initial shapes
+	    a = (3,2)
+	    b = (3)
+	    
+	    # apply rule 1 to b
+	    a = (3,2)
+	    b = (1,3)
+	    
+	    # applying rule 2 to a and b results in error because shapes do not macth!
+	    a = (3,2)
+	    b = (3,3)
+	    
+	    # reshape b from (3) to (3,1) to make broadcasting work
+	    a = (3,2)
+	    b = (3,1)
+    
+    # boolean arrays
+        array > 3                                     # broadcasts the scalar 3 and returns a boolean ndarray
+	array < 3
+	array >= 3
+	array <= 3
+	array != 3
+	array == 3
+	array1 == array2
+	~array <= 0                                   # ~ is the boolean NOT operator
+	(array > 0) & (array < 10)                    # combine boolean conditions using the & (AND) or the | (OR) operator
+	
+	# using boolean arrays for aggregation (see universal functions below)
+	np.sum((array > 0) & (array < 10))            # number of positive values less than 10 in the array
+	np.any(array > 0)                             # whether or not array has a positive value less than 10
+	np.all(array > 0)                             # whether or not all values in array are between 0 (inclusive) and 10 (exclusive)
+	
+	# using boolean arrays for masking values in arrays
+	array[(array > 0) & (array < 10))]            # return array with positive values less than 10
 
-        array.reshape((3, 4))                         # return an array of changed size
-        array.resize((3, 4))                          # changes the array in-place
-        array.transpose()                             # return transpose of matrix
-        array.sum(axis = 0/1)                         # 0 - column-wise, 1 - row-wise
-        array.cumsum(axis = 0/1)                      # cumulative sum across column/row
-
-        np.unique(array)
-        np.exp(array)                                 # array or pandas Series
-        np.sqrt(array)
-        np.max(array, axis)
+    # universal functions (vectorized functions for arithmetic operations)
+	np.abs(array)                                 # or np.absolute(array)
+	np.negative(array)
+	
+	np.add(a, b)                                  # a and b could be scalar or ndarrays
+	np.subtract(a, b)
+	np.multiply(a, b)
+	np.divide(a, b)
+	np.floor_divide(a, b)
+	np.pow(a, b)
+	np.mod(a, b)
+	
+	np.exp(array)                                 # e ^ bases
+	np.power(bases, powers)                       # bases and powers could be scalar or ndarrays
+	np.log(array)                                 # natural log
+	
+	np.sin(array)
+	np.cos(array)
+	np.tan(array)
+	np.arcsin(array)
+	np.arccos(array)
+	np.arctan(array)
+	
+        np.sum(array, axis=None)                      # sums up all the elements of array if axis is None or of an arbitrary axis
+	np.cumsum(array, axis)                        # other aggregate functions: https://ibb.co/tqWnsR3
+	np.prod(array, axis)
+	np.cumprod(array, axis)
+	np.max(array, axis)
+	np.argmax(array, axis)
         np.min(array, axis)
-        np.mean(array)
-        np.median(array)
-        np.var(array)
-        np.std(array)
-        np.percentile(array, [10, 40, 90])            # similar to quartile() in R
+	np.argmin(array, axis)
+        np.mean(array, axis)
+        np.median(array, axis)
+        np.var(array, axis)
+        np.std(array, axis)
+	np.percentile(array, [10, 40, 90])            # similar to quartile() in R
         np.cov(x, y)
         np.corrcoef(x, y)                             # pearson correlation coefficient
+	np.unique(array, axis)
 
-        column_stack((a, b))                          # similar to cbind in R.
-        row_stack((a, b))                             # similar to rbind in R
-        vstack((a, b))                                # vertically stack array a and b.
-        hstack((a, b))                                # horizontally stack array a and b
-        concatenate((a, b), axis = )                  # concatenate array a and b
-
-        a = array([1, 2, 3, 4])
-        b = a                                         # not a copy. If "b" changes, "a" changes
-        c = a.copy()                                  # deep copy. If "c" changes, "a" remains unchanged
-
-        # indexing and slicing
-        array[start:end:jump, start:end:jump]         # for 2D array
-
-        # boolean operations
-        logical_and(array1, array2)                   # returns an array with boolean values
-        logical_or(array1, array2)
-        logical_not(array)
+	np.any(array)                                 # whether or not any value is True
+	np.all(array)                                 # whether or not all values are True
+	
+    # the random module
+        np.random.seed(4)                             # set seed for random number
+        np.random.rand()                              # create random number in [0.0,1.0)
+        np.random.randint(low, high, (5,3))           # create a 5x3 ndarray with random numbers in [low, high)
+        np.random.random((3, 4))                      # create 3x4 array with random numbers in [0.0,1.0)
+        np.random.choice([0,1,2], size, replace, p)   # generate random numbers of size from array with probability p
+        np.random.shuffle(array)                      # modify a sequence in-place by shuffling its contents
 
         # distributions - google numpy distribution functions
         np.random.normal(mean, std, size)
@@ -327,10 +475,14 @@
         np.random.poisson(n, size)
         np.random.exponential(tau, size)
 
-        # linear regression in numpy
-        slope, intercept = np.polyfit(x, y, 1)        # degree of polynomial is 1 to specify linear regression
+    # sort
+    	np.sort(array)                                # return sorted copy of array
+	np.argsort(array)                             # return indices of sorted array
+	
+    # linear regression in numpy
+    	slope, intercept = np.polyfit(x, y, 1)        # degree of polynomial is 1 to specify linear regression
 
-        # print options
+    # print options
         from numpy import set_printoptions
         set_printoptions(precision=3)
 
