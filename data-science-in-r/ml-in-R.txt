@@ -290,13 +290,21 @@
 
 
     # model assessment
+    	
+    	# plot model
+    	plot(linear.model)
+    	
+    	OR
+    	
+    	library(ggfortify)
+		autoplot(linear.model)
 
         # normality check
         qqnorm(variable)          # check whether all X and y that are used in modelling have normal distribution
         
         # check linearity between X and y, and independence, normality and homoscedasticity of residuals
             
-            # plot residuals against response; should look like a perfect random noise
+            # plot residuals against predictions; should look like a perfect random noise
             plot(residuals(model)); abline(0,0)
             
             # plot residuals against predictors
@@ -304,7 +312,12 @@
             boxplot(linear.model$residual ~ df$categorical_variable, xlab = "", ylab = "Residual")
 
 
-    	# outlier check
+    	# outlier check for both predictors and response using scatterplots
+    	
+    	# cook's distance and leverage points
+    	plot(linear.model, 4)
+    	plot(linear.model, 5)
+    	cooks.distance(linear.model)
 
 
 	# model evaluation
