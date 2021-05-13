@@ -1,0 +1,59 @@
+# SELECT: Selects columns.
+SELECT *
+FROM table_name;
+
+SELECT column_1, column_2
+FROM table_name;
+
+# AS: Create alias for columns in query result
+SELECT column_name AS column
+FROM table_name;
+
+# LIMIT: limit query results to top 10 rows
+SELECT *
+FROM table_name
+LIMIT 10;
+
+# DISTINCT: removes duplicates
+SELECT DISTINCT column
+FROM table_name;
+
+# WHERE: Filters rows of query result.
+SELECT column_name
+FROM table_name
+WHERE column_name = 0;
+
+WHERE column_name != 0;
+WHERE column_name > 0;
+WHERE column_name >= 0;
+WHERE column_name < 0;
+WHERE column_name <= 0;
+
+WHERE column_name IS NULL;
+WHERE column_name IS NOT NULL;
+
+WHERE column_name LIKE 'string pattern';
+
+WHERE condition_1 AND condition_2;
+WHERE condition_1 OR condition_2;
+
+WHERE column_name BETWEEN -10 AND 10;                  # [-10,10]
+WHERE column_name BETWEEN 'A%' AND 'D%';               # [A*, D*)
+
+# ORDER BY: Orders results.
+SELECT *
+FROM table_name
+ORDER BY column_name ASC;
+
+SELECT *
+FROM table_name
+ORDER BY column_name DESC;
+
+# CASE: Uually used inside SELECT to custom column result based on if-then logic while querying
+SELECT name,
+ CASE
+  WHEN imdb_rating > 8 THEN 'Fantastic'
+  WHEN imdb_rating > 6 THEN 'Poorly Received'
+  ELSE 'Avoid at All Costs'
+ END AS 'Review'
+FROM movies;

@@ -1,0 +1,28 @@
+# AGGREGATE FUNCTIONS: Used in SELECT statement.
+# COUNT(column_name): Count number of non-null values
+# SUM(column_name), MAX(column_name), MIN(column_name), AVG(column_name), ROUND(column_name, 2)
+
+# GROUP BY: Arrange identical data from a column into groups. Typically used before applying an aggregate function. Comes after WHERE and before ORDER BY and LIMIT
+SELECT price, COUNT(*) 
+FROM fake_apps
+GROUP BY price;
+
+SELECT ROUND(imdb_rating),
+   COUNT(name)
+FROM movies
+GROUP BY 1
+ORDER BY 1;
+
+SELECT category, 
+   price,
+   AVG(downloads)
+FROM fake_apps
+GROUP BY 1, 2;
+
+# HAVING: Filter groups. Equivalent to WHERE but for groups formed by GROUP BY. Comes after GROUP BY but before ORDER BY and LIMIT.
+SELECT year,
+   genre,
+   COUNT(name)
+FROM movies
+GROUP BY 1, 2
+HAVING COUNT(name) > 10;

@@ -1,0 +1,50 @@
+# JOIN: Cross product of two or more tables. Equivalent to CROSS JOIN.
+
+SELECT *
+FROM orders
+JOIN customers;
+
+SELECT *
+FROM orders
+CROSS JOIN customers;
+
+# ON: Filters the result of a JOIN. Performs inner join if used after JOIN. Performs left/right/outer join if used after LEFT/RIGHT/OUTER JOIN.
+
+SELECT *
+FROM orders
+JOIN customers
+  ON orders.customer_id = customers.customer_id;
+
+SELECT *
+FROM orders
+LEFT JOIN customers
+  ON orders.customer_id = customers.customer_id;
+
+SELECT *
+FROM orders
+RIGHT JOIN customers
+  ON orders.customer_id = customers.customer_id;
+
+SELECT *
+FROM orders
+FULL OUTER JOIN customers
+  ON orders.customer_id = customers.customer_id;
+
+# UNION: Stack two tables on top of each other. Tables must have same number of columns, and the order of data types of the oclumns must be the same in the tables.
+SELECT *
+FROM table1
+UNION
+SELECT *
+FROM table2;
+
+# WITH: Allows us to define one or more temporary tables that can be used in the final query.
+WITH previous_query AS (
+  SELECT customer_id,
+   COUNT(subscription_id) AS 'subscriptions'
+FROM orders
+GROUP BY customer_id)
+SELECT customers.customer_name, 
+previous_query.subscriptions
+FROM previous_query
+JOIN customers
+ON previous_query.customer_id = customers.customer_id;
