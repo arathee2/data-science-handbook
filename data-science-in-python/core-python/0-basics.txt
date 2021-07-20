@@ -1,0 +1,3 @@
+A program comprises of modules (i.e. files that end with .py).
+A module comprises of statements.
+A statement comprises of literals (5, 'abc', [1, 2, 3]), variables, objects, expressions, and keywords.

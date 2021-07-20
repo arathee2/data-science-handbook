@@ -1,0 +1,104 @@
+------------------------------------------------------------------------------
+Expressions
+------------------------------------------------------------------------------
+-x                         # negation
+x + y                      # addition
+x - y                      # addition
+x * y                      # addition
+x / y                      # addition
+
+x % y                      # modulus (returns remainder)
+x // y                     # floor division
+x ** y                     # raise x to power y
+
+x | y                      # bitwise OR
+x & y                      # bitwise AND
+x ^ y                      # bitwise XOR
+~x                         # bitwise NOT
+x << y                     # shift x left by y bits
+x >> y                     # shift x right by y bits
+
+x == y                     # check value equality
+x != y                     # check value inequality
+x < y                      # check if less than
+x <= y                     # check if less than or equals
+x > y                      # check if greater than
+x >= y                     # check if greater than or equals
+x == y < z                 # comparison chaining, equivalent to `x == y and y < z`
+
+x is y                     # check object equality (whether x and y both point to the same object in memory)
+x is not y                 # check object inequality
+
+x in y                     # check if x is in iterable or set y
+x not in y                 # check if x is not in iterable or set y
+
+x or y                     # logical OR (returns boolean)
+x and y                    # logical AND (returns boolean)
+not x                      # logical NOT (returns boolean)
+
+x[i]                       # indexing
+x[i:j:k]                   # slicing; goes from i (inclusive) to j (exclusive) in increments of k
+
+x(...)                     # call function, method, class or other callable
+x.attr                     # access attribute
+
+(...)                      # tuple, expression, generator expression
+[...]                      # list or list comprehension
+{...}                      # dictionary, set, dictionary comprehension or set comprehension
+
+x if y else z              # ternary selection
+
+lambda args: expression    # anonymous function
+
+yield x                    # generator function send protocol
+
+------------------------------------------------------------------------------
+Objects, Variables and Assignment
+------------------------------------------------------------------------------
+# OBJECTS
+- Objects are data that are stored in the memory.
+- Objects have a type. And they keep reference counts (number of variables pointing to them at a given time)
+- Examples: booleans, integers, floats, lists, dictionaries, classes, modules, etc. are all objects.
+
+# VARIABLES
+- Variables are names or "boxes" that refer (or point) to objects in memory. Similar to `void *` in C.
+- Variables DO NOT have a type.
+
+- Variable Creation: Happens when an object is assigned to a variable the first time using an assignment operator. Re-assigning a variable simply means the variable now points to the new object in memory.
+- Variable Use: Variables are replaced with the objects that they refer to when they are referenced in an expression. Need to assign variables at least once before referencing them.
+
+# ASSIGNMENT
+# shared reference illustration with immutable object (integers, strings, tuples)
+a = 3      # a points to the object 3 in memory. a --> 3
+b = a      # b points to the same object as a does; b --> 3; variable --> variable is not possible in Python
+a = a + 2  # a points to 5. 5 is a new object since 3 cannot be updated to 5 (integers are immutable)
+print(b)   # b still points to 3
+
+# shared reference illustration with immutable object (lists, dictionaries, sets)
+a = [1, 2, 3]  # a --> [1, 2, 3]
+b = a          # b --> [1, 2, 3] i.e. the same object as a
+a[0] = 10      # a --> [10, 2, 3] since lists are mutable
+print(b)       # b --> [10, 2, 3] still pointing to the same object as a
+
+# shallow vs deep copy
+import copy
+a = [1, 2, 3]         # a --> [1, 2, 3]
+b = [4, 5, a]         # b --> [4, 5, a]
+i = b                 # i --> [4, 5, a] i.e. refers to the same object as b
+j = copy.copy(b)      # j --> new [4, 5, a]; shallow copy (top-level copy) of b; changing a will change j; other ways: b.copy(), list(b) and only for lists, b[:]
+k = copy.deepcopy(b)  # k --> new [4, 5, new [1, 2, 3]]; deep copy (nested copy) of b; changing a has no effect on k
+
+# ASSIGNMENT OPERATORS
+x = y
+x += y
+x -= y
+x *= y
+x /= y
+x %= y
+x //= y
+x **= y
+x |= y
+x &= y
+x ^= y
+x <<= y
+x >>= y

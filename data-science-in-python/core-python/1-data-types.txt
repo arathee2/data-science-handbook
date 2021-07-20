@@ -1,0 +1,274 @@
+------------------------------------------------------------------------------
+1. Numbers: Immutable.
+------------------------------------------------------------------------------
+# integers
+3
+
+# floating-point (case insensitive, exponent sign is optional)
+3.14, 2.1e+32, 2.1e32, 2.1e-32, 4.32E2, 4.32E+2, 4.32E-2
+float(item)     # convert integer or string to a floating-point number
+
+# other bases: binary, octal and hexadecimal (case-insensitive)
+0b1111          # binary
+bin(number)     # return binary string representation of given integer
+0o11            # octal
+oct(number)     # return octal string representation of given integer
+0xab3           # hexadecimal
+hex(number)     # return hexadecimal string representation of given integer
+int(str, base)  # convert string representation of a number to given base
+
+# complex (case-insensitive)
+2+4j, -2J
+complex(3, 5)
+
+# decimal (fixed-precision unlike floating-point numbers)
+from decimal import Decimal
+Decimal(1) / Decimal(7)  # equivalent to Decimal('0.142857')
+
+# fractions: 1/3 * 3 will be 1, not 0.9999...
+from fractions import Fraction
+Fraction(2, -4)          # equivalent to Fraction(-1, 2)
+Fraction('0.25')         # equivalent to Fraction(1, 4)
+
+# type-specific functions and methods
+abs(num)
+pow(a, b)
+min(a, b)
+max(a, b)
+round(num[, precision])
+
+import math
+import random
+------------------------------------------------------------------------------
+2. Strings: Immutable. Ordered.
+------------------------------------------------------------------------------
+s = 'Hello'
+s = str(ab123)
+
+# indexing
+s[0]   # the first element of sequence
+s[-1]  # equivalent to s[len(s) - 1]
+
+# slicing (results in new object)
+s[i:j]    # results in a NEW sequence from index i upto but not including j; i < j
+s[i:j:k]  # k is the stride; defaults to 1; k could be negative in which case i > j
+s[i:]     # right bound defaults to len(s)
+s[:j]     # right bound defaults to 0
+s[:]      # equivalent to s[0:len(s)]
+s[-3:-1]  # slicing with negative bounds
+
+# generic methods
+len(s)
+s + 'abc'  # concatenates strings. '+' is an overloaded operator. equivalent to `s 'abc'`
+s * 3      # concatenates the string with itself three times
+
+# type specific methods
+s.find('l')          # returns offset of first occurrence of 'l' or -1 if not found
+s.replace('x', 'y')  # replace all 'x's with 'y's
+s.lower()
+s.upper()
+s.strip()            # removes whitespace from either sides of the string
+s.rstrip()           # removes whitespace from right side of the string
+s.lstrip()           # removes whitespace from left side of the string
+s.split(',')         # splits string into a list based on ','
+s.isalpha()          # returns Boolean if string contains all alphabets
+s.isdigit()          # returns Boolean if string contains all digits
+
+# strings are unicode by default
+s = 'hello'   # unicode string
+s = b'hello'  # byte string
+s = r'\new'   # does not recognize '\n' as special character
+
+# things specific to strings
+- escaping special characters
+- multiline quotes
+- chr() and ord()
+
+------------------------------------------------------------------------------
+3. Lists: Mutable. Ordered.
+------------------------------------------------------------------------------
+l = [1, 2, 3, 'hello', 'world']      # an array of pointer to objects
+l = list(1, 2, 3, 'hello', 'world')
+
+# indexing: similar to string slicing, in addition supports assignment because lists are mutable
+l[i] = 4               # index assignment
+
+# slicing: similar to string slicing, in addition supports assignment because lists are mutable
+l[i:j] = [4, 5, 6]     # slice assignment; performs replacement, insertion or deletion when size of LHS != size of RHS; refer examples on page 245 of Learning Python by Mark Lutz. Prefer list methods for such operations.
+
+# generic methods
+len(l)
+l + [4, 5]  # concatenates lists; results in a NEW list object; list.append() is similar but in-place.
+l * 3       # concatenates lists with itself three times
+
+# type-specific methods
+l.append(item)         # adds item to the end as single element. 
+l.extend(item)         # adds multiple elements to the end if item is a sequence.
+l.index(item)          # return index of item if present, else return -1
+l.count(item)          # return number of occurrences of item
+l.insert(index, item)  # adds item at the given index
+l.pop(index)           # returns and removes item present at index. index defaults to len(l)
+l.remove(item)         # removes item from the list
+del l[index]           # equivalent to l.pop(index)
+l.sort()
+l.reverse()
+
+# nested lists
+l = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+l[2][1][0]             # fetch third element's second element's first element.
+
+# list comprehension
+[x ** 2 for x in range(5)]
+[x ** 2 for x in range(5) if x % 2 == 0]
+[x ** y for x in range(5) for y in range(5)]
+
+------------------------------------------------------------------------------
+4. Dictionaries: Mutable. Unordered.
+------------------------------------------------------------------------------
+d = {'key1': 'value1', 'key2': 'value2'}               # keys have to be immutable objects
+d = dict(key1='value1', key2='value2')                 # keys are always strings in this case
+d = dict([('key1', 'value1'), ('key2', 'value2')])     
+d = dict(zip(['key1', 'key2'], ['value1', 'value2']))  # same as above
+
+# indexing and slicing not supported!
+
+# generic methods
+len(d)
+
+# type-specific methods
+x = d['key1']               # access key1's value. raise exception if key not present
+x = d.get('key1', other)    # access key2's value or assign other if key not present; other defaults to None
+d['key1'] = y               # replace key1's value or create a new key-value pair if key not present
+d.update(other_d)           # merges key-value pairs from other_d to to d; replaces values in case of key clash
+d.pop('key1')               # removes 'key1':'value1' pair from dictionary and returns 'value1'
+d.keys()                    # returns a (set-like) collection of keys; gets updated with dictionary dynamically
+d.values()                  # returns a collection of keys; gets updated with dictionary dynamically
+d.items()                   # returns a collection of (key, value) tuple; gets updated with dictionary dynamically
+'key1' in d                 # boolean expression
+
+# nested dictionaries
+d = {'name': {'first': 'Bob', 'last': 'Smith'},
+	 'jobs': ['dev', 'mgr'],
+	 'age': 40.5}
+d['name']['first']
+d['jobs'][1]
+
+# dictionary comprehension
+{x: x ** 2 for x in range(5)}
+
+------------------------------------------------------------------------------
+5. Sets: Mutable. Unordered. Can only store immutable types.
+------------------------------------------------------------------------------
+A = {1, 2, 3}
+B = set(3, 4, 4)
+
+# indexing and slicing not supported!
+
+# generic methods
+len(s)
+
+# type-specific method
+A.add(item)     # insert item
+A.remove(item)  # merge: in-place union
+A.update(B)     # remove item
+A & B           # or A.intersection(B); methods allow any iterable, set notation does not
+A | B           # or A.union(B); methods allow any iterable, set notation does not
+A - B           # or A.difference(B); methods allow any iterable, set notation does not
+A ^ B           # or S.symmetric_difference(B); Union - Intersection i.e. (A | B) - (A & B)
+A > B           # or A.issuperset(B); A < B is subset check; >= and <= checks also possible
+
+# nested sets
+A = set([1, 2, [3, 4, 5]], 6)
+
+# set comprehension
+{x ** 2 for x in range(5)}
+
+------------------------------------------------------------------------------
+6. Tuples: Immutable. Ordered.
+------------------------------------------------------------------------------
+t = (0,)            # one-item tuple
+t = (1, 2, 3)
+t = 1, 2, 3
+t = tuple(1, 2, 3)
+
+# indexing: same as lists
+
+# slicing: same as lists
+
+# generic methods
+len(t)
+t + (4, 5)  # concatenates tuples
+t * 3       # concatenates tuple with itself three times
+
+# type-specific methods
+t.count()      # return total number of elements
+t.index(item)  # return index of item
+
+# nested tuples
+t = (1, [2, 3])
+t[1].append(4)  # t[1] is a list
+
+# namedtuple: hybrid of tuple and dictionary
+from collections import namedtuple
+Record = namedtuple('Rec', ['name', 'age', 'jobs'])  # need to initialize
+bob = Record('Bob', age=40.5, jobs=['dev', 'mgr'])   # create a single tuple
+print(bob[0], bob[2])
+print(bob.name, bob.jobs)                            # same as above
+
+------------------------------------------------------------------------------
+7. File Objects
+------------------------------------------------------------------------------
+# open
+fileobj = open(filepath, mode='rb')  # mode could be 'r' for read (default), 'w' for write, '+' for read and write, 'a' for append, b'for binary and so on.
+
+# read
+string = fileobj.read()              # read entire file as single string
+string = fileobj.read(N)             # read upto N characters as a single string
+lines = fileobj.readlines()          # read a list of line strings
+
+# write
+fileobj.write(string)                # write a string into file
+fileobj.write(lines)                 # write all line strings into file
+
+# flush and close: these methods force changes from memory to disk
+fileobj.flush()                      # flush output buffer to disk without closing file
+fileobj.close()                      # close file
+
+# file iterator
+for line in fileobj: print(line)
+
+# pickle
+import pickle
+pickle.dump(data, fileobj)            # saves data (Python object) to disk; ensure fileobj is read in 'wb' mode
+data = pickle.lead(fileobj)           # loads data back as Python object
+
+# other data formats: JSON, CSV, and XML
+
+------------------------------------------------------------------------------
+8. Other Types: Booleans and None.
+------------------------------------------------------------------------------
+False         # acts as 0; the number zero is False; empty data structures are False
+True          # acts as 1; non-zero numbers are True; non-empty data structures are True
+bool(0)       # evaluates to False
+bool(1)       # evaluates to True
+bool([])      # evaluates to False
+bool([0])     # evaluates to True
+bool('')      # evaluates to False
+bool('0')     # evaluates to True
+bool({})      # evaluates to False
+bool({0: 0})  # evaluates to True
+
+None          # evaluates to False
+
+------------------------------------------------------------------------------
+Type Checking
+------------------------------------------------------------------------------
+type(object)              # return type of object
+isinstance(object, list)  # return True if object is of type list
+type(object) == list      # same as above
+
+------------------------------------------------------------------------------
+Help and Documentation
+------------------------------------------------------------------------------
+dir(object/type)   # returns a list of attributes that belong to the object.
+help(object/type)  # returns PyDoc for the object or atribute.
