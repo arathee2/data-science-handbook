@@ -32,10 +32,6 @@ x is not y                 # check object inequality
 x in y                     # check if x is in iterable or set y
 x not in y                 # check if x is not in iterable or set y
 
-x or y                     # logical OR (returns boolean)
-x and y                    # logical AND (returns boolean)
-not x                      # logical NOT (returns boolean)
-
 x[i]                       # indexing
 x[i:j:k]                   # slicing; goes from i (inclusive) to j (exclusive) in increments of k
 
@@ -52,8 +48,13 @@ lambda args: expression    # anonymous function
 
 yield x                    # generator function send protocol
 
+# logical expressions: return object instead of boolean; each object corresponds to a boolean
+x or y                     # logical OR (returns the first object from left that determines the result or the last object if result is not determined i.e. nothing evaluates to True)
+x and y                    # logical AND (returns the first object from left that determines the result or the last object if result is not determined i.e. nothing evaluates to False)
+not x                      # logical NOT (returns the NOT of boolean that corresponds to object x)
+
 ------------------------------------------------------------------------------
-Objects, Variables and Assignment
+Objects and Variables
 ------------------------------------------------------------------------------
 # OBJECTS
 - Objects are data that are stored in the memory.
@@ -67,7 +68,9 @@ Objects, Variables and Assignment
 - Variable Creation: Happens when an object is assigned to a variable the first time using an assignment operator. Re-assigning a variable simply means the variable now points to the new object in memory.
 - Variable Use: Variables are replaced with the objects that they refer to when they are referenced in an expression. Need to assign variables at least once before referencing them.
 
-# ASSIGNMENT
+------------------------------------------------------------------------------
+Assignment
+------------------------------------------------------------------------------
 # shared reference illustration with immutable object (integers, strings, tuples)
 a = 3      # a points to the object 3 in memory. a --> 3
 b = a      # b points to the same object as a does; b --> 3; variable --> variable is not possible in Python

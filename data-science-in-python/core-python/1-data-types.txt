@@ -117,7 +117,7 @@ l.reverse()
 l = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 l[2][1][0]             # fetch third element's second element's first element.
 
-# list comprehension
+# list comprehension: always results in a new list object
 [x ** 2 for x in range(5)]
 [x ** 2 for x in range(5) if x % 2 == 0]
 [x ** y for x in range(5) for y in range(5)]
@@ -247,7 +247,8 @@ data = pickle.lead(fileobj)           # loads data back as Python object
 ------------------------------------------------------------------------------
 8. Other Types: Booleans and None.
 ------------------------------------------------------------------------------
-False         # acts as 0; the number zero is False; empty data structures are False
+# each Python object is inherently True or False
+False         # acts as 0; the number zero is False; empty data structures and None are False
 True          # acts as 1; non-zero numbers are True; non-empty data structures are True
 bool(0)       # evaluates to False
 bool(1)       # evaluates to True
@@ -270,5 +271,12 @@ type(object) == list      # same as above
 ------------------------------------------------------------------------------
 Help and Documentation
 ------------------------------------------------------------------------------
-dir(object/type)   # returns a list of attributes that belong to the object.
-help(object/type)  # returns PyDoc for the object or atribute.
+# help - reading documentation
+dir(module/class/function/object/type)   # returns a list of attributes that belong to the object.
+help(module/class/function/object/type)  # returns PyDoc that is also accessible through object.__doc__
+python -m pydoc -b                       # open PyDoc documentation in browser
+
+# documentation tools - writing documentation
+single line comments                     # 
+docstrings                               # These show up in PyDoc
+

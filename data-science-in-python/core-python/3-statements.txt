@@ -2,7 +2,32 @@
 Assignment
 ------------------------------------------------------------------------------
 # simple assignment: creates a reference
-a = 3  # creates reference to the object 3
+a = 2  # creates reference to the object 2
+
+# sequence assignment: number of items ion both sides of '=' must be the same
+a, b = 2, 3            # tuple assignment; a=2; b=3
+a, b, c, d = 'spam'    # tuple assignment; a='s'; b='p'; c='a'; d='m'
+[a, b] = 2, 3          # list assignment; a=2; b=3
+
+# sequence unpacking: when number of items on either side of '=' mismatch
+a, b = 2               # error! too many values to unpack
+a, *b = 2, 3, 4, 5     # a=2; b=[3, 4, 5]; variable with * are always assigned a list
+*a, b = 2, 3, 4, 5     # a=[2, 3, 4]; b = 5
+a, *b, c = 'spam'      # a='s'; b=['p', 'a']; c='m'
+*a, b = 3              # a=[]; b=3
+*a = 3                 # error! only star variable present
+*a, *b, c = 'spamham'  # error! multiple stars
+
+# nested sequence
+((a, b), c) = ('sp', 'am')  # a='s'; b = 'p'; c='am'
+
+# multi-target assignment
+a = b = c = 2          # equivalent to c=2; b=c; a=b
+
+# augmented assignment: better optimized than full assignments
+a += 2
+l = [1, 2]
+l += 3                 # mapped to l.extend([3])
 
 ------------------------------------------------------------------------------
 Function Calls
@@ -13,33 +38,163 @@ log.write("message")
 ------------------------------------------------------------------------------
 Printing
 ------------------------------------------------------------------------------
-# print function
+# print function signature
+print([object, ...][, sep=' '][, end='\n'][, file=sys.stdout][, flush=False])
+
+# print redirection examples
+print(3, file=sys.stderr)             # file could be anything with a .write(str) method
+print(3, file=open('abc.txt', 'w'))   # prints to the file in addition to sys.stdout
+
+# using sys.stdout: print()'s backend calls sys.stdout.write() method
+import sys
+x = 3
+sys.stdout.write(str(x))              # same as print(3); needs explicit conversion to str unlike print()
+
+# alternative way for print redirection
+sys.stdout = open('abc.txt', 'a')     # sys.stdout can be anything with a .write(str) method
+print(x)                              # shows up in 'abc.txt'
+
+------------------------------------------------------------------------------
+Multi-line Statements
+------------------------------------------------------------------------------
+# use brackets to span lines on multiple lines
+a = [1,
+	 2,
+	 3]        # works for lists and list comprehensions
+
+b = (1,
+	 2,
+	 3)        # works for tuples, generator expressions, expressions and function arguments
+
+c = {1,
+	 2,
+	 3}        # works for dictionaries, sets and their comprehensions
+
+# outdated
+a = 1 + 2 + \  # ensure no space after \
+	3 + 4
+
+# special case for multi-line strings
+a = ('hello'
+	 'world')  # no explicit presence of '+' means string concatenation
+
+b = """
+	this is a multiline string
+	"""
 
 ------------------------------------------------------------------------------
 Conditionals
 ------------------------------------------------------------------------------
-# if/elif/else
+# if statement
+if expression:
+	# code
+elif expression:
+	# code
+else:
+	# code
 
-------------------------------------------------------------------------------
-For Loop
-------------------------------------------------------------------------------
-# for/else
-
+# ternary expression
+Y if X else Z
 
 ------------------------------------------------------------------------------
 While Loop
 ------------------------------------------------------------------------------
-# while/else
+while condition:          # condition evaluates to True or False
+	# code
+else:                     # optional else
+	# code                # run if loop if exited normally i.e. without encountering break
+                          # also runs if while loop never ran (because did not run break in this case)
 
+while test:
+	if condition:
+		# code
+		break
+else:                     # runs if break was not encountered i.e. condition was never met
+	# code
+
+------------------------------------------------------------------------------
+For Loop
+------------------------------------------------------------------------------
+for target in iterable:
+	# code
+else:
+	# code                # runs if for did not encounter a break statement
+
+
+for x in range(len(iterable)):
+	# code
+
+for (a, *b) in iterable:
+	# code
+
+for (index, item) in enumerate(iterable):
+	 # code
+
+for (itemA, itemB) in zip(listA, listB):
+	# code
 
 ------------------------------------------------------------------------------
 Break, Continue and Pass
 ------------------------------------------------------------------------------
 # pass
+def f():
+	pass       # an empty placeholder, does nothing
 
 # break
+while condition:
+	break      # exits the innermost enclosing loop
 
 # continue
+while condition:
+	continue   # goes to the header of innermost enclosing loop
+
+# ellipses
+x = ...        # acts as None
+def f():
+	...        # acts as pass
+
+------------------------------------------------------------------------------
+Iterators
+------------------------------------------------------------------------------
+# iterable: an object with __iter__() method that returns an iterator
+# iterator: an object with __next__() method and that raises StopIteration exception
+
+x = [1, 2, 3]
+I = iter(x)               # iter(x) is equivalent to x.__iter__()
+next(I)                   # same as iterator.__next__(); returns 1
+next(I)                   # returns 2
+next(I)                   # returns 3
+next(I)                   # raises the StopIteration exception
+
+x = {'a': 0, 'b': 1}
+I = iter(x)               # returns keys one at a time
+
+x = (1, 2, 3)
+I = iter(x)
+
+x = 'spam'
+I = iter(x)
+
+x = range(3)
+I = iter(x)               # use next(I) to get items one by one or use list(x) to get all items at once
+
+x = enumerate([7, 8, 9])
+I = iter(x)               # returns a tuple (index, item) on each next(I) call
+
+x = zip(listA, listB)     # zip, map and filter do NOT support multiple iterators
+I = iter(x)               # returns a tuple one at a time on each next(I) call
+
+# for loop and iterators
+The for loop uses the iteration protocol to step through items in the iterable 
+object across which it is iterating. It first fetches an iterator from the 
+iterable by passing the object to iter(), and then calls this iterator object’s 
+__next__() method on each iteration and catches the StopIteration exception to 
+determine when to stop looping. For some objects that are their own iterator, 
+the initial iter call is extraneous but harmless.
+
+# file iterator: file objects have in-built iterator i.e. in-built __next__() method
+for line in open(filename, mode):  # calls file objects __next__() method
+	print(line)
 
 ------------------------------------------------------------------------------
 Miscellaneous

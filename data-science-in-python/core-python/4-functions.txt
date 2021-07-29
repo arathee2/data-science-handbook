@@ -1,0 +1,123 @@
+------------------------------------------------------------------------------
+Basics
+------------------------------------------------------------------------------
+# syntax
+def fname(arguments):  # fname points to a function object after def is executed
+	# code
+	return object      # return statemenet is optional; yield is alternative
+
+- `def` is executed when the module containing it is imported or the script is run. It creates a function object. The function name points to the function object.
+- `return` is optional. You could either have no return statement or return followed by nothing (None is returned in both cases).
+- Arguments are passed by reference. Therefore mutable objects will be effected by the code inside the function.
+
+# alternative names
+def func(): ...        # func --> function object
+othername = func       # othername --> function object
+othername()            # call function object with the other name
+func()                 # call function object with the original name
+
+# function attributes
+def func(): ...
+func.attr = value
+
+# nested functions: avoid them
+def maker(N):
+	def action(X):     # creates a function object
+		return X ** N
+	return action
+func = maker(2)        # func --> action function object; on the contrary `func = maker` means func --> maker function object
+func(5)                # returns 5 ** 2
+
+------------------------------------------------------------------------------
+Scope
+------------------------------------------------------------------------------
+Local variable: a variable that is assigned a value inside a function.
+Nonlocal variable: a variable that is assigned a value in the enclosing function.
+Global variable: a variable that is assigned at a module level or imported from other module.
+
+Assignment refers to = statements, function arguments, imports, and function definitions.
+Also keep in mind references, a name might be local but it could be pointing to a global object.
+
+# LNGB rule for variable reference and assignment
+Variable lookup order in a function is: local --> nonlocal --> global --> builtins
+
+# Comprehension statements always localize their variables.
+
+# While and for loops do not localize their variables. You can use them after the loops.
+
+# Variables in try-except such as except E as X are local to except.
+
+# global
+X = 88              # global X
+def func():
+	global X        # refers and changes global X; searches global and then builtins; don't have to pre-exist
+	X = 99          # global X: outside def
+func()
+print(X)            # prints 99
+
+# nonlocal
+def a():
+	x = 3
+	def b():
+		nonlocal x   # refers and changes x from enclosing scope; searches enclosing scopes only inner to outer (skipping its own scope, global and builtins); have to pre-exist in enclosing scope
+		x += 1       # allowed to change it if nonlocal
+	return nested
+
+------------------------------------------------------------------------------
+Arguments
+------------------------------------------------------------------------------
+# arguments are always passed by assignment.
+def f(a, b): ...
+f(3, 4)           # a --> 3, b --> 4
+
+# positional arguments: the default, matched from left to right
+def func(name): ...
+func(value)
+
+# keyword arguments: matched by argument name, not position
+def func(name)
+func(name=value)              # not to be confused with default argument which takes place in function header
+
+# default arguments           # beware of mutable defaults, they retain their state across function calls
+def func(name=value): ...     # not to be confused with keyword argument which takes place in function call
+
+# variable argument collection
+def func(*args): ...          # *args collects remaining unmatched positional arguments
+func(1, 2, 3)                 # args = (1, 2, 3)
+
+def func(**kwargs): ...       # **kwargs collects remaining unmatched keyword arguments
+func(a=1, b=2, c=3)           # kwargs = {'a'=1, 'b'=2, 'c'=3}
+
+# variable argument unpacking
+def func(a, b): ...
+func(*[1, 2])                 # unpack the list (or any iterable), equivalent to func(a=1, b=2)
+
+def func(a, b): ...
+func(**{'a'=1, 'b'=2})        # unpack the dictionary, equivalent to func(a=1, b=2)
+
+# argument syntax ordering rules
+function header: positional, default, *args, keyword only, **args
+function call: positional, keyword, *args, **args
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
