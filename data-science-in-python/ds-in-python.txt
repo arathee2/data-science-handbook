@@ -836,6 +836,7 @@
         plt.style.use("ggplot")                        # run plt.style.available to check avialble plots
         
     	# figure size
+	plt.rcParams["figure.figsize"] = (20,10)       # change it before plotting
         plt.figure(figsize=(width, height))            # change it before plotting
         
         # labels
